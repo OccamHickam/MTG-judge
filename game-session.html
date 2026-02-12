@@ -3,230 +3,386 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xyneth - Game Session</title>
+    <title>Xyneth - Listening</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: linear-gradient(135deg, #0a0f1a 0%, #1a1f2e 100%);
             color: #e2e8f0;
             min-height: 100vh;
-            padding: 20px;
+            overflow: hidden;
+            position: relative;
         }
-        .container { max-width: 900px; margin: 0 auto; }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            border-bottom: 2px solid #334155;
-            margin-bottom: 30px;
-        }
-        .back-link {
-            color: #14b8a6;
-            text-decoration: none;
-            font-size: 1.1rem;
-        }
-        .back-link:hover { text-decoration: underline; }
-        .session-status {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .status-indicator {
-            width: 12px;
-            height: 12px;
+        
+        /* Ambient listening indicator - subtle pulsing dot */
+        .ambient-indicator {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: #64748b;
+            background: #14b8a6;
+            opacity: 0.3;
+            animation: ambientPulse 3s infinite;
         }
-        .status-indicator.active {
-            background: #22c55e;
-            box-shadow: 0 0 10px #22c55e;
+        @keyframes ambientPulse {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
         }
-        .status-indicator.recording {
-            background: #ef4444;
-            animation: pulse 1s infinite;
+        
+        /* Back link - minimal */
+        .back-link {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.9rem;
+            opacity: 0.5;
+            transition: opacity 0.3s;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        .main-controls {
+        .back-link:hover { opacity: 1; color: #14b8a6; }
+        
+        /* Xyneth character - hidden by default */
+        .xyneth-container {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(200px);
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
             text-align: center;
-            padding: 40px;
-            background: #1e293b;
-            border-radius: 16px;
-            border: 1px solid #334155;
-            margin-bottom: 30px;
+            pointer-events: none;
         }
-        .mic-button {
-            width: 120px;
-            height: 120px;
+        .xyneth-container.active {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        /* Xyneth avatar */
+        .xyneth-avatar {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             background: linear-gradient(135deg, #14b8a6, #2dd4bf);
-            border: none;
-            cursor: pointer;
-            font-size: 3rem;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
-        }
-        .mic-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(20, 184, 166, 0.5);
-        }
-        .mic-button.recording {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            animation: pulse 1.5s infinite;
-        }
-        .transcript-box {
-            background: #0f172a;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 30px;
-            min-height: 200px;
-            border: 1px solid #334155;
-        }
-        .transcript-box h3 {
-            color: #14b8a6;
-            margin-bottom: 15px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 20px;
+            box-shadow: 0 0 40px rgba(20, 184, 166, 0.4);
+            animation: avatarFloat 3s ease-in-out infinite;
         }
-        .transcript-content {
+        @keyframes avatarFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* Speech bubble */
+        .speech-bubble {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 25px 30px;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid #1e293b;
+        }
+        .speech-bubble h3 {
+            color: #14b8a6;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .speech-bubble p {
             color: #94a3b8;
             line-height: 1.6;
-            white-space: pre-wrap;
+            font-size: 1rem;
         }
-        .transcript-content .timestamp {
+        .speech-bubble .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
             color: #64748b;
-            font-size: 0.85rem;
-            margin-right: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0;
         }
-        .insights-panel {
-            background: #1e293b;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
+        .speech-bubble .close-btn:hover { color: #e2e8f0; }
+        
+        /* Transcript history - hidden off-screen */
+        .transcript-drawer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid #334155;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+        .transcript-drawer.open {
+            transform: translateY(0);
+        }
+        .transcript-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(30, 41, 59, 0.8);
             border: 1px solid #334155;
+            color: #64748b;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-        .insights-panel h3 {
+        .transcript-toggle.visible {
+            opacity: 1;
+        }
+        .transcript-toggle:hover {
             color: #14b8a6;
+            border-color: #14b8a6;
+        }
+        .transcript-content {
+            padding: 20px 30px;
+        }
+        .transcript-item {
             margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #334155;
         }
-        .insight-card {
-            background: #0f172a;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 3px solid #14b8a6;
+        .transcript-item:last-child {
+            border-bottom: none;
         }
-        .insight-card h4 {
-            color: #e2e8f0;
+        .transcript-time {
+            color: #64748b;
+            font-size: 0.8rem;
             margin-bottom: 5px;
         }
-        .insight-card p {
-            color: #94a3b8;
-            font-size: 0.95rem;
+        .transcript-text {
+            color: #e2e8f0;
         }
-        button {
-            background: linear-gradient(90deg, #14b8a6, #2dd4bf);
-            color: #0f172a;
+        .transcript-text.question {
+            color: #14b8a6;
+        }
+        
+        /* End session button - hidden until needed */
+        .end-session {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(220, 38, 38, 0.8);
             border: none;
-            padding: 14px 28px;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: bold;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
+        .end-session.visible {
+            opacity: 1;
         }
-        .hidden { display: none !important; }
+        
+        /* Coach screen */
+        .coach-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            transform: translateY(100%);
+            transition: transform 0.5s;
+            overflow-y: auto;
+            padding: 40px;
+            z-index: 100;
+        }
+        .coach-screen.active {
+            transform: translateY(0);
+        }
+        .coach-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .coach-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .coach-header h2 {
+            color: #14b8a6;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .coach-header p {
+            color: #64748b;
+        }
+        .session-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #334155;
+        }
+        .stat-value {
+            font-size: 2rem;
+            color: #14b8a6;
+            font-weight: bold;
+        }
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        .coach-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+        .coach-actions button {
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .btn-secondary {
+            background: #334155 !important;
+            color: #e2e8f0 !important;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <a href="index.html" class="back-link">← Back to Home</a>
-            <div class="session-status">
-                <span id="status-text">Ready to start</span>
-                <div id="status-light" class="status-indicator"></div>
-            </div>
-        </header>
-
-        <!-- Listening Screen (starts immediately) -->
-        <div id="session-section">
-            <div class="main-controls">
-                <button id="mic-btn" class="mic-button" onclick="toggleListening()">🎤</button>
-                <p style="margin-top: 20px; color: #94a3b8;">Tap to start/stop listening</p>
-                <p style="margin-top: 10px; font-size: 0.9rem; color: #64748b;">Xyneth will transcribe game actions and offer insights</p>
-            </div>
-
-            <div class="transcript-box">
-                <h3>
-                    📝 Game Transcript
-                    <button onclick="clearTranscript()" style="padding: 6px 12px; font-size: 0.8rem;">Clear</button>
-                </h3>
-                <div id="transcript" class="transcript-content">
-                    <span style="color: #64748b;">Game transcript will appear here...</span>
-                </div>
-            </div>
-
-            <div class="insights-panel">
-                <h3>💡 Xyneth's Insights</h3>
-                <div id="insights">
-                    <div class="insight-card">
-                        <h4>Waiting for game to start...</h4>
-                        <p>Start the microphone and begin playing. Xyneth will listen for rules questions and strategic moments.</p>
-                    </div>
-                </div>
-            </div>
-
-            <button onclick="endSession()" style="width: 100%; margin-top: 20px; background: linear-gradient(90deg, #dc2626, #ef4444);">End Session</button>
+    <!-- Ambient indicator -->
+    <div class="ambient-indicator" title="Xyneth is listening"></div>
+    
+    <!-- Back link -->
+    <a href="index.html" class="back-link">← Back</a>
+    
+    <!-- Xyneth character - appears when needed -->
+    <div class="xyneth-container" id="xyneth">
+        <div class="xyneth-avatar">🎙️</div>
+        <div class="speech-bubble">
+            <button class="close-btn" onclick="dismissXyneth()">×</button>
+            <h3 id="xyneth-title">Xyneth</h3>
+            <p id="xyneth-message">Listening...</p>
         </div>
-
-        <!-- Coach Screen (shown after session ends) -->
-        <div id="coach-section" class="hidden">
-            <div class="main-controls" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
-                <h2 style="color: #14b8a6; margin-bottom: 20px;">🧠 Session Analysis</h2>
-                <p style="color: #94a3b8; margin-bottom: 30px;">Review your game and get strategic insights</p>
+    </div>
+    
+    <!-- Transcript toggle -->
+    <button class="transcript-toggle" id="transcriptBtn" onclick="toggleTranscript()">📝 History</button>
+    
+    <!-- Transcript drawer -->
+    <div class="transcript-drawer" id="transcriptDrawer">
+        <div class="transcript-content" id="transcriptContent">
+            <p style="color: #64748b; text-align: center;">No questions asked yet...</p>
+        </div>
+    </div>
+    
+    <!-- End session -->
+    <button class="end-session" id="endBtn" onclick="endSession()">End Session</button>
+    
+    <!-- Coach screen -->
+    <div class="coach-screen" id="coachScreen">
+        <div class="coach-content">
+            <div class="coach-header">
+                <h2>🧠 Session Analysis</h2>
+                <p>Review your game and insights</p>
             </div>
-
-            <div class="transcript-box">
-                <h3>📝 Game Transcript</h3>
-                <div id="full-transcript" class="transcript-content">
-                    <span style="color: #64748b;">No transcript recorded...</span>
+            
+            <div class="session-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-questions">0</div>
+                    <div class="stat-label">Questions Asked</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-duration">0:00</div>
+                    <div class="stat-label">Duration</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-rules">0</div>
+                    <div class="stat-label">Rules Clarified</div>
                 </div>
             </div>
-
-            <div class="insights-panel">
-                <h3>💡 Coaching Notes</h3>
-                <div id="coaching-notes">
-                    <div class="insight-card">
-                        <h4>🎯 Key Moments</h4>
-                        <p>Review the transcript above for rules questions and strategic decisions.</p>
-                    </div>
+            
+            <div class="transcript-box" style="background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155;">
+                <h3 style="color: #14b8a6; margin-bottom: 15px;">📝 Full Transcript</h3>
+                <div id="coach-transcript" style="color: #94a3b8; line-height: 1.6;">
+                    <p>No transcript recorded.</p>
                 </div>
             </div>
-
-            <div style="display: flex; gap: 15px; margin-top: 20px;">
-                <button onclick="window.location.href='index.html'" style="flex: 1; background: #334155;">← Back to Home</button>
-                <button onclick="location.reload()" style="flex: 1;">🎮 New Session</button>
+            
+            <div class="coach-actions">
+                <button class="btn-secondary" onclick="window.location.href='index.html'">← Back to Home</button>
+                <button onclick="location.reload()">🎮 New Session</button>
             </div>
         </div>
     </div>
 
     <script>
         let recognition = null;
-        let isListening = false;
+        let isListening = true;
         let sessionData = {
             transcript: [],
-            startTime: new Date().toISOString()
+            questions: [],
+            startTime: new Date(),
+            rulesClarified: 0
+        };
+        let xynethVisible = false;
+        let dismissTimeout = null;
+
+        // Question patterns to detect disputes
+        const questionPatterns = [
+            /can i/i, /can you/i, /can we/i, /can they/i,
+            /does/i, /do /i, /is /i, /are /i, /will /i,
+            /how does/i, /how do/i, /what happens/i, /what if/i,
+            /wait/i, /hold on/i, /actually/i, /doesn't/i,
+            /target/i, /respond/i, /trigger/i, /stack/i,
+            /hexproof/i, /flying/i, /trample/i, /indestructible/i,
+            /commander/i, /combat/i, /attack/i, /block/i
+        ];
+
+        // Rules database
+        const rules = {
+            'hexproof': 'Hexproof means this permanent can\'t be targeted by spells or abilities your opponents control. But it can still be affected by board wipes, sacrifice effects, or spells that don\'t target.',
+            'trample': 'Trample lets excess combat damage spill over to the defending player. If a 5/5 with trample is blocked by a 2/2, 2 damage kills the blocker and 3 hits the player.',
+            'flying': 'Flying creatures can only be blocked by other creatures with flying or reach. Ground creatures can\'t block them.',
+            'indestructible': 'Indestructible means damage and "destroy" effects don\'t kill it. But it can still be exiled, sacrificed, or have its toughness reduced to 0.',
+            'commander tax': 'Each time you cast your commander from the command zone after the first, it costs 2 more generic mana. This tax accumulates.',
+            'commander damage': 'If a single commander deals 21 or more combat damage to you over the course of the game, you lose. Track this separately for each commander.',
+            'priority': 'The active player gets priority first. When they pass, the non-active player can respond. Most actions use the stack.',
+            'the stack': 'Spells and abilities wait on the stack to resolve. Last one cast resolves first (LIFO). Players can respond before each resolution.',
+            'target': 'To target, you must choose a legal target when casting. Hexproof and shroud prevent targeting. Once a spell is cast, removing the target counters the spell.',
+            'trigger': 'Triggers go on the stack when their condition is met. In multiplayer, APNAP order applies: Active Player, then Non-Active Players in turn order.',
+            'combat': 'Combat has steps: Beginning, Declare Attackers, Declare Blockers, Combat Damage, End. Players get priority in each step.',
+            'respond': 'You can only respond when you have priority, typically after something is cast or activated. Instants and abilities can respond at instant speed.'
         };
 
+        // Initialize speech recognition
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
@@ -237,154 +393,150 @@
             recognition.onresult = (event) => {
                 const results = event.results;
                 const lastResult = results[results.length - 1];
+                const transcript = lastResult[0].transcript;
                 
                 if (lastResult.isFinal) {
-                    const transcript = lastResult[0].transcript;
-                    addToTranscript(transcript);
-                    analyzeTranscript(transcript);
+                    processTranscript(transcript);
                 }
             };
 
             recognition.onerror = (event) => {
-                console.error('Speech recognition error:', event.error);
                 if (event.error === 'no-speech') return;
-                stopListening();
+                console.error('Error:', event.error);
+                setTimeout(() => { if (isListening) recognition.start(); }, 1000);
             };
 
             recognition.onend = () => {
-                if (isListening) {
-                    recognition.start();
-                }
+                if (isListening) recognition.start();
             };
-        } else {
-            alert('Speech recognition not supported in this browser. Try Chrome or Edge.');
-        }
 
-        function toggleListening() {
-            if (!recognition) {
-                alert('Speech recognition not available');
-                return;
-            }
-
-            if (isListening) {
-                stopListening();
-            } else {
-                startListening();
-            }
-        }
-
-        function startListening() {
-            isListening = true;
+            // Auto-start
             recognition.start();
-            document.getElementById('mic-btn').classList.add('recording');
-            updateStatus('🔴 Recording - Listening to game', 'recording');
+            
+            // Show controls after delay
+            setTimeout(() => {
+                document.getElementById('transcriptBtn').classList.add('visible');
+                document.getElementById('endBtn').classList.add('visible');
+            }, 2000);
+        } else {
+            alert('Speech recognition not supported. Use Chrome or Edge.');
         }
 
-        function stopListening() {
-            isListening = false;
-            if (recognition) recognition.stop();
-            document.getElementById('mic-btn').classList.remove('recording');
-            updateStatus('Session active - Tap mic to listen', 'active');
-        }
-
-        function updateStatus(text, state) {
-            document.getElementById('status-text').textContent = text;
-            const light = document.getElementById('status-light');
-            light.className = 'status-indicator ' + state;
-        }
-
-        function addToTranscript(text) {
+        function processTranscript(text) {
             const timestamp = new Date().toLocaleTimeString();
-            const entry = { time: timestamp, text: text };
+            const entry = { time: timestamp, text: text, isQuestion: false };
+            
+            // Check if it's a question
+            const isQuestion = questionPatterns.some(pattern => pattern.test(text));
+            
+            if (isQuestion) {
+                entry.isQuestion = true;
+                sessionData.questions.push(entry);
+                
+                // Find relevant rule
+                let answer = findAnswer(text);
+                if (answer) {
+                    sessionData.rulesClarified++;
+                    showXyneth(answer.title, answer.text);
+                } else {
+                    showXyneth('I Heard You', `You asked about "${text}". In Phase 2, I'll have detailed answers for this.`);
+                }
+            }
+            
             sessionData.transcript.push(entry);
-            
-            const container = document.getElementById('transcript');
-            if (container.innerHTML.includes('Game transcript will appear')) {
-                container.innerHTML = '';
-            }
-            
-            container.innerHTML += `<div><span class="timestamp">${timestamp}</span> ${text}</div>`;
-            container.scrollTop = container.scrollHeight;
+            updateTranscript();
         }
 
-        function analyzeTranscript(text) {
+        function findAnswer(text) {
             const lower = text.toLowerCase();
-            let insight = null;
-
-            if (lower.includes('attack') || lower.includes('combat')) {
-                insight = {
-                    title: '⚔️ Combat Detected',
-                    text: 'Consider: blockers, combat tricks, and life total before declaring attackers.'
-                };
-            } else if (lower.includes('counter') || lower.includes('spell')) {
-                insight = {
-                    title: '📜 Spell on Stack',
-                    text: 'Check: Do you have responses? Mana open? Is this the right timing?'
-                };
-            } else if (lower.includes('trigger')) {
-                insight = {
-                    title: '⚡ Trigger Detected',
-                    text: 'Remember: "When" triggers go on stack in APNAP order.'
-                };
-            } else if (lower.includes('search') || lower.includes('tutor')) {
-                insight = {
-                    title: '🔍 Searching Library',
-                    text: 'Note: Shuffle after searching. Opponent may respond before you find the card.'
-                };
+            for (const [keyword, explanation] of Object.entries(rules)) {
+                if (lower.includes(keyword)) {
+                    return { title: keyword.charAt(0).toUpperCase() + keyword.slice(1), text: explanation };
+                }
             }
-
-            if (insight) {
-                addInsight(insight.title, insight.text);
-            }
+            return null;
         }
 
-        function addInsight(title, text) {
-            const container = document.getElementById('insights');
-            if (container.innerHTML.includes('Waiting for game to start')) {
-                container.innerHTML = '';
-            }
+        function showXyneth(title, message) {
+            clearTimeout(dismissTimeout);
             
-            const card = document.createElement('div');
-            card.className = 'insight-card';
-            card.innerHTML = `<h4>${title}</h4><p>${text}</p>`;
-            container.insertBefore(card, container.firstChild);
+            document.getElementById('xyneth-title').textContent = title;
+            document.getElementById('xyneth-message').textContent = message;
+            document.getElementById('xyneth').classList.add('active');
+            xynethVisible = true;
             
-            while (container.children.length > 5) {
-                container.removeChild(container.lastChild);
-            }
+            // Auto-dismiss after 8 seconds unless hovered
+            dismissTimeout = setTimeout(() => {
+                if (!document.querySelector('.xyneth-container:hover')) {
+                    dismissXyneth();
+                }
+            }, 8000);
         }
 
-        function clearTranscript() {
-            document.getElementById('transcript').innerHTML = '<span style="color: #64748b;">Game transcript cleared...</span>';
-            sessionData.transcript = [];
+        function dismissXyneth() {
+            document.getElementById('xyneth').classList.remove('active');
+            xynethVisible = false;
+        }
+
+        function updateTranscript() {
+            const content = document.getElementById('transcriptContent');
+            if (sessionData.transcript.length === 0) return;
+            
+            content.innerHTML = sessionData.transcript.map(entry => `
+                <div class="transcript-item">
+                    <div class="transcript-time">${entry.time}</div>
+                    <div class="transcript-text ${entry.isQuestion ? 'question' : ''}">${entry.text}</div>
+                </div>
+            `).join('');
+        }
+
+        function toggleTranscript() {
+            document.getElementById('transcriptDrawer').classList.toggle('open');
         }
 
         function endSession() {
-            stopListening();
+            isListening = false;
+            if (recognition) recognition.stop();
             
-            let sessions = JSON.parse(localStorage.getItem('xyneth_sessions') || '[]');
-            sessionData.endTime = new Date().toISOString();
-            sessions.push(sessionData);
-            localStorage.setItem('xyneth_sessions', JSON.stringify(sessions));
+            const duration = Math.floor((new Date() - sessionData.startTime) / 1000);
+            const minutes = Math.floor(duration / 60);
+            const seconds = duration % 60;
             
-            showCoachScreen();
-        }
-
-        function showCoachScreen() {
-            document.getElementById('session-section').classList.add('hidden');
-            document.getElementById('coach-section').classList.remove('hidden');
+            document.getElementById('stat-questions').textContent = sessionData.questions.length;
+            document.getElementById('stat-duration').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('stat-rules').textContent = sessionData.rulesClarified;
             
-            const transcriptDiv = document.getElementById('full-transcript');
+            const coachTranscript = document.getElementById('coach-transcript');
             if (sessionData.transcript.length > 0) {
-                transcriptDiv.innerHTML = sessionData.transcript.map(entry => 
-                    `<div><span class="timestamp">${entry.time}</span> ${entry.text}</div>`
-                ).join('');
-            } else {
-                transcriptDiv.innerHTML = '<span style="color: #64748b;">No voice data recorded during this session.</span>';
+                coachTranscript.innerHTML = sessionData.transcript.map(entry => `
+                    <p style="margin-bottom: 10px; ${entry.isQuestion ? 'color: #14b8a6;' : ''}">
+                        <strong>${entry.time}</strong> ${entry.text}
+                    </p>
+                `).join('');
             }
             
-            updateStatus('Session Complete', 'active');
+            // Save to localStorage
+            let sessions = JSON.parse(localStorage.getItem('xyneth_sessions') || '[]');
+            sessions.push({
+                ...sessionData,
+                endTime: new Date().toISOString(),
+                duration: duration
+            });
+            localStorage.setItem('xyneth_sessions', JSON.stringify(sessions));
+            
+            document.getElementById('coachScreen').classList.add('active');
         }
+
+        // Keep listening
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.xyneth-container')) return;
+            if (isListening && recognition && !xynethVisible) {
+                // Ensure we're still listening
+                try {
+                    recognition.start();
+                } catch(e) {}
+            }
+        });
     </script>
 </body>
 </html>
