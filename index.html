@@ -1,9 +1,9 @@
-home_page = '''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xyneth - MTG Rules Assistant</title>
+    <title>Veritas - MTG Rules Assistant</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -272,16 +272,16 @@ home_page = '''<!DOCTYPE html>
 <body>
     <div class="container">
         <header>
-            <h1>🎴 Xyneth</h1>
+            <h1>⚖️ Veritas</h1>
             <p class="tagline">"Rules at the speed of conversation"</p>
         </header>
 
         <!-- Hero Section -->
         <div class="hero">
             <h2>Your AI-Powered MTG Assistant</h2>
-            <p>Get instant rules clarification, deck analysis, and strategic coaching. Xyneth listens to your games and helps you make better decisions.</p>
+            <p>Get instant rules clarification, deck analysis, and strategic coaching. Veritas listens to your games and helps you make better decisions.</p>
             <a href="game-session.html" class="cta-button">🎮 Start Game Session</a>
-            <a href="#tools" class="cta-button secondary">📋 Browse Tools</a>
+            <a href="coach-session.html" class="cta-button secondary">🧠 Coach Mode</a>
         </div>
 
         <!-- Tools Section -->
@@ -291,13 +291,12 @@ home_page = '''<!DOCTYPE html>
             <div class="mode-tabs">
                 <button class="mode-tab active" onclick="switchMode('rules')">📋 Rules Assistant</button>
                 <button class="mode-tab" onclick="switchMode('deck')">🎴 Deck Analyzer</button>
-                <button class="mode-tab" onclick="switchMode('coach')">🧠 Coach Mode</button>
             </div>
 
             <!-- Rules Panel -->
             <div id="rules-panel" class="panel active">
                 <div class="input-group">
-                    <label>Ask Xyneth about rules, cards, or interactions:</label>
+                    <label>Ask Veritas about rules, cards, or interactions:</label>
                     <div style="display: flex;">
                         <input type="text" id="rules-input" placeholder="e.g., 'How does trample work?'" style="flex: 1;">
                         <button class="voice-btn" onclick="toggleVoice()" title="Voice input">🎤</button>
@@ -311,7 +310,7 @@ home_page = '''<!DOCTYPE html>
                     <button class="quick-btn" onclick="askQuick('priority')">Priority</button>
                     <button class="quick-btn" onclick="askQuick('mana abilities')">Mana Abilities</button>
                 </div>
-                <button onclick="askRules()" style="margin-top: 20px;">Ask Xyneth</button>
+                <button onclick="askRules()" style="margin-top: 20px;">Ask Veritas</button>
                 <div id="rules-results"></div>
             </div>
 
@@ -338,27 +337,13 @@ home_page = '''<!DOCTYPE html>
                 <button onclick="analyzeDeck()">Analyze Deck</button>
                 <div id="deck-results"></div>
             </div>
-
-            <!-- Coach Panel -->
-            <div id="coach-panel" class="panel">
-                <div class="input-group">
-                    <label>Describe your game situation:</label>
-                    <textarea id="coach-input" placeholder="e.g., 'I'm playing aggro vs control. They have 4 cards in hand, I'm at 10 life. Should I attack with everything?'" style="min-height: 100px;"></textarea>
-                </div>
-                <div class="input-group">
-                    <label>Your Deck Strategy (optional):</label>
-                    <input type="text" id="coach-deck" placeholder="e.g., 'Mono-red aggro with burn spells'">
-                </div>
-                <button onclick="askCoach()">Get Coaching</button>
-                <div id="coach-results"></div>
-            </div>
         </div>
 
         <!-- Features Grid -->
         <div class="features" style="margin-top: 60px;">
             <div class="feature-card">
                 <h3>🎙️ Voice Activated</h3>
-                <p>Ask questions naturally while you play. Xyneth listens and responds instantly, keeping your hands free for your cards.</p>
+                <p>Ask questions naturally while you play. Veritas listens and responds instantly, keeping your hands free for your cards.</p>
             </div>
             <div class="feature-card">
                 <h3>📚 28+ Keywords</h3>
@@ -366,12 +351,12 @@ home_page = '''<!DOCTYPE html>
             </div>
             <div class="feature-card">
                 <h3>🎮 Game Sessions</h3>
-                <p>Start a session and let Xyneth listen to your game. Get real-time suggestions and post-game analysis.</p>
+                <p>Start a session and let Veritas listen to your game. Get real-time suggestions and post-game analysis.</p>
             </div>
         </div>
 
         <footer>
-            <p>Xyneth - MTG Rules Assistant | Built for Commander/EDH players</p>
+            <p>Veritas - MTG Rules Assistant | Built for Commander/EDH players</p>
             <p style="margin-top: 10px; font-size: 0.9rem;">Data collected locally to improve AI recommendations</p>
         </footer>
     </div>
@@ -455,9 +440,9 @@ home_page = '''<!DOCTYPE html>
             const input = document.getElementById('rules-input').value.toLowerCase().trim();
             const resultsDiv = document.getElementById('rules-results');
             if (!input) return;
-            let history = JSON.parse(localStorage.getItem('xyneth_searches') || '[]');
+            let history = JSON.parse(localStorage.getItem('veritas_searches') || '[]');
             history.push({ query: input, time: new Date().toISOString() });
-            localStorage.setItem('xyneth_searches', JSON.stringify(history));
+            localStorage.setItem('veritas_searches', JSON.stringify(history));
             let found = null;
             for (const [key, data] of Object.entries(keywords)) {
                 if (input.includes(key)) { found = { keyword: key, ...data }; break; }
@@ -465,7 +450,7 @@ home_page = '''<!DOCTYPE html>
             if (found) {
                 resultsDiv.innerHTML = `<div class="results"><h3>📚 ${found.keyword.toUpperCase()}</h3><p><strong>Rule ${found.rule}:</strong> ${found.description}</p><div class="card"><h4>💡 Example</h4><p>${found.example}</p></div></div>`;
             } else {
-                resultsDiv.innerHTML = `<div class="results"><h3>🤔 Xyneth's Response</h3><p>I don't have that specific rule yet. Try: ${Object.keys(keywords).slice(0, 8).join(', ')}...</p></div>`;
+                resultsDiv.innerHTML = `<div class="results"><h3>🤔 Veritas's Response</h3><p>I don't have that specific rule yet. Try: ${Object.keys(keywords).slice(0, 8).join(', ')}...</p></div>`;
             }
         }
 
@@ -502,28 +487,10 @@ home_page = '''<!DOCTYPE html>
                     ${recs.length > 0 ? `<div style="margin-top: 20px;"><h4>💡 Suggestions:</h4><ul style="margin-top: 10px; padding-left: 20px;">${recs.map(r => `<li>${r}</li>`).join('')}</ul></div>` : '<p>✅ Basic structure looks good!</p>'}
                 </div>
             `;
-            let decks = JSON.parse(localStorage.getItem('xyneth_decks') || '[]');
+            let decks = JSON.parse(localStorage.getItem('veritas_decks') || '[]');
             decks.push({ name, format, cards, date: new Date().toISOString() });
-            localStorage.setItem('xyneth_decks', JSON.stringify(decks));
-        }
-
-        function askCoach() {
-            const situation = document.getElementById('coach-input').value;
-            const resultsDiv = document.getElementById('coach-results');
-            if (!situation) return;
-            resultsDiv.innerHTML = `
-                <div class="results">
-                    <h3>🧠 Xyneth's Coaching</h3>
-                    <div class="card-grid">
-                        <div class="card"><h4>📈 Resources</h4><p>Consider your cards in hand, mana available, and board state vs opponent's.</p></div>
-                        <div class="card"><h4>⚡ Tempo</h4><p>Are you the aggressor or defender? This changes which trades are favorable.</p></div>
-                        <div class="card"><h4>🎯 Win Condition</h4><p>What's your path to victory? Prioritize plays that advance that plan.</p></div>
-                    </div>
-                </div>
-            `;
+            localStorage.setItem('veritas_decks', JSON.stringify(decks));
         }
     </script>
 </body>
-</html>'''
-
-print(home_page)
+</html>
