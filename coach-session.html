@@ -3,623 +3,664 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Veritas - Coach Mode</title>
+    <title>Veritas - Coach Dashboard</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a0f1a 0%, #1a1f2e 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: #e2e8f0;
             min-height: 100vh;
-            overflow: hidden;
-            position: relative;
+            padding: 20px;
         }
+        .container { max-width: 1200px; margin: 0 auto; }
         
-        /* Ambient listening indicator */
-        .ambient-indicator {
-            position: fixed;
-            top: 30px;
-            right: 30px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #14b8a6;
-            opacity: 0.3;
-            animation: ambientPulse 3s infinite;
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 2px solid #334155;
+            margin-bottom: 30px;
         }
-        @keyframes ambientPulse {
-            0%, 100% { opacity: 0.2; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
-        }
-        
         .back-link {
-            position: fixed;
-            top: 30px;
-            left: 30px;
-            color: #64748b;
+            color: #14b8a6;
             text-decoration: none;
-            font-size: 0.9rem;
-            opacity: 0.5;
-            transition: opacity 0.3s;
+            font-size: 1.1rem;
         }
-        .back-link:hover { opacity: 1; color: #14b8a6; }
+        .back-link:hover { text-decoration: underline; }
         
-        /* Veritas character - hidden by default */
-        .veritas-container {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%) translateY(200px);
-            opacity: 0;
-            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        h1 {
+            font-size: 2rem;
+            background: linear-gradient(90deg, #14b8a6, #2dd4bf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Stats Overview */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #334155;
             text-align: center;
-            pointer-events: none;
         }
-        .veritas-container.active {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-            pointer-events: auto;
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #14b8a6;
+        }
+        .stat-label {
+            color: #64748b;
+            margin-top: 5px;
+            font-size: 0.95rem;
         }
         
-        .veritas-avatar {
-            width: 80px;
-            height: 80px;
+        /* Main Layout */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        @media (max-width: 900px) {
+            .dashboard { grid-template-columns: 1fr; }
+        }
+        
+        /* Panels */
+        .panel {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #334155;
+        }
+        .panel h2 {
+            color: #14b8a6;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Voice Input Section */
+        .voice-section {
+            text-align: center;
+            padding: 30px;
+            background: #0f172a;
+            border-radius: 12px;
+            border: 2px dashed #334155;
+            margin-bottom: 20px;
+        }
+        .voice-btn-large {
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             background: linear-gradient(135deg, #14b8a6, #2dd4bf);
+            border: none;
+            cursor: pointer;
+            font-size: 2.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
+        }
+        .voice-btn-large:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(20, 184, 166, 0.5);
+        }
+        .voice-btn-large.listening {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .voice-status {
+            margin-top: 15px;
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+        
+        /* Advice Display */
+        .advice-display {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 200px;
+            border: 1px solid #334155;
+        }
+        .advice-display.empty {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
-            margin: 0 auto 20px;
-            box-shadow: 0 0 40px rgba(20, 184, 166, 0.4);
-            animation: avatarFloat 3s ease-in-out infinite;
+            color: #64748b;
         }
-        @keyframes avatarFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .speech-bubble {
+        .advice-card {
             background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 20px;
-            padding: 25px 30px;
-            max-width: 600px;
-            position: relative;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border-left: 4px solid #14b8a6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
         }
-        .speech-bubble::before {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 10px solid #1e293b;
-        }
-        .speech-bubble h3 {
+        .advice-card h3 {
             color: #14b8a6;
             margin-bottom: 10px;
-            font-size: 1.1rem;
         }
-        .speech-bubble p {
+        .advice-card p {
             color: #94a3b8;
             line-height: 1.6;
-            font-size: 1rem;
+            margin-bottom: 15px;
         }
-        .speech-bubble .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: #64748b;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 0;
-        }
-        .speech-bubble .close-btn:hover { color: #e2e8f0; }
-        
-        /* Coaching tips styling */
-        .tip-section {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #334155;
-        }
-        .tip-section h4 {
-            color: #2dd4bf;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .tip-section ul {
+        .advice-card ul {
             margin: 0;
             padding-left: 20px;
             color: #cbd5e1;
         }
-        .tip-section li {
-            margin-bottom: 6px;
+        .advice-card li {
+            margin-bottom: 8px;
             line-height: 1.5;
         }
         
-        .transcript-toggle {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: rgba(30, 41, 59, 0.8);
+        /* Session History */
+        .session-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .session-item {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
             border: 1px solid #334155;
-            color: #64748b;
-            padding: 10px 20px;
-            border-radius: 20px;
             cursor: pointer;
-            font-size: 0.85rem;
-            opacity: 0;
-            transition: opacity 0.3s;
+            transition: all 0.2s;
         }
-        .transcript-toggle.visible {
-            opacity: 1;
-        }
-        .transcript-toggle:hover {
-            color: #14b8a6;
+        .session-item:hover {
             border-color: #14b8a6;
         }
-        
-        .transcript-drawer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(15, 23, 42, 0.95);
-            border-top: 1px solid #334155;
-            transform: translateY(100%);
-            transition: transform 0.3s;
-            max-height: 40vh;
-            overflow-y: auto;
-        }
-        .transcript-drawer.open {
-            transform: translateY(0);
-        }
-        .transcript-content {
-            padding: 20px 30px;
-        }
-        .transcript-item {
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #334155;
-        }
-        .transcript-item:last-child {
-            border-bottom: none;
-        }
-        .transcript-time {
+        .session-date {
             color: #64748b;
-            font-size: 0.8rem;
-            margin-bottom: 5px;
-        }
-        .transcript-text {
-            color: #e2e8f0;
-        }
-        .transcript-text.question {
-            color: #14b8a6;
-        }
-        
-        .end-session {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            background: rgba(220, 38, 38, 0.8);
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
             font-size: 0.85rem;
-            opacity: 0;
-            transition: opacity 0.3s;
         }
-        .end-session.visible {
-            opacity: 1;
+        .session-topic {
+            color: #e2e8f0;
+            margin-top: 5px;
+        }
+        .session-count {
+            color: #14b8a6;
+            font-size: 0.9rem;
+            margin-top: 5px;
         }
         
-        .summary-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            transform: translateY(100%);
-            transition: transform 0.5s;
-            overflow-y: auto;
-            padding: 40px;
-            z-index: 100;
-        }
-        .summary-screen.active {
-            transform: translateY(0);
-        }
-        .summary-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .summary-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .summary-header h2 {
-            color: #14b8a6;
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-        .summary-header p {
-            color: #64748b;
-        }
-        .coaching-card {
-            background: #1e293b;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 1px solid #334155;
-        }
-        .coaching-card h3 {
-            color: #14b8a6;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-        }
-        .coaching-card p, .coaching-card li {
-            color: #94a3b8;
-            line-height: 1.6;
-        }
-        .coaching-card ul {
-            padding-left: 20px;
-        }
-        .coaching-card li {
-            margin-bottom: 8px;
-        }
-        .summary-actions {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 40px;
-        }
-        .summary-actions button {
-            padding: 15px 30px;
+        /* Trends */
+        .trend-chart {
+            background: #0f172a;
+            padding: 20px;
             border-radius: 8px;
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 10px;
+        }
+        .trend-bar {
+            flex: 1;
+            background: linear-gradient(to top, #14b8a6, #2dd4bf);
+            border-radius: 4px 4px 0 0;
+            min-height: 20px;
+            position: relative;
+        }
+        .trend-bar::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: #64748b;
+            white-space: nowrap;
+        }
+        
+        /* Text Input Alternative */
+        .text-input-alt {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .text-input-alt input {
+            flex: 1;
+            padding: 12px;
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
             font-size: 1rem;
         }
-        .btn-secondary {
-            background: #334155 !important;
-            color: #e2e8f0 !important;
+        .text-input-alt input:focus {
+            outline: none;
+            border-color: #14b8a6;
+        }
+        button {
+            background: linear-gradient(90deg, #14b8a6, #2dd4bf);
+            color: #0f172a;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
+        }
+        button.secondary {
+            background: #334155;
+            color: #e2e8f0;
+        }
+        
+        /* Full Width Sections */
+        .full-width {
+            grid-column: 1 / -1;
         }
     </style>
 </head>
 <body>
-    <!-- Ambient indicator -->
-    <div class="ambient-indicator" title="Veritas is listening"></div>
-    
-    <!-- Back link -->
-    <a href="index.html" class="back-link">← Back</a>
-    
-    <!-- Veritas character -->
-    <div class="veritas-container" id="veritas">
-        <div class="veritas-avatar">⚖️</div>
-        <div class="speech-bubble">
-            <button class="close-btn" onclick="dismissVeritas()">×</button>
-            <h3 id="veritas-title">Veritas</h3>
-            <div id="veritas-content">
-                <p>Listening for your strategic questions...</p>
+    <div class="container">
+        <header>
+            <a href="index.html" class="back-link">← Back to Home</a>
+            <h1>🧠 Coach Dashboard</h1>
+            <div style="width: 100px;"></div>
+        </header>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalSessions">0</div>
+                <div class="stat-label">Coaching Sessions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalQuestions">0</div>
+                <div class="stat-label">Questions Asked</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalTime">0h</div>
+                <div class="stat-label">Total Coaching Time</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="topTopic">-</div>
+                <div class="stat-label">Most Discussed Topic</div>
             </div>
         </div>
-    </div>
-    
-    <!-- Transcript toggle -->
-    <button class="transcript-toggle" id="transcriptBtn" onclick="toggleTranscript()">📝 History</button>
-    
-    <!-- Transcript drawer -->
-    <div class="transcript-drawer" id="transcriptDrawer">
-        <div class="transcript-content" id="transcriptContent">
-            <p style="color: #64748b; text-align: center;">Describe your game situation and I'll offer coaching...</p>
-        </div>
-    </div>
-    
-    <!-- End session -->
-    <button class="end-session" id="endBtn" onclick="endSession()">End Session</button>
-    
-    <!-- Summary screen -->
-    <div class="summary-screen" id="summaryScreen">
-        <div class="summary-content">
-            <div class="summary-header">
-                <h2>🧠 Coaching Session Summary</h2>
-                <p>Strategic insights from your session</p>
+
+        <!-- Main Dashboard -->
+        <div class="dashboard">
+            <!-- Left: Active Coaching -->
+            <div class="panel">
+                <h2>🎤 Ask for Coaching</h2>
+                
+                <div class="voice-section">
+                    <button class="voice-btn-large" id="voiceBtn" onclick="toggleVoice()">🎙️</button>
+                    <div class="voice-status" id="voiceStatus">Tap microphone to speak</div>
+                </div>
+                
+                <div class="text-input-alt">
+                    <input type="text" id="textInput" placeholder="Or type your question... (e.g., 'Should I attack with everything?')">
+                    <button onclick="submitText()">Ask</button>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h3 style="color: #14b8a6; margin-bottom: 15px; font-size: 1rem;">Current Advice</h3>
+                    <div class="advice-display empty" id="adviceDisplay">
+                        <span>Your coaching advice will appear here...</span>
+                    </div>
+                </div>
             </div>
-            
-            <div id="summary-cards">
-                <!-- Dynamically populated -->
+
+            <!-- Right: Session History -->
+            <div class="panel">
+                <h2>📚 Recent Sessions</h2>
+                <div class="session-list" id="sessionList">
+                    <p style="color: #64748b; text-align: center; padding: 40px;">No coaching sessions yet. Start by asking a question!</p>
+                </div>
             </div>
-            
-            <div class="summary-actions">
-                <button class="btn-secondary" onclick="window.location.href='index.html'">← Back to Home</button>
-                <button onclick="location.reload()">🧠 New Coaching Session</button>
+
+            <!-- Bottom: Topic Trends -->
+            <div class="panel full-width">
+                <h2>📊 Your Coaching Trends</h2>
+                <div class="trend-chart" id="trendChart">
+                    <div class="trend-bar" style="height: 40%;" data-label="Combat"></div>
+                    <div class="trend-bar" style="height: 60%;" data-label="Resources"></div>
+                    <div class="trend-bar" style="height: 30%;" data-label="Planning"></div>
+                    <div class="trend-bar" style="height: 80%;" data-label="Trading"></div>
+                    <div class="trend-bar" style="height: 50%;" data-label="Tempo"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         let recognition = null;
-        let isListening = true;
-        let sessionData = {
-            situations: [],
-            advice: [],
+        let isListening = false;
+        let currentSession = {
+            questions: [],
             startTime: new Date()
         };
-        let veritasVisible = false;
-        let dismissTimeout = null;
 
-        // Coaching patterns to detect strategic questions
-        const coachingPatterns = [
-            /should i/i, /do i/i, /can i/i, /is it right/i,
-            /attack/i, /block/i, /trade/i, /hold/i, /wait/i,
-            /play.*now/i, /cast.*now/i, /use.*ability/i,
-            /what.*do/i, /how.*play/i, /strategy/i, /plan/i,
-            /ahead/i, /behind/i, /winning/i, /losing/i,
-            /life/i, /cards/i, /board/i, /mana/i, /resources/i
-        ];
-
-        // Strategic coaching database
-        const coachingAdvice = {
-            'attack': {
-                title: '⚔️ Combat Decision',
-                quick: 'Consider: Can they profitably block? What removal might they have? Are you the beatdown?',
-                detailed: [
-                    'Count potential blockers and compare to your attackers',
-                    'Consider combat tricks or removal they might have',
-                    'Ask: "If I attack and they block optimally, who wins?"',
-                    'If you\'re ahead, force trades. If behind, hold back blockers.'
-                ]
-            },
-            'block': {
-                title: '🛡️ Blocking Strategy',
-                quick: 'Block to preserve life or trade efficiently. Don\'t chump block unless necessary.',
-                detailed: [
-                    'Trade your worse creatures for their better ones',
-                    'Preserve creatures with evasion or high value',
-                    'Consider: "Will I need this blocker later?"',
-                    'Sometimes taking damage is better than losing a key creature'
-                ]
-            },
-            'trade': {
-                title: '⚖️ Trading Resources',
-                quick: 'Trade when your card is worse than theirs, or when you\'re ahead and want to simplify.',
-                detailed: [
-                    'Trade up: your 2/2 for their 3/3 is winning',
-                    'Don\'t trade your only flyer if they have bigger ground creatures',
-                    'When ahead, trade to reduce variance. When behind, avoid trades and seek 2-for-1s',
-                    'Consider the quality of cards remaining in each deck'
-                ]
-            },
-            'resources': {
-                title: '📊 Resource Management',
-                quick: 'Count cards, life, and mana. Who has more total resources?',
-                detailed: [
-                    'Card advantage: Who will run out of playable spells first?',
-                    'Tempo: Who dictates the pace of the game?',
-                    'Mana efficiency: Are you using all your mana each turn?',
-                    'Life total: Is it a resource to spend or protect?'
-                ]
-            },
-            'plan': {
-                title: '🎯 Strategic Planning',
-                quick: 'What\'s your path to victory? Play toward that plan.',
-                detailed: [
-                    'Identify your win condition (aggro, combo, control, value)',
-                    'Determine if you\'re the aggressor or defender',
-                    'Sequence your plays to maximize pressure or disruption',
-                    'Anticipate their best responses and have backup plans'
-                ]
-            },
-            'ahead': {
-                title: '🏆 Playing From Ahead',
-                quick: 'Protect your advantage. Force trades, reduce variance, close out quickly.',
-                detailed: [
-                    'Don\'t get greedy — secure the win',
-                    'Force trades to reduce their comeback potential',
-                    'Hold removal for their best threats',
-                    'Watch for sweepers and overextending'
-                ]
-            },
-            'behind': {
-                title: '🔄 Playing From Behind',
-                quick: 'Seek 2-for-1s, play to your outs, and force them to have answers.',
-                detailed: [
-                    'Take calculated risks — you need to change the game state',
-                    'Play to your specific outs (topdeck threats, synergies)',
-                    'Bluff confidence to pressure their decisions',
-                    'Consider unconventional lines they might not expect'
-                ]
-            },
-            'default': {
-                title: '🧠 Strategic Analysis',
-                quick: 'Analyze resources, identify who\'s ahead, and play to your win condition.',
-                detailed: [
-                    'Assess: life totals, cards in hand, board state, graveyards',
-                    'Determine: Are you beatdown or control in this matchup?',
-                    'Plan: What sequence of plays maximizes your win probability?',
-                    'Adapt: Respond to new information and shifting game states'
-                ]
-            }
-        };
+        // Load historical data
+        let allSessions = JSON.parse(localStorage.getItem('veritas_coaching') || '[]');
+        updateStats();
+        renderSessionList();
 
         // Initialize speech recognition
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = true;
+            recognition.continuous = false;
+            recognition.interimResults = false;
             recognition.lang = 'en-US';
 
             recognition.onresult = (event) => {
-                const results = event.results;
-                const lastResult = results[results.length - 1];
-                const transcript = lastResult[0].transcript;
-                
-                if (lastResult.isFinal) {
-                    processTranscript(transcript);
-                }
+                const transcript = event.results[0][0].transcript;
+                processQuestion(transcript);
+                stopVoice();
             };
 
-            recognition.onerror = (event) => {
-                if (event.error === 'no-speech') return;
-                console.error('Error:', event.error);
-                setTimeout(() => { if (isListening) recognition.start(); }, 1000);
-            };
-
-            recognition.onend = () => {
-                if (isListening) recognition.start();
-            };
-
-            recognition.start();
-            
-            setTimeout(() => {
-                document.getElementById('transcriptBtn').classList.add('visible');
-                document.getElementById('endBtn').classList.add('visible');
-            }, 2000);
-        } else {
-            alert('Speech recognition not supported. Use Chrome or Edge.');
+            recognition.onerror = () => stopVoice();
+            recognition.onend = () => stopVoice();
         }
 
-        function processTranscript(text) {
-            const timestamp = new Date().toLocaleTimeString();
-            const entry = { time: timestamp, text: text, isSituation: false };
-            
-            const isCoachingRequest = coachingPatterns.some(pattern => pattern.test(text));
-            
-            if (isCoachingRequest) {
-                entry.isSituation = true;
-                sessionData.situations.push(entry);
-                
-                const advice = generateAdvice(text);
-                sessionData.advice.push(advice);
-                showVeritas(advice);
+        function toggleVoice() {
+            if (!recognition) {
+                alert('Voice recognition not supported. Use Chrome or Edge.');
+                return;
             }
-            
-            updateTranscript(entry);
-        }
 
-        function generateAdvice(text) {
-            const lower = text.toLowerCase();
-            let key = 'default';
-            
-            if (lower.includes('attack') || lower.includes('swing')) key = 'attack';
-            else if (lower.includes('block')) key = 'block';
-            else if (lower.includes('trade')) key = 'trade';
-            else if (lower.includes('mana') || lower.includes('cards') || lower.includes('life')) key = 'resources';
-            else if (lower.includes('plan') || lower.includes('strategy') || lower.includes('do')) key = 'plan';
-            else if (lower.includes('ahead') || lower.includes('winning')) key = 'ahead';
-            else if (lower.includes('behind') || lower.includes('losing')) key = 'behind';
-            
-            return coachingAdvice[key];
-        }
+            const btn = document.getElementById('voiceBtn');
+            const status = document.getElementById('voiceStatus');
 
-        function showVeritas(advice) {
-            clearTimeout(dismissTimeout);
-            
-            document.getElementById('veritas-title').textContent = advice.title;
-            
-            let content = `<p>${advice.quick}</p>`;
-            if (advice.detailed) {
-                content += `<div class="tip-section"><h4>Key Considerations</h4><ul>`;
-                advice.detailed.forEach(tip => {
-                    content += `<li>${tip}</li>`;
-                });
-                content += `</ul></div>`;
+            if (isListening) {
+                recognition.stop();
+                stopVoice();
+            } else {
+                recognition.start();
+                isListening = true;
+                btn.classList.add('listening');
+                status.textContent = 'Listening... speak your question';
+                status.style.color = '#ef4444';
             }
-            
-            document.getElementById('veritas-content').innerHTML = content;
-            document.getElementById('veritas').classList.add('active');
-            veritasVisible = true;
-            
-            dismissTimeout = setTimeout(() => {
-                if (!document.querySelector('.veritas-container:hover')) {
-                    dismissVeritas();
-                }
-            }, 12000);
         }
 
-        function dismissVeritas() {
-            document.getElementById('veritas').classList.remove('active');
-            veritasVisible = false;
-        }
-
-        function updateTranscript(entry) {
-            const content = document.getElementById('transcriptContent');
-            if (content.innerHTML.includes('Describe your game')) {
-                content.innerHTML = '';
-            }
-            
-            const div = document.createElement('div');
-            div.className = 'transcript-item';
-            div.innerHTML = `
-                <div class="transcript-time">${entry.time}</div>
-                <div class="transcript-text ${entry.isSituation ? 'question' : ''}">${entry.text}</div>
-            `;
-            content.insertBefore(div, content.firstChild);
-        }
-
-        function toggleTranscript() {
-            document.getElementById('transcriptDrawer').classList.toggle('open');
-        }
-
-        function endSession() {
+        function stopVoice() {
             isListening = false;
-            if (recognition) recognition.stop();
+            document.getElementById('voiceBtn').classList.remove('listening');
+            document.getElementById('voiceStatus').textContent = 'Tap microphone to speak';
+            document.getElementById('voiceStatus').style.color = '#64748b';
+        }
+
+        function submitText() {
+            const input = document.getElementById('textInput');
+            const question = input.value.trim();
+            if (!question) return;
+            processQuestion(question);
+            input.value = '';
+        }
+
+        function processQuestion(question) {
+            const advice = generateAdvice(question);
             
-            const duration = Math.floor((new Date() - sessionData.startTime) / 1000);
-            const minutes = Math.floor(duration / 60);
-            const seconds = duration % 60;
+            // Add to current session
+            currentSession.questions.push({
+                text: question,
+                advice: advice,
+                time: new Date().toISOString()
+            });
+
+            // Display advice
+            displayAdvice(advice);
             
-            let summaryHTML = `
-                <div class="coaching-card">
-                    <h3>⏱️ Session Duration</h3>
-                    <p>${minutes}:${seconds.toString().padStart(2, '0')}</p>
-                </div>
-                <div class="coaching-card">
-                    <h3>🎯 Situations Analyzed</h3>
-                    <p>${sessionData.situations.length} strategic questions addressed</p>
-                </div>
-            `;
+            // Save session data
+            saveSession();
             
-            if (sessionData.advice.length > 0) {
-                const adviceCounts = {};
-                sessionData.advice.forEach(a => {
-                    adviceCounts[a.title] = (adviceCounts[a.title] || 0) + 1;
-                });
-                
-                summaryHTML += `<div class="coaching-card"><h3>📊 Topics Covered</h3><ul>`;
-                for (const [title, count] of Object.entries(adviceCounts)) {
-                    summaryHTML += `<li>${title}: ${count} time${count > 1 ? 's' : ''}</li>`;
-                }
-                summaryHTML += `</ul></div>`;
+            // Update UI
+            updateStats();
+            renderSessionList();
+        }
+
+        function generateAdvice(question) {
+            const lower = question.toLowerCase();
+            
+            // Determine topic and generate specific advice
+            if (lower.includes('attack') || lower.includes('swing') || lower.includes('combat')) {
+                return {
+                    topic: 'Combat',
+                    title: '⚔️ Combat Decision',
+                    summary: 'Consider blockers, removal, and your role (beatdown vs control).',
+                    details: [
+                        'Count potential blockers vs your attackers',
+                        'Do they have mana open for combat tricks?',
+                        'If blocked optimally, do you win or lose the trade?',
+                        'Are you the aggressor? If ahead, force trades. If behind, be cautious.'
+                    ]
+                };
             }
             
-            summaryHTML += `
-                <div class="coaching-card">
-                    <h3>💡 Remember</h3>
-                    <p>Good Magic is about making the best decisions with available information. Review your games to identify patterns in your play.</p>
+            if (lower.includes('block')) {
+                return {
+                    topic: 'Combat',
+                    title: '🛡️ Blocking Strategy',
+                    summary: 'Trade efficiently or preserve key creatures.',
+                    details: [
+                        'Trade your weaker creatures for their stronger ones',
+                        'Don\'t chump block unless necessary — life is a resource',
+                        'Preserve creatures with evasion or high long-term value',
+                        'Consider: "Will I need this blocker on a future turn?"'
+                    ]
+                };
+            }
+            
+            if (lower.includes('trade')) {
+                return {
+                    topic: 'Trading',
+                    title: '⚖️ Resource Trading',
+                    summary: 'Trade when your card is worse, or when ahead to reduce variance.',
+                    details: [
+                        'Trade up: your 2/2 for their 3/3 is profitable',
+                        'When ahead, trade to simplify. When behind, avoid trades and seek 2-for-1s',
+                        'Consider cards remaining in deck — who has more quality left?',
+                        'Don\'t trade your only answer to their big threat'
+                    ]
+                };
+            }
+            
+            if (lower.includes('mana') || lower.includes('cards') || lower.includes('resources')) {
+                return {
+                    topic: 'Resources',
+                    title: '📊 Resource Management',
+                    summary: 'Track cards, life, and mana. Who has more total resources?',
+                    details: [
+                        'Card advantage: Who will run out of playable spells first?',
+                        'Tempo: Who is dictating the pace of play?',
+                        'Mana efficiency: Are you using all your mana each turn?',
+                        'Life total: Is it a resource to spend or must be protected?'
+                    ]
+                };
+            }
+            
+            if (lower.includes('plan') || lower.includes('strategy') || lower.includes('win')) {
+                return {
+                    topic: 'Planning',
+                    title: '🎯 Strategic Planning',
+                    summary: 'Identify your win condition and play toward it.',
+                    details: [
+                        'What is your path to victory? (Aggro, combo, value, control)',
+                        'Are you the beatdown or the control deck in this matchup?',
+                        'Sequence plays to maximize pressure or disruption',
+                        'Anticipate their responses and have backup plans'
+                    ]
+                };
+            }
+            
+            if (lower.includes('ahead') || lower.includes('winning') || lower.includes('lead')) {
+                return {
+                    topic: 'Tempo',
+                    title: '🏆 Playing From Ahead',
+                    summary: 'Protect your advantage. Force trades and reduce variance.',
+                    details: [
+                        'Don\'t get greedy — secure the win methodically',
+                        'Force trades to reduce their comeback potential',
+                        'Hold removal for their best threats only',
+                        'Watch for board wipes — don\'t overextend into sweepers'
+                    ]
+                };
+            }
+            
+            if (lower.includes('behind') || lower.includes('losing') || lower.includes('catch')) {
+                return {
+                    topic: 'Tempo',
+                    title: '🔄 Playing From Behind',
+                    summary: 'Take calculated risks. Play to your outs.',
+                    details: [
+                        'Seek 2-for-1s or card advantage to catch up',
+                        'Play to specific outs (topdeck threats, synergies)',
+                        'Bluff confidence — pressure their decisions',
+                        'Consider unconventional lines they won\'t expect'
+                    ]
+                };
+            }
+            
+            // Default
+            return {
+                topic: 'General',
+                title: '🧠 Strategic Analysis',
+                summary: 'Assess the game state and identify the critical decision.',
+                details: [
+                    'Resources: Compare life, cards, board state, and mana',
+                    'Role: Determine if you\'re beatdown or control',
+                    'Plan: What sequence maximizes your win probability?',
+                    'Adapt: New information should update your strategy'
+                ]
+            };
+        }
+
+        function displayAdvice(advice) {
+            const display = document.getElementById('adviceDisplay');
+            display.classList.remove('empty');
+            
+            display.innerHTML = `
+                <div class="advice-card">
+                    <h3>${advice.title}</h3>
+                    <p>${advice.summary}</p>
+                    <ul>
+                        ${advice.details.map(d => `<li>${d}</li>`).join('')}
+                    </ul>
                 </div>
             `;
-            
-            document.getElementById('summary-cards').innerHTML = summaryHTML;
-            
-            let sessions = JSON.parse(localStorage.getItem('veritas_coaching') || '[]');
-            sessions.push({
-                ...sessionData,
-                endTime: new Date().toISOString(),
-                duration: duration
-            });
-            localStorage.setItem('veritas_coaching', JSON.stringify(sessions));
-            
-            document.getElementById('summaryScreen').classList.add('active');
         }
+
+        function saveSession() {
+            // Update or create session in storage
+            let sessions = JSON.parse(localStorage.getItem('veritas_coaching') || '[]');
+            
+            // Check if we have an active session from today
+            const today = new Date().toDateString();
+            const existingIndex = sessions.findIndex(s => 
+                new Date(s.startTime).toDateString() === today && !s.endTime
+            );
+            
+            if (existingIndex >= 0) {
+                sessions[existingIndex] = {
+                    ...sessions[existingIndex],
+                    questions: currentSession.questions,
+                    endTime: new Date().toISOString()
+                };
+            } else {
+                sessions.push({
+                    ...currentSession,
+                    endTime: new Date().toISOString()
+                });
+            }
+            
+            localStorage.setItem('veritas_coaching', JSON.stringify(sessions));
+            allSessions = sessions;
+        }
+
+        function updateStats() {
+            document.getElementById('totalSessions').textContent = allSessions.length;
+            
+            const totalQuestions = allSessions.reduce((sum, s) => sum + (s.questions?.length || 0), 0);
+            document.getElementById('totalQuestions').textContent = totalQuestions;
+            
+            const totalMinutes = allSessions.reduce((sum, s) => {
+                if (s.startTime && s.endTime) {
+                    return sum + Math.floor((new Date(s.endTime) - new Date(s.startTime)) / 60000);
+                }
+                return sum;
+            }, 0);
+            document.getElementById('totalTime').textContent = totalMinutes + 'm';
+            
+            // Find top topic
+            const topicCounts = {};
+            allSessions.forEach(s => {
+                s.questions?.forEach(q => {
+                    topicCounts[q.advice?.topic] = (topicCounts[q.advice?.topic] || 0) + 1;
+                });
+            });
+            const topTopic = Object.entries(topicCounts).sort((a, b) => b[1] - a[1])[0];
+            document.getElementById('topTopic').textContent = topTopic ? topTopic[0] : '-';
+        }
+
+        function renderSessionList() {
+            const list = document.getElementById('sessionList');
+            
+            if (allSessions.length === 0) {
+                list.innerHTML = '<p style="color: #64748b; text-align: center; padding: 40px;">No coaching sessions yet. Start by asking a question!</p>';
+                return;
+            }
+            
+            // Sort by date, newest first
+            const sorted = [...allSessions].reverse().slice(0, 10);
+            
+            list.innerHTML = sorted.map(session => {
+                const date = new Date(session.startTime);
+                const dateStr = date.toLocaleDateString();
+                const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const questionCount = session.questions?.length || 0;
+                const topics = [...new Set(session.questions?.map(q => q.advice?.topic).filter(Boolean))].join(', ');
+                
+                return `
+                    <div class="session-item" onclick="loadSession('${session.startTime}')">
+                        <div class="session-date">${dateStr} at ${timeStr}</div>
+                        <div class="session-topic">${topics || 'General coaching'}</div>
+                        <div class="session-count">${questionCount} question${questionCount !== 1 ? 's' : ''}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function loadSession(startTime) {
+            const session = allSessions.find(s => s.startTime === startTime);
+            if (!session || !session.questions?.length) return;
+            
+            // Show the last question from that session
+            const lastQ = session.questions[session.questions.length - 1];
+            displayAdvice(lastQ.advice);
+            
+            // Scroll to advice
+            document.getElementById('adviceDisplay').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Handle Enter key
+        document.getElementById('textInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') submitText();
+        });
     </script>
 </body>
 </html>
