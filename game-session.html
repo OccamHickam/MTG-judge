@@ -3,36 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xyneth - Listening</title>
+    <title>Veritas - Game Session</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a0f1a 0%, #1a1f2e 100%);
+            background: linear-gradient(135deg, #0a0f1a 0%, #1a1f2e 50%, #0f172a 100%);
             color: #e2e8f0;
             min-height: 100vh;
             overflow: hidden;
             position: relative;
         }
         
-        /* Ambient listening indicator - subtle pulsing dot */
-        .ambient-indicator {
+        /* Animated background particles */
+        .particles {
             position: fixed;
-            top: 30px;
-            right: 30px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #14b8a6;
-            opacity: 0.3;
-            animation: ambientPulse 3s infinite;
-        }
-        @keyframes ambientPulse {
-            0%, 100% { opacity: 0.2; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
         }
         
-        /* Back link - minimal */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(20, 184, 166, 0.6);
+            border-radius: 50%;
+            animation: float 15s infinite;
+            box-shadow: 0 0 10px rgba(20, 184, 166, 0.4);
+        }
+        
+        .particle:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 12s; }
+        .particle:nth-child(2) { left: 20%; animation-delay: 1s; animation-duration: 18s; width: 6px; height: 6px; }
+        .particle:nth-child(3) { left: 30%; animation-delay: 2s; animation-duration: 14s; }
+        .particle:nth-child(4) { left: 40%; animation-delay: 0.5s; animation-duration: 16s; width: 3px; height: 3px; background: rgba(45, 212, 191, 0.5); }
+        .particle:nth-child(5) { left: 50%; animation-delay: 3s; animation-duration: 20s; width: 5px; height: 5px; }
+        .particle:nth-child(6) { left: 60%; animation-delay: 1.5s; animation-duration: 13s; }
+        .particle:nth-child(7) { left: 70%; animation-delay: 2.5s; animation-duration: 17s; width: 4px; height: 4px; background: rgba(20, 184, 166, 0.4); }
+        .particle:nth-child(8) { left: 80%; animation-delay: 0s; animation-duration: 19s; width: 6px; height: 6px; }
+        .particle:nth-child(9) { left: 90%; animation-delay: 4s; animation-duration: 15s; }
+        .particle:nth-child(10) { left: 15%; animation-delay: 2s; animation-duration: 21s; width: 3px; height: 3px; background: rgba(45, 212, 191, 0.6); }
+        .particle:nth-child(11) { left: 25%; animation-delay: 5s; animation-duration: 14s; }
+        .particle:nth-child(12) { left: 35%; animation-delay: 1s; animation-duration: 18s; width: 5px; height: 5px; }
+        .particle:nth-child(13) { left: 45%; animation-delay: 3.5s; animation-duration: 16s; }
+        .particle:nth-child(14) { left: 55%; animation-delay: 0.5s; animation-duration: 20s; width: 4px; height: 4px; background: rgba(20, 184, 166, 0.5); }
+        .particle:nth-child(15) { left: 65%; animation-delay: 4.5s; animation-duration: 13s; }
+        .particle:nth-child(16) { left: 75%; animation-delay: 2.5s; animation-duration: 17s; width: 6px; height: 6px; }
+        .particle:nth-child(17) { left: 85%; animation-delay: 1s; animation-duration: 19s; }
+        .particle:nth-child(18) { left: 5%; animation-delay: 3s; animation-duration: 15s; width: 3px; height: 3px; }
+        .particle:nth-child(19) { left: 95%; animation-delay: 0s; animation-duration: 22s; width: 5px; height: 5px; background: rgba(45, 212, 191, 0.4); }
+        .particle:nth-child(20) { left: 50%; animation-delay: 6s; animation-duration: 14s; }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Additional ambient glow */
+        .ambient-glow {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(20, 184, 166, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+            animation: drift 20s infinite ease-in-out;
+        }
+        
+        .ambient-glow:nth-child(1) {
+            top: 20%;
+            left: 20%;
+            animation-delay: 0s;
+        }
+        
+        .ambient-glow:nth-child(2) {
+            top: 60%;
+            right: 20%;
+            animation-delay: -10s;
+            background: radial-gradient(circle, rgba(45, 212, 191, 0.1) 0%, transparent 70%);
+        }
+        
+        @keyframes drift {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(50px, -30px) scale(1.1);
+            }
+            50% {
+                transform: translate(-30px, 50px) scale(0.9);
+            }
+            75% {
+                transform: translate(-50px, -20px) scale(1.05);
+            }
+        }
+        
+        /* Recording state - particles turn red */
+        body.recording .particle {
+            background: rgba(239, 68, 68, 0.6);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+        }
+        
+        body.recording .ambient-glow {
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 70%);
+        }
+        
+        /* UI Elements */
         .back-link {
             position: fixed;
             top: 30px;
@@ -42,55 +135,101 @@
             font-size: 0.9rem;
             opacity: 0.5;
             transition: opacity 0.3s;
+            z-index: 10;
         }
         .back-link:hover { opacity: 1; color: #14b8a6; }
         
-        /* Xyneth character - hidden by default */
-        .xyneth-container {
+        /* Status indicator */
+        .status-bar {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #334155;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: statusPulse 2s infinite;
+        }
+        
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        body.recording .status-dot {
+            background: #ef4444;
+            animation: recordingPulse 1s infinite;
+        }
+        
+        @keyframes recordingPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .status-text {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+        
+        /* Veritas character */
+        .veritas-container {
             position: fixed;
             bottom: 100px;
             left: 50%;
-            transform: translateX(-50%) translateY(200px);
+            transform: translateX(-50%) translateY(300px);
             opacity: 0;
             transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
             text-align: center;
+            z-index: 10;
             pointer-events: none;
         }
-        .xyneth-container.active {
+        .veritas-container.active {
             transform: translateX(-50%) translateY(0);
             opacity: 1;
             pointer-events: auto;
         }
         
-        /* Xyneth avatar */
-        .xyneth-avatar {
-            width: 80px;
-            height: 80px;
+        .veritas-avatar {
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             background: linear-gradient(135deg, #14b8a6, #2dd4bf);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
+            font-size: 3rem;
             margin: 0 auto 20px;
-            box-shadow: 0 0 40px rgba(20, 184, 166, 0.4);
+            box-shadow: 0 0 60px rgba(20, 184, 166, 0.5);
             animation: avatarFloat 3s ease-in-out infinite;
         }
+        
         @keyframes avatarFloat {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-15px); }
         }
         
-        /* Speech bubble */
         .speech-bubble {
-            background: #1e293b;
+            background: rgba(30, 41, 59, 0.95);
             border: 1px solid #334155;
             border-radius: 20px;
             padding: 25px 30px;
             max-width: 500px;
             position: relative;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }
+        
         .speech-bubble::before {
             content: '';
             position: absolute;
@@ -99,18 +238,20 @@
             transform: translateX(-50%);
             border-left: 10px solid transparent;
             border-right: 10px solid transparent;
-            border-top: 10px solid #1e293b;
+            border-top: 10px solid rgba(30, 41, 59, 0.95);
         }
+        
         .speech-bubble h3 {
             color: #14b8a6;
             margin-bottom: 10px;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
         }
+        
         .speech-bubble p {
             color: #94a3b8;
             line-height: 1.6;
-            font-size: 1rem;
         }
+        
         .speech-bubble .close-btn {
             position: absolute;
             top: 10px;
@@ -120,91 +261,100 @@
             color: #64748b;
             font-size: 1.2rem;
             cursor: pointer;
-            padding: 0;
         }
-        .speech-bubble .close-btn:hover { color: #e2e8f0; }
         
-        /* Transcript history - hidden off-screen */
+        /* Transcript drawer */
+        .transcript-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid #334155;
+            color: #64748b;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        
+        .transcript-toggle:hover {
+            color: #14b8a6;
+            border-color: #14b8a6;
+        }
+        
         .transcript-drawer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(15, 23, 42, 0.98);
             border-top: 1px solid #334155;
             transform: translateY(100%);
             transition: transform 0.3s;
-            max-height: 40vh;
+            max-height: 50vh;
             overflow-y: auto;
+            z-index: 20;
+            backdrop-filter: blur(20px);
         }
+        
         .transcript-drawer.open {
             transform: translateY(0);
         }
-        .transcript-toggle {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid #334155;
-            color: #64748b;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .transcript-toggle.visible {
-            opacity: 1;
-        }
-        .transcript-toggle:hover {
-            color: #14b8a6;
-            border-color: #14b8a6;
-        }
+        
         .transcript-content {
-            padding: 20px 30px;
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
         }
+        
         .transcript-item {
-            margin-bottom: 15px;
-            padding-bottom: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
             border-bottom: 1px solid #334155;
         }
-        .transcript-item:last-child {
-            border-bottom: none;
-        }
+        
         .transcript-time {
             color: #64748b;
             font-size: 0.8rem;
             margin-bottom: 5px;
         }
+        
         .transcript-text {
             color: #e2e8f0;
+            font-size: 1.1rem;
         }
+        
         .transcript-text.question {
             color: #14b8a6;
         }
         
-        /* End session button - hidden until needed */
+        /* End session */
         .end-session {
             position: fixed;
             bottom: 30px;
             left: 30px;
-            background: rgba(220, 38, 38, 0.8);
+            background: rgba(220, 38, 38, 0.9);
             border: none;
             color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
+            padding: 12px 24px;
+            border-radius: 25px;
             cursor: pointer;
-            font-size: 0.85rem;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .end-session.visible {
-            opacity: 1;
+            font-size: 0.9rem;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
         }
         
-        /* Coach screen */
-        .coach-screen {
+        .end-session:hover {
+            background: rgba(220, 38, 38, 1);
+            transform: translateY(-2px);
+        }
+        
+        /* Summary screen */
+        .summary-screen {
             position: fixed;
             top: 0;
             left: 0;
@@ -217,128 +367,208 @@
             padding: 40px;
             z-index: 100;
         }
-        .coach-screen.active {
+        
+        .summary-screen.active {
             transform: translateY(0);
         }
-        .coach-content {
+        
+        .summary-content {
             max-width: 800px;
             margin: 0 auto;
         }
-        .coach-header {
+        
+        .summary-header {
             text-align: center;
             margin-bottom: 40px;
         }
-        .coach-header h2 {
+        
+        .summary-header h2 {
             color: #14b8a6;
-            font-size: 2rem;
+            font-size: 2.5rem;
             margin-bottom: 10px;
         }
-        .coach-header p {
-            color: #64748b;
-        }
-        .session-stats {
+        
+        .summary-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             margin-bottom: 40px;
         }
-        .stat-card {
+        
+        .summary-stat {
             background: #1e293b;
-            padding: 20px;
+            padding: 25px;
             border-radius: 12px;
             text-align: center;
             border: 1px solid #334155;
         }
-        .stat-value {
-            font-size: 2rem;
+        
+        .summary-stat-value {
+            font-size: 2.5rem;
             color: #14b8a6;
             font-weight: bold;
         }
-        .stat-label {
+        
+        .summary-stat-label {
             color: #64748b;
-            font-size: 0.9rem;
             margin-top: 5px;
         }
-        .coach-actions {
+        
+        .transcript-summary {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #334155;
+            margin-bottom: 30px;
+        }
+        
+        .transcript-summary h3 {
+            color: #14b8a6;
+            margin-bottom: 20px;
+        }
+        
+        .summary-actions {
             display: flex;
             gap: 15px;
             justify-content: center;
-            margin-top: 40px;
         }
-        .coach-actions button {
+        
+        .summary-actions button {
             padding: 15px 30px;
             border-radius: 8px;
             font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
         }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, #14b8a6, #2dd4bf);
+            color: #0f172a;
+            font-weight: bold;
+        }
+        
         .btn-secondary {
-            background: #334155 !important;
-            color: #e2e8f0 !important;
+            background: #334155;
+            color: #e2e8f0;
+        }
+        
+        /* Initial hint */
+        .start-hint {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #64748b;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .start-hint.hidden {
+            opacity: 0;
+            transition: opacity 0.5s;
         }
     </style>
 </head>
 <body>
-    <!-- Ambient indicator -->
-    <div class="ambient-indicator" title="Xyneth is listening"></div>
+    <!-- Animated background -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
     
-    <!-- Back link -->
+    <div class="ambient-glow"></div>
+    <div class="ambient-glow"></div>
+    
+    <!-- UI -->
     <a href="index.html" class="back-link">← Back</a>
     
-    <!-- Xyneth character - appears when needed -->
-    <div class="xyneth-container" id="xyneth">
-        <div class="xyneth-avatar">🎙️</div>
+    <div class="status-bar">
+        <div class="status-dot"></div>
+        <span class="status-text" id="statusText">Listening...</span>
+    </div>
+    
+    <!-- Start hint -->
+    <div class="start-hint" id="startHint">
+        <p style="font-size: 1.2rem; margin-bottom: 10px;">🎙️ Veritas is listening</p>
+        <p style="font-size: 0.9rem;">Ask a rules question to begin</p>
+    </div>
+    
+    <!-- Veritas character -->
+    <div class="veritas-container" id="veritas">
+        <div class="veritas-avatar">⚖️</div>
         <div class="speech-bubble">
-            <button class="close-btn" onclick="dismissXyneth()">×</button>
-            <h3 id="xyneth-title">Xyneth</h3>
-            <p id="xyneth-message">Listening...</p>
+            <button class="close-btn" onclick="dismissVeritas()">×</button>
+            <h3 id="veritas-title">Veritas</h3>
+            <p id="veritas-message">Listening for your questions...</p>
         </div>
     </div>
     
-    <!-- Transcript toggle -->
-    <button class="transcript-toggle" id="transcriptBtn" onclick="toggleTranscript()">📝 History</button>
+    <!-- Controls -->
+    <button class="transcript-toggle" onclick="toggleTranscript()">📝 History</button>
+    
+    <button class="end-session" onclick="endSession()">End Session</button>
     
     <!-- Transcript drawer -->
     <div class="transcript-drawer" id="transcriptDrawer">
         <div class="transcript-content" id="transcriptContent">
-            <p style="color: #64748b; text-align: center;">No questions asked yet...</p>
+            <p style="color: #64748b; text-align: center;">Ask a question to see the transcript...</p>
         </div>
     </div>
     
-    <!-- End session -->
-    <button class="end-session" id="endBtn" onclick="endSession()">End Session</button>
-    
-    <!-- Coach screen -->
-    <div class="coach-screen" id="coachScreen">
-        <div class="coach-content">
-            <div class="coach-header">
-                <h2>🧠 Session Analysis</h2>
-                <p>Review your game and insights</p>
+    <!-- Summary screen -->
+    <div class="summary-screen" id="summaryScreen">
+        <div class="summary-content">
+            <div class="summary-header">
+                <h2>🧠 Session Complete</h2>
+                <p style="color: #64748b;">Here's what we covered</p>
             </div>
             
-            <div class="session-stats">
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-questions">0</div>
-                    <div class="stat-label">Questions Asked</div>
+            <div class="summary-stats">
+                <div class="summary-stat">
+                    <div class="summary-stat-value" id="statQuestions">0</div>
+                    <div class="summary-stat-label">Questions</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-duration">0:00</div>
-                    <div class="stat-label">Duration</div>
+                <div class="summary-stat">
+                    <div class="summary-stat-value" id="statDuration">0:00</div>
+                    <div class="summary-stat-label">Duration</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-rules">0</div>
-                    <div class="stat-label">Rules Clarified</div>
+                <div class="summary-stat">
+                    <div class="summary-stat-value" id="statRules">0</div>
+                    <div class="summary-stat-label">Rules Explained</div>
                 </div>
             </div>
             
-            <div class="transcript-box" style="background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155;">
-                <h3 style="color: #14b8a6; margin-bottom: 15px;">📝 Full Transcript</h3>
-                <div id="coach-transcript" style="color: #94a3b8; line-height: 1.6;">
-                    <p>No transcript recorded.</p>
+            <div class="transcript-summary">
+                <h3>📝 Full Transcript</h3>
+                <div id="summaryTranscript" style="color: #94a3b8; line-height: 1.6;">
+                    <p>No questions asked during this session.</p>
                 </div>
             </div>
             
-            <div class="coach-actions">
+            <div class="summary-actions">
                 <button class="btn-secondary" onclick="window.location.href='index.html'">← Back to Home</button>
-                <button onclick="location.reload()">🎮 New Session</button>
+                <button class="btn-primary" onclick="location.reload()">🎮 New Session</button>
             </div>
         </div>
     </div>
@@ -350,17 +580,17 @@
             transcript: [],
             questions: [],
             startTime: new Date(),
-            rulesClarified: 0
+            rulesExplained: 0
         };
-        let xynethVisible = false;
+        let veritasVisible = false;
         let dismissTimeout = null;
 
-        // Question patterns to detect disputes
+        // Question patterns
         const questionPatterns = [
-            /can i/i, /can you/i, /can we/i, /can they/i,
-            /does/i, /do /i, /is /i, /are /i, /will /i,
-            /how does/i, /how do/i, /what happens/i, /what if/i,
-            /wait/i, /hold on/i, /actually/i, /doesn't/i,
+            /can i/i, /can you/i, /can we/i,
+            /does/i, /do /i, /is /i, /are /i,
+            /how does/i, /what happens/i, /what if/i,
+            /wait/i, /hold on/i, /actually/i,
             /target/i, /respond/i, /trigger/i, /stack/i,
             /hexproof/i, /flying/i, /trample/i, /indestructible/i,
             /commander/i, /combat/i, /attack/i, /block/i
@@ -373,16 +603,14 @@
             'flying': 'Flying creatures can only be blocked by other creatures with flying or reach. Ground creatures can\'t block them.',
             'indestructible': 'Indestructible means damage and "destroy" effects don\'t kill it. But it can still be exiled, sacrificed, or have its toughness reduced to 0.',
             'commander tax': 'Each time you cast your commander from the command zone after the first, it costs 2 more generic mana. This tax accumulates.',
-            'commander damage': 'If a single commander deals 21 or more combat damage to you over the course of the game, you lose. Track this separately for each commander.',
-            'priority': 'The active player gets priority first. When they pass, the non-active player can respond. Most actions use the stack.',
+            'commander damage': 'If a single commander deals 21 or more combat damage to you over the course of the game, you lose.',
             'the stack': 'Spells and abilities wait on the stack to resolve. Last one cast resolves first (LIFO). Players can respond before each resolution.',
-            'target': 'To target, you must choose a legal target when casting. Hexproof and shroud prevent targeting. Once a spell is cast, removing the target counters the spell.',
-            'trigger': 'Triggers go on the stack when their condition is met. In multiplayer, APNAP order applies: Active Player, then Non-Active Players in turn order.',
-            'combat': 'Combat has steps: Beginning, Declare Attackers, Declare Blockers, Combat Damage, End. Players get priority in each step.',
-            'respond': 'You can only respond when you have priority, typically after something is cast or activated. Instants and abilities can respond at instant speed.'
+            'priority': 'The active player gets priority first. When they pass, the non-active player can respond. Most actions use the stack.',
+            'target': 'To target, you must choose a legal target when casting. Hexproof and shroud prevent targeting. Removing the target counters the spell.',
+            'trigger': 'Triggers go on the stack when their condition is met. In multiplayer, APNAP order applies: Active Player, then Non-Active Players.'
         };
 
-        // Initialize speech recognition
+        // Initialize
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
@@ -402,7 +630,6 @@
 
             recognition.onerror = (event) => {
                 if (event.error === 'no-speech') return;
-                console.error('Error:', event.error);
                 setTimeout(() => { if (isListening) recognition.start(); }, 1000);
             };
 
@@ -410,37 +637,36 @@
                 if (isListening) recognition.start();
             };
 
-            // Auto-start
             recognition.start();
-            
-            // Show controls after delay
-            setTimeout(() => {
-                document.getElementById('transcriptBtn').classList.add('visible');
-                document.getElementById('endBtn').classList.add('visible');
-            }, 2000);
-        } else {
-            alert('Speech recognition not supported. Use Chrome or Edge.');
         }
 
         function processTranscript(text) {
             const timestamp = new Date().toLocaleTimeString();
             const entry = { time: timestamp, text: text, isQuestion: false };
             
-            // Check if it's a question
             const isQuestion = questionPatterns.some(pattern => pattern.test(text));
             
             if (isQuestion) {
                 entry.isQuestion = true;
                 sessionData.questions.push(entry);
                 
-                // Find relevant rule
+                document.body.classList.add('recording');
+                document.getElementById('statusText').textContent = 'Processing...';
+                
                 let answer = findAnswer(text);
                 if (answer) {
-                    sessionData.rulesClarified++;
-                    showXyneth(answer.title, answer.text);
+                    sessionData.rulesExplained++;
+                    showVeritas(answer.title, answer.text);
                 } else {
-                    showXyneth('I Heard You', `You asked about "${text}". In Phase 2, I'll have detailed answers for this.`);
+                    showVeritas('Question Heard', `You asked: "${text}"\n\nIn the full version, I'll provide detailed rules analysis for this.`);
                 }
+                
+                setTimeout(() => {
+                    document.body.classList.remove('recording');
+                    document.getElementById('statusText').textContent = 'Listening...';
+                }, 2000);
+                
+                document.getElementById('startHint').classList.add('hidden');
             }
             
             sessionData.transcript.push(entry);
@@ -457,37 +683,40 @@
             return null;
         }
 
-        function showXyneth(title, message) {
+        function showVeritas(title, message) {
             clearTimeout(dismissTimeout);
             
-            document.getElementById('xyneth-title').textContent = title;
-            document.getElementById('xyneth-message').textContent = message;
-            document.getElementById('xyneth').classList.add('active');
-            xynethVisible = true;
+            document.getElementById('veritas-title').textContent = title;
+            document.getElementById('veritas-message').textContent = message;
+            document.getElementById('veritas').classList.add('active');
+            veritasVisible = true;
             
-            // Auto-dismiss after 8 seconds unless hovered
             dismissTimeout = setTimeout(() => {
-                if (!document.querySelector('.xyneth-container:hover')) {
-                    dismissXyneth();
+                if (!document.querySelector('.veritas-container:hover')) {
+                    dismissVeritas();
                 }
-            }, 8000);
+            }, 10000);
         }
 
-        function dismissXyneth() {
-            document.getElementById('xyneth').classList.remove('active');
-            xynethVisible = false;
+        function dismissVeritas() {
+            document.getElementById('veritas').classList.remove('active');
+            veritasVisible = false;
         }
 
         function updateTranscript() {
             const content = document.getElementById('transcriptContent');
-            if (sessionData.transcript.length === 0) return;
+            if (content.innerHTML.includes('Ask a question')) {
+                content.innerHTML = '';
+            }
             
-            content.innerHTML = sessionData.transcript.map(entry => `
-                <div class="transcript-item">
-                    <div class="transcript-time">${entry.time}</div>
-                    <div class="transcript-text ${entry.isQuestion ? 'question' : ''}">${entry.text}</div>
-                </div>
-            `).join('');
+            const entry = sessionData.transcript[sessionData.transcript.length - 1];
+            const div = document.createElement('div');
+            div.className = 'transcript-item';
+            div.innerHTML = `
+                <div class="transcript-time">${entry.time}</div>
+                <div class="transcript-text ${entry.isQuestion ? 'question' : ''}">${entry.text}</div>
+            `;
+            content.insertBefore(div, content.firstChild);
         }
 
         function toggleTranscript() {
@@ -502,41 +731,29 @@
             const minutes = Math.floor(duration / 60);
             const seconds = duration % 60;
             
-            document.getElementById('stat-questions').textContent = sessionData.questions.length;
-            document.getElementById('stat-duration').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            document.getElementById('stat-rules').textContent = sessionData.rulesClarified;
+            document.getElementById('statQuestions').textContent = sessionData.questions.length;
+            document.getElementById('statDuration').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('statRules').textContent = sessionData.rulesExplained;
             
-            const coachTranscript = document.getElementById('coach-transcript');
+            const summaryDiv = document.getElementById('summaryTranscript');
             if (sessionData.transcript.length > 0) {
-                coachTranscript.innerHTML = sessionData.transcript.map(entry => `
+                summaryDiv.innerHTML = sessionData.transcript.map(entry => `
                     <p style="margin-bottom: 10px; ${entry.isQuestion ? 'color: #14b8a6;' : ''}">
                         <strong>${entry.time}</strong> ${entry.text}
                     </p>
                 `).join('');
             }
             
-            // Save to localStorage
-            let sessions = JSON.parse(localStorage.getItem('xyneth_sessions') || '[]');
+            let sessions = JSON.parse(localStorage.getItem('veritas_sessions') || '[]');
             sessions.push({
                 ...sessionData,
                 endTime: new Date().toISOString(),
                 duration: duration
             });
-            localStorage.setItem('xyneth_sessions', JSON.stringify(sessions));
+            localStorage.setItem('veritas_sessions', JSON.stringify(sessions));
             
-            document.getElementById('coachScreen').classList.add('active');
+            document.getElementById('summaryScreen').classList.add('active');
         }
-
-        // Keep listening
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.xyneth-container')) return;
-            if (isListening && recognition && !xynethVisible) {
-                // Ensure we're still listening
-                try {
-                    recognition.start();
-                } catch(e) {}
-            }
-        });
     </script>
 </body>
 </html>
