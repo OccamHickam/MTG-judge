@@ -2,2099 +2,408 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xyneth - MTG Rules Assistant</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
-
-        :root {
-            --void-black: #0a0a0f;
-            --deep-purple: #1a0f2e;
-            --wizard-blue: #2d4a6f;
-            --arcane-gold: #d4af37;
-            --moonlight: #e8e6e3;
-            --ethereal-cyan: #5dade2;
-            --mist-gray: #7f8c8d;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html, body {
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        body {
-            font-family: 'Cormorant Garamond', serif;
-            background: linear-gradient(135deg, var(--void-black) 0%, var(--deep-purple) 50%, #0f1419 100%);
-            color: var(--moonlight);
-        }
-
-        .app-container {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* LEFT - Wizard Character Area */
-        .wizard-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            position: relative;
-        }
-
-        .wizard-avatar {
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(45, 74, 111, 0.4));
-            border: 3px solid rgba(212, 175, 55, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 60px rgba(212, 175, 55, 0.2);
-        }
-
-        .wizard-avatar:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 80px rgba(212, 175, 55, 0.3);
-        }
-
-        .wizard-avatar.listening {
-            animation: listening-pulse 2s infinite;
-            border-color: var(--ethereal-cyan);
-            box-shadow: 0 0 100px rgba(93, 173, 226, 0.5);
-        }
-
-        @keyframes listening-pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-        }
-
-        .wizard-icon {
-            font-size: 120px;
-            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
-        }
-
-        .wizard-status {
-            margin-top: 30px;
-            font-family: 'Cinzel', serif;
-            font-size: 1.2rem;
-            color: var(--arcane-gold);
-            letter-spacing: 3px;
+        .container { max-width: 1200px; margin: 0 auto; }
+        header {
             text-align: center;
+            padding: 40px 0;
+            border-bottom: 2px solid #334155;
+            margin-bottom: 30px;
         }
-
-        .voice-hint {
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: var(--mist-gray);
-            font-style: italic;
-        }
-
-        /* RIGHT - Interface Panel */
-        .interface-panel {
-            width: 450px;
-            background: rgba(10, 10, 15, 0.7);
-            border-left: 1px solid rgba(212, 175, 55, 0.2);
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .logo {
-            font-family: 'Cinzel', serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--arcane-gold), #f4e4c1);
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(90deg, #14b8a6, #2dd4bf);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: 4px;
-        }
-
-        .subtitle {
-            color: var(--mist-gray);
-            font-size: 0.95rem;
-            letter-spacing: 2px;
-            margin-top: 5px;
-        }
-
-        /* Controls */
-        .controls {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: var(--arcane-gold);
-            font-size: 1.3rem;
-            transition: all 0.3s ease;
-        }
-
-        .btn:hover {
-            background: rgba(212, 175, 55, 0.2);
-            transform: scale(1.1);
-        }
-
-        .btn.muted {
-            color: var(--mist-gray);
-            border-color: rgba(127, 140, 141, 0.3);
-        }
-
-        .status-bar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 20px;
-            font-size: 0.85rem;
-            color: var(--mist-gray);
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--mist-gray);
-        }
-
-        .status-dot.ready {
-            background: #2ecc71;
-            box-shadow: 0 0 10px #2ecc71;
-        }
-
-        /* Input */
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .text-input {
-            width: 100%;
-            padding: 15px 20px;
-            background: rgba(26, 15, 46, 0.5);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 12px;
-            color: var(--moonlight);
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.1rem;
-            outline: none;
             margin-bottom: 10px;
         }
-
-        .text-input:focus {
-            border-color: var(--arcane-gold);
-        }
-
-        .text-input::placeholder {
-            color: var(--mist-gray);
+        .tagline {
+            color: #94a3b8;
             font-style: italic;
+            font-size: 1.2rem;
         }
-
-        .submit-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--wizard-blue), var(--deep-purple));
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 12px;
-            color: var(--arcane-gold);
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: all 0.3s ease;
-        }
-
-        .submit-btn:hover {
-            border-color: var(--arcane-gold);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-        }
-
-        /* Response Area */
-        .response-area {
-            flex: 1;
-            overflow-y: auto;
-            margin-bottom: 20px;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 30px;
-            color: var(--arcane-gold);
-            font-family: 'Cinzel', serif;
-            animation: pulse 2s infinite;
-        }
-
-        .loading.show {
-            display: block;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-
-        .query-box {
-            background: rgba(26, 15, 46, 0.5);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            display: none;
-        }
-
-        .query-box.show {
-            display: block;
-        }
-
-        .query-label {
-            font-family: 'Cinzel', serif;
-            font-size: 0.7rem;
-            color: var(--arcane-gold);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
-        }
-
-        .response-box {
-            background: rgba(26, 15, 46, 0.8);
-            border: 2px solid rgba(212, 175, 55, 0.4);
-            border-radius: 12px;
-            padding: 20px;
-            display: none;
-            margin-bottom: 15px;
-        }
-
-        .response-box.show {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .response-header {
+        .mode-tabs {
             display: flex;
-            align-items: center;
             gap: 10px;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-        }
-
-        .avatar-small {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--arcane-gold), #8b6914);
-            display: flex;
-            align-items: center;
+            margin-bottom: 30px;
             justify-content: center;
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            color: var(--void-black);
-            font-size: 1rem;
+            flex-wrap: wrap;
         }
-
-        .response-title {
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            color: var(--arcane-gold);
+        .mode-tab {
+            padding: 12px 24px;
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
             font-size: 1rem;
+            color: #94a3b8;
         }
-
-        .badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-family: 'Cinzel', serif;
-            font-size: 0.6rem;
+        .mode-tab:hover {
+            border-color: #14b8a6;
+            color: #14b8a6;
+        }
+        .mode-tab.active {
+            background: #14b8a6;
+            border-color: #14b8a6;
+            color: #0f172a;
+            font-weight: bold;
+        }
+        .panel {
+            display: none;
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #334155;
+        }
+        .panel.active { display: block; }
+        .input-group { margin-bottom: 20px; }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #14b8a6;
+            font-weight: 600;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #14b8a6;
+        }
+        textarea { min-height: 200px; resize: vertical; }
+        button {
+            background: linear-gradient(90deg, #14b8a6, #2dd4bf);
+            color: #0f172a;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
+        }
+        .voice-btn {
+            background: #7c3aed;
             margin-left: 10px;
         }
-
-        .badge.high { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
-        .badge.medium { background: rgba(230, 126, 34, 0.2); color: #e67e22; }
-        .badge.low { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
-
-        .response-text {
-            font-size: 1.05rem;
-            line-height: 1.7;
-            margin-bottom: 15px;
+        .voice-btn:hover {
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
         }
-
-        .rule-ref {
-            background: rgba(212, 175, 55, 0.1);
-            border-left: 3px solid var(--arcane-gold);
-            padding: 10px 15px;
-            border-radius: 0 8px 8px 0;
-            font-size: 0.9rem;
-            color: var(--mist-gray);
-            font-style: italic;
+        .voice-btn.listening {
+            background: #ef4444;
+            animation: pulse 1.5s infinite;
         }
-
-        .feedback {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(212, 175, 55, 0.2);
-            display: none;
-            text-align: center;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
-
-        .feedback.show {
-            display: block;
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #0f172a;
+            border-radius: 8px;
+            border-left: 4px solid #14b8a6;
         }
-
-        .feedback-text {
-            font-family: 'Cinzel', serif;
-            font-size: 0.85rem;
-            color: var(--mist-gray);
-            margin-bottom: 10px;
+        .results h3 { color: #14b8a6; margin-bottom: 15px; }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
-
-        .feedback-btn {
-            padding: 8px 20px;
-            margin: 0 5px;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            background: rgba(212, 175, 55, 0.1);
-            color: var(--moonlight);
-            border-radius: 20px;
-            cursor: pointer;
-            font-family: 'Cinzel', serif;
-            font-size: 0.75rem;
-            transition: all 0.3s ease;
+        .card {
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #334155;
         }
-
-        .feedback-btn:hover {
-            background: rgba(212, 175, 55, 0.2);
-        }
-
-        /* Suggestions */
-        .suggestions {
-            margin-top: auto;
-        }
-
-        .suggestions-title {
-            font-family: 'Cinzel', serif;
-            font-size: 0.75rem;
-            color: var(--mist-gray);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-
-        .chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-        }
-
-        .chip {
-            padding: 6px 14px;
-            background: rgba(26, 15, 46, 0.5);
-            border: 1px solid rgba(212, 175, 55, 0.15);
-            border-radius: 15px;
-            color: var(--mist-gray);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .chip:hover {
-            border-color: var(--arcane-gold);
-            color: var(--arcane-gold);
-        }
-
+        .card h4 { color: #14b8a6; margin-bottom: 8px; }
         .stats {
-            margin-top: 15px;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-box {
+            background: #0f172a;
+            padding: 15px;
             border-radius: 8px;
             text-align: center;
-            font-size: 0.8rem;
-            color: var(--mist-gray);
-            font-family: 'Cinzel', serif;
+            border: 1px solid #334155;
         }
-
-        .stats span {
-            color: var(--arcane-gold);
-            font-weight: 700;
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #14b8a6;
         }
-
-        /* Mobile */
-        @media (max-width: 900px) {
-            .app-container {
-                flex-direction: column;
-            }
-
-            .wizard-panel {
-                height: 40vh;
-                padding: 20px;
-            }
-
-            .wizard-avatar {
-                width: 200px;
-                height: 200px;
-            }
-
-            .wizard-icon {
-                font-size: 80px;
-            }
-
-            .interface-panel {
-                width: 100%;
-                height: 60vh;
-                border-left: none;
-                border-top: 1px solid rgba(212, 175, 55, 0.2);
-            }
+        .stat-label { color: #64748b; font-size: 0.9rem; }
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .quick-btn {
+            background: #334155;
+            color: #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .quick-btn:hover {
+            background: #14b8a6;
+            color: #0f172a;
+        }
+        .error {
+            background: #450a0a;
+            border: 1px solid #dc2626;
+            color: #fca5a5;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .mode-tabs { flex-direction: column; }
+            .card-grid { grid-template-columns: 1fr; }
         }
     </style>
-<base target="_blank">
 </head>
 <body>
-    <div class="app-container">
-        <!-- LEFT: Wizard -->
-        <div class="wizard-panel">
-            <div class="wizard-avatar" id="wizardAvatar" onclick="toggleListening()">
-                <div class="wizard-icon">🧙‍♂️</div>
-            </div>
-            <div class="wizard-status" id="wizardStatus">Click to Speak</div>
-            <div class="voice-hint" id="voiceHint">Or type your question →</div>
+    <div class="container">
+        <header>
+            <h1>🎴 Xyneth</h1>
+            <p class="tagline">"Rules at the speed of conversation"</p>
+        </header>
+
+        <div class="mode-tabs">
+            <button class="mode-tab active" onclick="switchMode('rules')">📋 Rules Assistant</button>
+            <button class="mode-tab" onclick="switchMode('deck')">🎴 Deck Analyzer</button>
+            <button class="mode-tab" onclick="switchMode('coach')">🧠 Coach Mode</button>
         </div>
 
-        <!-- RIGHT: Interface -->
-        <div class="interface-panel">
-            <div class="header">
-                <div class="logo">Xyneth</div>
-                <div class="subtitle">Arcane Advisor of the Multiverse</div>
-            </div>
-
-            <div class="controls">
-                <button class="btn" onclick="testVoice()" title="Test Voice">🗣️</button>
-                <button class="btn" id="muteBtn" onclick="toggleMute()" title="Toggle Voice">🔊</button>
-            </div>
-
-            <div class="status-bar">
-                <div class="status-dot" id="statusDot"></div>
-                <span id="statusText">Loading voice...</span>
-            </div>
-
+        <!-- Rules Panel -->
+        <div id="rules-panel" class="panel active">
             <div class="input-group">
-                <input type="text" class="text-input" id="textInput" placeholder="Ask about Trample, the Stack, Commander Damage..." autocomplete="off">
-                <button class="submit-btn" onclick="handleSubmit()">Ask Xyneth</button>
-            </div>
-
-            <div class="response-area">
-                <div class="loading" id="loading">Consulting the ancient tomes...</div>
-
-                <div class="query-box" id="queryBox">
-                    <div class="query-label">You asked:</div>
-                    <div id="queryText"></div>
-                </div>
-
-                <div class="response-box" id="responseBox">
-                    <div class="response-header">
-                        <div class="avatar-small">X</div>
-                        <div>
-                            <div class="response-title">Xyneth the Wise</div>
-                        </div>
-                        <span class="badge high" id="confidenceBadge">Ancient Wisdom</span>
-                    </div>
-                    <div class="response-text" id="responseText"></div>
-                    <div class="rule-ref" id="ruleRef"></div>
-
-                    <div class="feedback" id="feedback">
-                        <div class="feedback-text">Was this counsel true?</div>
-                        <button class="feedback-btn" onclick="submitFeedback(true)">✓ Yes</button>
-                        <button class="feedback-btn" onclick="submitFeedback(false)">✗ No</button>
-                    </div>
+                <label>Ask Xyneth about rules, cards, or interactions:</label>
+                <div style="display: flex;">
+                    <input type="text" id="rules-input" placeholder="e.g., 'How does trample work?'" style="flex: 1;">
+                    <button class="voice-btn" onclick="toggleVoice()" title="Voice input">🎤</button>
                 </div>
             </div>
-
-            <div class="suggestions">
-                <div class="suggestions-title">Try asking about</div>
-                <div class="chips">
-                    <span class="chip" onclick="quickAsk('How does Trample work?')">Trample</span>
-                    <span class="chip" onclick="quickAsk('What is the Stack?')">Stack</span>
-                    <span class="chip" onclick="quickAsk('Explain Deathtouch')">Deathtouch</span>
-                    <span class="chip" onclick="quickAsk('Commander Damage')">Commander</span>
-                    <span class="chip" onclick="quickAsk('How do counters work?')">Counters</span>
-                    <span class="chip" onclick="quickAsk('What is Hexproof?')">Hexproof</span>
-                </div>
+            <div class="quick-actions">
+                <button class="quick-btn" onclick="askQuick('trample')">Trample</button>
+                <button class="quick-btn" onclick="askQuick('hexproof')">Hexproof</button>
+                <button class="quick-btn" onclick="askQuick('the stack')">The Stack</button>
+                <button class="quick-btn" onclick="askQuick('commander tax')">Commander Tax</button>
             </div>
+            <button onclick="askRules()" style="margin-top: 20px;">Ask Xyneth</button>
+            <div id="rules-results"></div>
+        </div>
 
-            <div class="stats">
-                Consultations: <span id="count">0</span> | 
-                Accuracy: <span id="accuracy">--</span>
+        <!-- Deck Panel -->
+        <div id="deck-panel" class="panel">
+            <div class="input-group">
+                <label>Deck Name:</label>
+                <input type="text" id="deck-name" placeholder="My Commander Deck">
             </div>
+            <div class="input-group">
+                <label>Format:</label>
+                <select id="deck-format">
+                    <option value="commander">Commander / EDH</option>
+                    <option value="standard">Standard</option>
+                    <option value="modern">Modern</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Paste your decklist:</label>
+                <textarea id="deck-input" placeholder="1 Sol Ring&#10;1 Command Tower&#10;1 Arcane Signet"></textarea>
+            </div>
+            <button onclick="analyzeDeck()">Analyze Deck</button>
+            <div id="deck-results"></div>
+        </div>
+
+        <!-- Coach Panel -->
+        <div id="coach-panel" class="panel">
+            <div class="input-group">
+                <label>Describe your game situation:</label>
+                <textarea id="coach-input" placeholder="e.g., 'Should I attack with everything?'" style="min-height: 100px;"></textarea>
+            </div>
+            <button onclick="askCoach()">Get Coaching</button>
+            <div id="coach-results"></div>
         </div>
     </div>
 
     <script>
-
-        // Xyneth Knowledge Base - 28 Core MTG Concepts
-        const knowledgeBase = {
-            'trample': {
-                answer: "When a creature with Trample deals combat damage, it must assign lethal damage to all blockers first. Any excess damage carries over to the defending player or planeswalker. This makes Trample powerful against multiple small blockers.",
-                rule: "Rule 702.19 - Trample",
-                confidence: 'high'
-            },
-            'deathtouch': {
-                answer: "A creature with Deathtouch destroys any creature it deals damage to, regardless of how much damage. Even 1 damage is lethal. This makes it extremely efficient in combat, especially when assigning damage to multiple blockers.",
-                rule: "Rule 702.2 - Deathtouch",
-                confidence: 'high'
-            },
-            'double strike': {
-                answer: "Creatures with Double Strike deal combat damage twice - once during the first strike damage step, and again during the normal damage step. If a creature is destroyed by the first strike, it won't deal damage back.",
-                rule: "Rule 702.7 - Double Strike",
-                confidence: 'high'
-            },
-            'first strike': {
-                answer: "First Strike creates an additional combat damage step before the normal one. Creatures with First Strike deal damage first, potentially destroying blockers before they can deal damage back.",
-                rule: "Rule 702.7 - First Strike",
-                confidence: 'high'
-            },
-            'flying': {
-                answer: "Flying is an evasion ability. Only creatures with Flying or Reach can block a creature with Flying. However, a creature with Flying can block ground creatures normally.",
-                rule: "Rule 702.9 - Flying",
-                confidence: 'high'
-            },
-            'reach': {
-                answer: "Reach allows a creature to block creatures with Flying as though it had Flying. It does not allow the creature to be blocked only by flyers - it can still be blocked normally by ground creatures.",
-                rule: "Rule 702.17 - Reach",
-                confidence: 'high'
-            },
-            'vigilance': {
-                answer: "Vigilance means the creature does not tap when attacking. This allows it to attack and still be available to block on your opponent's turn, or use tap abilities after attacking.",
-                rule: "Rule 702.20 - Vigilance",
-                confidence: 'high'
-            },
-            'haste': {
-                answer: "Haste allows a creature to attack and use activated abilities with the tap symbol immediately, ignoring summoning sickness. Without Haste, creatures must wait until they've been under your control since your last turn.",
-                rule: "Rule 702.10 - Haste",
-                confidence: 'high'
-            },
-            'lifelink': {
-                answer: "Lifelink means whenever the source deals damage, you gain that much life. This happens simultaneously with the damage. Multiple instances of Lifelink are redundant.",
-                rule: "Rule 702.15 - Lifelink",
-                confidence: 'high'
-            },
-            'menace': {
-                answer: "Menace means the creature cannot be blocked except by two or more creatures. If an opponent cannot assign at least two blockers, the creature cannot be blocked at all.",
-                rule: "Rule 702.110 - Menace",
-                confidence: 'high'
-            },
-            'hexproof': {
-                answer: "Hexproof means the permanent cannot be targeted by spells or abilities your opponents control. You can still target your own Hexproof permanents. Board wipes and non-targeted effects still affect it.",
-                rule: "Rule 702.11 - Hexproof",
-                confidence: 'high'
-            },
-            'shroud': {
-                answer: "Shroud means the permanent cannot be targeted by any spells or abilities, including your own. Only effects that don't target can affect it, such as board wipes.",
-                rule: "Rule 702.18 - Shroud",
-                confidence: 'high'
-            },
-            'protection': {
-                answer: "Protection provides four benefits (DEBT): Damage from the quality is prevented; cannot be Enchanted/Equipped by it; cannot be Blocked by it; cannot be Targeted by it. Protection is not absolute immunity.",
-                rule: "Rule 702.16 - Protection",
-                confidence: 'high'
-            },
-            'indestructible': {
-                answer: "Indestructible permanents cannot be destroyed by lethal damage or effects that say 'destroy.' They can still be exiled, returned to hand, sacrificed, or reduced to 0 toughness.",
-                rule: "Rule 702.12 - Indestructible",
-                confidence: 'high'
-            },
-            'the stack': {
-                answer: "The stack is where spells and abilities wait to resolve. When you cast a spell, it goes on the stack. Players can respond, adding more to the stack. It resolves Last-In-First-Out (LIFO).",
-                rule: "Rule 405 - Stack",
-                confidence: 'high'
-            },
-            'priority': {
-                answer: "Priority determines who can cast spells and activate abilities. The active player gets priority first. When both players pass priority consecutively, the top item on the stack resolves.",
-                rule: "Rule 117 - Timing and Priority",
-                confidence: 'high'
-            },
-            'instant': {
-                answer: "Instants can be cast at any time you have priority - during your turn, opponent's turn, during combat, or in response to spells. This makes them highly flexible for reactions.",
-                rule: "Rule 304 - Instants",
-                confidence: 'high'
-            },
-            'flash': {
-                answer: "Flash allows you to cast the spell at any time you could cast an Instant. This lets you play creatures and other permanents on your opponent's turn or in response to threats.",
-                rule: "Rule 702.8 - Flash",
-                confidence: 'high'
-            },
-            'counterspell': {
-                answer: "Countering a spell removes it from the stack without it resolving. The spell goes to the graveyard and has no effect. Counterspells target the spell on the stack.",
-                rule: "Rule 701.5 - Counter",
-                confidence: 'high'
-            },
-            'commander damage': {
-                answer: "In Commander, if a player is dealt 21 or more combat damage by the same commander over the course of the game, they lose. Only combat damage counts, not damage from abilities.",
-                rule: "Commander Rules - Commander Damage",
-                confidence: 'high'
-            },
-            'commander tax': {
-                answer: "Each time you cast your commander from the command zone, it costs 2 generic mana more for each previous time you've cast it from there this game. Returning it to hand avoids this tax.",
-                rule: "Commander Rules - Additional Cost",
-                confidence: 'high'
-            },
-            'color identity': {
-                answer: "A card's color identity includes all mana symbols in its cost and rules text. Your Commander deck can only contain cards whose color identity fits within your commander's.",
-                rule: "Commander Rules - Color Identity",
-                confidence: 'high'
-            },
-            'mana': {
-                answer: "Mana is the primary resource for casting spells. It comes in five colors and colorless. Mana empties from your mana pool at the end of each step and phase. There is no longer mana burn.",
-                rule: "Rule 106 - Mana",
-                confidence: 'high'
-            },
-            'tapping': {
-                answer: "Tapping turns a permanent sideways to indicate it's been used. Tapped creatures cannot attack or block. Tapped lands cannot be tapped for mana again until they untap.",
-                rule: "Rule 701.20 - Tap",
-                confidence: 'high'
-            },
-            'counters': {
-                answer: "Counters are markers on permanents. +1/+1 and -1/-1 counters modify power and toughness. When both exist on the same creature, they cancel out in pairs. Other counters track various game values.",
-                rule: "Rule 122 - Counters",
-                confidence: 'high'
-            },
-            'sacrifice': {
-                answer: "To sacrifice a permanent, you move it from the battlefield to its owner's graveyard. You can only sacrifice your own permanents. Unlike destruction, sacrifice cannot be prevented.",
-                rule: "Rule 701.17 - Sacrifice",
-                confidence: 'high'
-            },
-            'token': {
-                answer: "Tokens are game objects not represented by cards. If a token would leave the battlefield, it ceases to exist instead. Tokens can briefly enter the graveyard or exile, triggering abilities, before disappearing.",
-                rule: "Rule 111 - Tokens",
-                confidence: 'high'
-            },
-            'copy': {
-                answer: "A copy has all copiable values of the original: mana cost, name, text, type, power/toughness. Copies are not 'cast' so they don't trigger cast triggers. Token copies enter as tokens.",
-                rule: "Rule 707 - Copying Objects",
-                confidence: 'high'
-            }
+        // Keyword database
+        const keywords = {
+            'trample': { description: 'Excess combat damage is dealt to defending player/planeswalker', example: 'A 5/5 with trample blocked by a 2/2 deals 2 to creature, 3 to player', rule: '702.19b' },
+            'flying': { description: 'Can only be blocked by creatures with flying or reach', example: 'A creature with flying can fly over ground creatures', rule: '702.9b' },
+            'hexproof': { description: 'Cannot be targeted by spells or abilities opponent controls', example: 'Your creature with hexproof - opponent cannot target it with Doom Blade', rule: '702.11c' },
+            'indestructible': { description: 'Cannot be destroyed by damage or destroy effects', example: 'Board wipe destroys all creatures - indestructible ones remain', rule: '702.12b' },
+            'lifelink': { description: 'Damage dealt also gains you that much life', example: '5/5 with lifelink deals 5 damage, you gain 5 life', rule: '702.15b' },
+            'deathtouch': { description: 'Any amount of damage is lethal to creatures', example: '1/1 with deathtouch can kill a 10/10 in combat', rule: '702.2b' },
+            'haste': { description: 'Can attack and tap immediately when it comes under your control', example: 'Creature with haste can attack the turn you play it', rule: '702.10b' },
+            'vigilance': { description: 'Attacking does not cause this creature to tap', example: 'Can attack and still block on opponent\'s turn', rule: '702.20b' },
+            'first strike': { description: 'Deals combat damage before creatures without first strike', example: '3/1 first strike vs 2/2 - first strike kills 2/2 before it deals damage', rule: '702.7b' },
+            'double strike': { description: 'Deals combat damage twice - once in first strike, once in normal', example: '3/3 double strike deals 3 damage, then 3 more damage', rule: '702.8b' },
+            'menace': { description: 'Can only be blocked by two or more creatures', example: 'Opponent needs 2+ creatures to block your menace creature', rule: '702.110b' },
+            'reach': { description: 'Can block creatures with flying', example: 'Spider with reach can block a bird with flying', rule: '702.17b' },
+            'flash': { description: 'Can be cast any time you could cast an instant', example: 'Cast creature with flash during opponent\'s combat step', rule: '702.8a' },
+            'ward': { description: 'Opponent pays cost or spell/ability is countered', example: 'Ward 2 - opponent pays 2 or their spell fizzles', rule: '702.21b' },
+            'prowess': { description: 'Gets +1/+1 until end of turn when you cast noncreature spell', example: 'Cast Lightning Bolt, prowess creature gets +1/+1', rule: '702.107a' },
+            'commander': { description: 'Special card in Command Zone, can be cast from there', example: 'Commander dies - goes to Command Zone, costs 2 more next time', rule: '903.3' },
+            'command zone': { description: 'Special zone for commanders, emblems, and special cards', example: 'Commander starts here, not in library', rule: '903.6' },
+            'commander tax': { description: 'Commander costs 2 more for each time cast from Command Zone', example: 'First cast: normal cost, Second cast: +2, Third cast: +4', rule: '903.8' },
+            'commander damage': { description: '21 damage from one commander to a player is lethal', example: 'If a commander deals 21+ combat damage to you, you lose', rule: '903.10a' },
+            'color identity': { description: 'All mana symbols on card determine what colors can be in deck', example: 'Atraxa (WUBG) - deck can only have white, blue, black, green, colorless cards', rule: '903.4' },
+            'the stack': { description: 'Zone where spells and abilities wait to resolve (last in, first out)', example: 'You cast spell, opponent counters it - counter is on top, resolves first', rule: '405.1' },
+            'priority': { description: 'Right to cast spells and activate abilities', example: 'Active player gets priority first, then passes to opponent', rule: '117.1' },
+            'mana abilities': { description: 'Abilities that add mana and don\'t use the stack', example: 'Tap Forest for green mana - happens immediately, can\'t be responded to', rule: '605.1' },
+            'combat damage': { description: 'Damage dealt during combat phase by attacking/blocking creatures', example: 'Attacker deals damage equal to power to blocker or player', rule: '510.1' },
+            'state-based actions': { description: 'Game checks for things like 0 toughness, lethal damage, immediately', example: 'Creature with 0 toughness dies before you can respond', rule: '704.1' },
+            'target': { description: 'Choosing what a spell or ability affects when cast', example: 'Lightning Bolt targets a creature or player - hexproof prevents targeting', rule: '115.1' },
+            'resolve': { description: 'When a spell or ability on the stack takes effect', example: 'Counterspell resolves - target spell is countered and has no effect', rule: '608.1' },
+            'etb': { description: 'Enters the battlefield - triggers when permanent comes into play', example: 'Creature with ETB draw a card triggers when it enters', rule: '603.6a' }
         };
 
-        // Synonyms for better matching
-        const synonyms = {
-            'trample damage': 'trample', 'tramples': 'trample',
-            'deathtouch damage': 'deathtouch',
-            'double damage': 'double strike', 'hits twice': 'double strike',
-            'first damage': 'first strike', 'strikes first': 'first strike',
-            'flies': 'flying', 'flyer': 'flying', 'flying creature': 'flying',
-            'anti-flying': 'reach', 'blocks flyers': 'reach', 'block flying': 'reach',
-            'doesnt tap': 'vigilance', 'no tap': 'vigilance', 'attacks without tapping': 'vigilance',
-            'no summoning sickness': 'haste', 'can attack immediately': 'haste',
-            'gain life from damage': 'lifelink', 'life link': 'lifelink', 'damage gains life': 'lifelink',
-            'cant be blocked by one': 'menace', 'needs two blockers': 'menace',
-            'cant be targeted': 'hexproof', 'untargetable': 'hexproof',
-            'protection from': 'protection',
-            'cant be destroyed': 'indestructible', 'wont die': 'indestructible',
-            'stack rules': 'the stack', 'spell stack': 'the stack', 'how does stack work': 'the stack',
-            'when can i play instants': 'instant', 'cast anytime': 'instant',
-            'cast at instant speed': 'flash', 'flash speed': 'flash',
-            '21 damage': 'commander damage', '21 commander': 'commander damage', 'commander 21': 'commander damage',
-            'commander cost': 'commander tax', 'extra cost commander': 'commander tax',
-            'deck colors': 'color identity', 'what colors can i play': 'color identity',
-            'mana pool': 'mana', 'mana types': 'mana',
-            'turn sideways': 'tapping', 'tap for mana': 'tapping',
-            '+1+1 counters': 'counters', 'plus one counters': 'counters', 'minus counters': 'counters',
-            'sac': 'sacrifice', 'sacs': 'sacrifice', 'sacking': 'sacrifice'
-        };
-
-        // State
-        let isListening = false;
         let recognition = null;
-        let wizardVoice = null;
-        let voiceMuted = false;
-        let interactionData = [];
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            initVoice();
-            initSpeechRecognition();
-            loadData();
-            updateStats();
-
-            document.getElementById('textInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') handleSubmit();
-            });
-        });
-
-        // Voice Setup
-        function initVoice() {
-            if (!window.speechSynthesis) {
-                updateStatus('error', 'Voice not supported');
-                return;
-            }
-
-            const loadVoices = () => {
-                const voices = window.speechSynthesis.getVoices();
-                if (voices.length > 0) {
-                    // Prefer deep male voices
-                    const preferred = ['Google UK English Male', 'Microsoft David', 'Daniel', 'Arthur', 'Google US English', 'Microsoft Mark', 'Alex'];
-
-                    for (const name of preferred) {
-                        wizardVoice = voices.find(v => v.name.includes(name));
-                        if (wizardVoice) break;
-                    }
-
-                    if (!wizardVoice) {
-                        wizardVoice = voices.find(v => v.lang.startsWith('en')) || voices[0];
-                    }
-
-                    updateStatus('ready', 'Voice ready');
-                }
-            };
-
-            loadVoices();
-            if (speechSynthesis.onvoiceschanged !== undefined) {
-                speechSynthesis.onvoiceschanged = loadVoices;
-            }
-            setTimeout(loadVoices, 1000);
-        }
-
-        function updateStatus(status, text) {
-            const dot = document.getElementById('statusDot');
-            const label = document.getElementById('statusText');
-
-            dot.className = 'status-dot ' + status;
-            label.textContent = text;
-        }
-
-        function speak(text) {
-            if (voiceMuted || !window.speechSynthesis || !wizardVoice) return;
-
-            window.speechSynthesis.cancel();
-
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.voice = wizardVoice;
-            utterance.rate = 0.9;
-            utterance.pitch = 0.85;
-            utterance.volume = 1;
-
-            utterance.onstart = () => {
-                document.getElementById('wizardStatus').textContent = 'Speaking...';
-            };
-
-            utterance.onend = () => {
-                document.getElementById('wizardStatus').textContent = 'Click to Speak';
-            };
-
-            window.speechSynthesis.speak(utterance);
-        }
-
-        function testVoice() {
-            if (!wizardVoice) {
-                alert('Voice not loaded yet. Please wait a moment and try again.');
-                return;
-            }
-            speak("I am Xyneth, keeper of arcane wisdom. Speak your question, traveler.");
-        }
-
-        function toggleMute() {
-            voiceMuted = !voiceMuted;
-            const btn = document.getElementById('muteBtn');
-
-            if (voiceMuted) {
-                btn.textContent = '🔇';
-                btn.classList.add('muted');
-                window.speechSynthesis.cancel();
-            } else {
-                btn.textContent = '🔊';
-                btn.classList.remove('muted');
-                testVoice();
-            }
-        }
-
-        // Speech Recognition
-        function initSpeechRecognition() {
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                document.getElementById('wizardStatus').textContent = 'Type to Ask';
-                document.getElementById('voiceHint').textContent = 'Voice not available in this browser';
-                return;
-            }
-
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
-
             recognition.continuous = false;
-            recognition.interimResults = true;
+            recognition.interimResults = false;
             recognition.lang = 'en-US';
-
-            recognition.onstart = () => {
-                isListening = true;
-                document.getElementById('wizardAvatar').classList.add('listening');
-                document.getElementById('wizardStatus').textContent = 'Listening...';
-            };
-
-            recognition.onend = () => {
-                isListening = false;
-                document.getElementById('wizardAvatar').classList.remove('listening');
-                document.getElementById('wizardStatus').textContent = 'Click to Speak';
-            };
-
             recognition.onresult = (event) => {
-                let transcript = '';
-
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    if (event.results[i].isFinal) {
-                        transcript += event.results[i][0].transcript;
-                    }
-                }
-
-                if (transcript) {
-                    processQuery(transcript);
-                }
+                document.getElementById('rules-input').value = event.results[0][0].transcript;
+                stopVoice();
             };
-
-            recognition.onerror = () => {
-                document.getElementById('wizardStatus').textContent = 'Try Typing';
-                isListening = false;
-                document.getElementById('wizardAvatar').classList.remove('listening');
-            };
+            recognition.onerror = () => stopVoice();
+            recognition.onend = () => stopVoice();
         }
 
-        function toggleListening() {
-            if (!recognition) {
-                document.getElementById('textInput').focus();
-                return;
-            }
+        function switchMode(mode) {
+            document.querySelectorAll('.mode-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(mode + '-panel').classList.add('active');
+        }
 
-            if (isListening) {
+        function toggleVoice() {
+            if (!recognition) { alert('Voice not supported'); return; }
+            const btn = event.target;
+            if (btn.classList.contains('listening')) {
                 recognition.stop();
             } else {
                 recognition.start();
+                btn.classList.add('listening');
             }
         }
 
-        // Query Handling
-        function handleSubmit() {
-            const input = document.getElementById('textInput');
-            const query = input.value.trim();
+        function stopVoice() {
+            document.querySelectorAll('.voice-btn').forEach(btn => btn.classList.remove('listening'));
+        }
 
-            if (query) {
-                processQuery(query);
-                input.value = '';
+        function askQuick(term) {
+            document.getElementById('rules-input').value = term;
+            askRules();
+        }
+
+        function askRules() {
+            const input = document.getElementById('rules-input').value.toLowerCase().trim();
+            const resultsDiv = document.getElementById('rules-results');
+            if (!input) return;
+            let history = JSON.parse(localStorage.getItem('xyneth_searches') || '[]');
+            history.push({ query: input, time: new Date().toISOString() });
+            localStorage.setItem('xyneth_searches', JSON.stringify(history));
+            let found = null;
+            for (const [key, data] of Object.entries(keywords)) {
+                if (input.includes(key)) { found = { keyword: key, ...data }; break; }
+            }
+            if (found) {
+                resultsDiv.innerHTML = `<div class="results"><h3>📚 ${found.keyword.toUpperCase()}</h3><p><strong>Rule ${found.rule}:</strong> ${found.description}</p><div class="card"><h4>💡 Example</h4><p>${found.example}</p></div></div>`;
+            } else {
+                resultsDiv.innerHTML = `<div class="results"><h3>🤔 Xyneth's Response</h3><p>I don't have that specific rule yet. Try: ${Object.keys(keywords).slice(0, 8).join(', ')}...</p></div>`;
             }
         }
 
-        function quickAsk(query) {
-            processQuery(query);
-        }
-
-        function processQuery(query) {
-            // Show loading
-            document.getElementById('loading').classList.add('show');
-            document.getElementById('queryBox').classList.remove('show');
-            document.getElementById('responseBox').classList.remove('show');
-            document.getElementById('feedback').classList.remove('show');
-
-            // Simulate thinking delay
-            setTimeout(() => {
-                const result = findAnswer(query);
-                displayAnswer(query, result);
-                logInteraction(query, result);
-            }, 600);
-        }
-
-        function findAnswer(query) {
-            const lowerQuery = query.toLowerCase();
-
-            // Check exact matches
-            for (const [key, data] of Object.entries(knowledgeBase)) {
-                if (lowerQuery.includes(key)) {
-                    return { ...data, matched: key, type: 'exact' };
-                }
+        function analyzeDeck() {
+            const name = document.getElementById('deck-name').value || 'Untitled Deck';
+            const format = document.getElementById('deck-format').value;
+            const input = document.getElementById('deck-input').value;
+            const resultsDiv = document.getElementById('deck-results');
+            if (!input.trim()) { resultsDiv.innerHTML = '<div class="error">Please enter a decklist</div>'; return; }
+            const lines = input.split('\n');
+            let cards = [];
+            for (const line of lines) {
+                const match = line.match(/^(\d+)x?\s+(.+?)(?:\s*\(|\s*#|$)/i);
+                if (match) cards.push({ quantity: parseInt(match[1]), name: match[2].trim() });
             }
-
-            // Check synonyms
-            for (const [synonym, canonical] of Object.entries(synonyms)) {
-                if (lowerQuery.includes(synonym)) {
-                    return { ...knowledgeBase[canonical], matched: canonical, type: 'synonym' };
-                }
+            const totalCards = cards.reduce((sum, c) => sum + c.quantity, 0);
+            const landCount = cards.filter(c => 
+                ['forest','island','mountain','plains','swamp'].some(land => c.name.toLowerCase().includes(land))
+                || c.name.toLowerCase().includes('land')
+            ).reduce((sum, c) => sum + c.quantity, 0);
+            let recs = [];
+            if (format === 'commander') {
+                if (totalCards < 99) recs.push('Add more cards - Commander needs 99 + commander');
+                if (landCount < 35) recs.push('Consider more lands or ramp (you have ' + landCount + ')');
             }
-
-            // No match
-            return {
-                answer: "The mists of knowledge obscure that particular path. I can guide you through Trample, the Stack, Commander Damage, Deathtouch, and many other mysteries of the Multiverse. Please ask about a specific keyword or mechanic.",
-                rule: "Unknown Incantation",
-                confidence: 'low',
-                matched: null,
-                type: 'none'
-            };
-        }
-
-        function displayAnswer(query, result) {
-            // Hide loading
-            document.getElementById('loading').classList.remove('show');
-
-            // Show query
-            document.getElementById('queryText').textContent = query;
-            document.getElementById('queryBox').classList.add('show');
-
-            // Show response
-            document.getElementById('responseText').textContent = result.answer;
-            document.getElementById('ruleRef').innerHTML = '<strong>Reference:</strong> ' + result.rule;
-
-            // Update badge
-            const badge = document.getElementById('confidenceBadge');
-            badge.className = 'badge ' + result.confidence;
-            badge.textContent = result.confidence === 'high' ? 'Ancient Wisdom' : 
-                               result.confidence === 'medium' ? 'Scholarly' : 'Uncertain';
-
-            // Show response box
-            document.getElementById('responseBox').classList.add('show');
-
-            // Show feedback for good answers
-            if (result.confidence !== 'low') {
-                document.getElementById('feedback').classList.add('show');
-            }
-
-            // Scroll to response
-            document.getElementById('responseBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-            // Speak answer
-            speak(result.answer);
-        }
-
-        // Data Logging
-        function logInteraction(query, result) {
-            interactionData.push({
-                timestamp: new Date().toISOString(),
-                query: query,
-                matched: result.matched,
-                confidence: result.confidence,
-                helpful: null
-            });
-
-            saveData();
-            updateStats();
-        }
-
-        function submitFeedback(wasHelpful) {
-            if (interactionData.length > 0) {
-                interactionData[interactionData.length - 1].helpful = wasHelpful;
-                saveData();
-                updateStats();
-            }
-
-            const feedbackDiv = document.getElementById('feedback');
-            const color = wasHelpful ? '#2ecc71' : '#e74c3c';
-            const msg = wasHelpful ? '✦ Wisdom confirmed ✦' : '✦ I shall study more ✦';
-
-            feedbackDiv.innerHTML = '<div style="color: ' + color + '; font-family: Cinzel, serif; font-size: 0.9rem;">' + msg + '</div>';
-        }
-
-        function saveData() {
-            try {
-                localStorage.setItem('xyneth_data', JSON.stringify(interactionData));
-            } catch (e) {}
-        }
-
-        function loadData() {
-            try {
-                const saved = localStorage.getItem('xyneth_data');
-                if (saved) interactionData = JSON.parse(saved);
-            } catch (e) {}
-        }
-
-        function updateStats() {
-            document.getElementById('count').textContent = interactionData.length;
-
-            const rated = interactionData.filter(i => i.helpful !== null);
-            if (rated.length > 0) {
-                const good = rated.filter(i => i.helpful).length;
-                const percent = Math.round((good / rated.length) * 100);
-                document.getElementById('accuracy').textContent = percent + '%';
-            }
-        }
-    </script<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Xyneth - MTG Rules Assistant</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
-
-        :root {
-            --void-black: #0a0a0f;
-            --deep-purple: #1a0f2e;
-            --wizard-blue: #2d4a6f;
-            --arcane-gold: #d4af37;
-            --moonlight: #e8e6e3;
-            --ethereal-cyan: #5dade2;
-            --mist-gray: #7f8c8d;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html, body {
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        body {
-            font-family: 'Cormorant Garamond', serif;
-            background: linear-gradient(135deg, var(--void-black) 0%, var(--deep-purple) 50%, #0f1419 100%);
-            color: var(--moonlight);
-        }
-
-        .app-container {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* LEFT - Wizard Character Area */
-        .wizard-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            position: relative;
-        }
-
-        .wizard-avatar {
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(45, 74, 111, 0.4));
-            border: 3px solid rgba(212, 175, 55, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 60px rgba(212, 175, 55, 0.2);
-        }
-
-        .wizard-avatar:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 80px rgba(212, 175, 55, 0.3);
-        }
-
-        .wizard-avatar.listening {
-            animation: listening-pulse 2s infinite;
-            border-color: var(--ethereal-cyan);
-            box-shadow: 0 0 100px rgba(93, 173, 226, 0.5);
-        }
-
-        @keyframes listening-pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-        }
-
-        .wizard-icon {
-            font-size: 120px;
-            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
-        }
-
-        .wizard-status {
-            margin-top: 30px;
-            font-family: 'Cinzel', serif;
-            font-size: 1.2rem;
-            color: var(--arcane-gold);
-            letter-spacing: 3px;
-            text-align: center;
-        }
-
-        .voice-hint {
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: var(--mist-gray);
-            font-style: italic;
-        }
-
-        /* RIGHT - Interface Panel */
-        .interface-panel {
-            width: 450px;
-            background: rgba(10, 10, 15, 0.7);
-            border-left: 1px solid rgba(212, 175, 55, 0.2);
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .logo {
-            font-family: 'Cinzel', serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--arcane-gold), #f4e4c1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 4px;
-        }
-
-        .subtitle {
-            color: var(--mist-gray);
-            font-size: 0.95rem;
-            letter-spacing: 2px;
-            margin-top: 5px;
-        }
-
-        /* Controls */
-        .controls {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: var(--arcane-gold);
-            font-size: 1.3rem;
-            transition: all 0.3s ease;
-        }
-
-        .btn:hover {
-            background: rgba(212, 175, 55, 0.2);
-            transform: scale(1.1);
-        }
-
-        .btn.muted {
-            color: var(--mist-gray);
-            border-color: rgba(127, 140, 141, 0.3);
-        }
-
-        .status-bar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 20px;
-            font-size: 0.85rem;
-            color: var(--mist-gray);
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--mist-gray);
-        }
-
-        .status-dot.ready {
-            background: #2ecc71;
-            box-shadow: 0 0 10px #2ecc71;
-        }
-
-        /* Input */
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .text-input {
-            width: 100%;
-            padding: 15px 20px;
-            background: rgba(26, 15, 46, 0.5);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 12px;
-            color: var(--moonlight);
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.1rem;
-            outline: none;
-            margin-bottom: 10px;
-        }
-
-        .text-input:focus {
-            border-color: var(--arcane-gold);
-        }
-
-        .text-input::placeholder {
-            color: var(--mist-gray);
-            font-style: italic;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--wizard-blue), var(--deep-purple));
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 12px;
-            color: var(--arcane-gold);
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: all 0.3s ease;
-        }
-
-        .submit-btn:hover {
-            border-color: var(--arcane-gold);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-        }
-
-        /* Response Area */
-        .response-area {
-            flex: 1;
-            overflow-y: auto;
-            margin-bottom: 20px;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 30px;
-            color: var(--arcane-gold);
-            font-family: 'Cinzel', serif;
-            animation: pulse 2s infinite;
-        }
-
-        .loading.show {
-            display: block;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-
-        .query-box {
-            background: rgba(26, 15, 46, 0.5);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            display: none;
-        }
-
-        .query-box.show {
-            display: block;
-        }
-
-        .query-label {
-            font-family: 'Cinzel', serif;
-            font-size: 0.7rem;
-            color: var(--arcane-gold);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
-        }
-
-        .response-box {
-            background: rgba(26, 15, 46, 0.8);
-            border: 2px solid rgba(212, 175, 55, 0.4);
-            border-radius: 12px;
-            padding: 20px;
-            display: none;
-            margin-bottom: 15px;
-        }
-
-        .response-box.show {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .response-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-        }
-
-        .avatar-small {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--arcane-gold), #8b6914);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            color: var(--void-black);
-            font-size: 1rem;
-        }
-
-        .response-title {
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            color: var(--arcane-gold);
-            font-size: 1rem;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-family: 'Cinzel', serif;
-            font-size: 0.6rem;
-            margin-left: 10px;
-        }
-
-        .badge.high { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
-        .badge.medium { background: rgba(230, 126, 34, 0.2); color: #e67e22; }
-        .badge.low { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
-
-        .response-text {
-            font-size: 1.05rem;
-            line-height: 1.7;
-            margin-bottom: 15px;
-        }
-
-        .rule-ref {
-            background: rgba(212, 175, 55, 0.1);
-            border-left: 3px solid var(--arcane-gold);
-            padding: 10px 15px;
-            border-radius: 0 8px 8px 0;
-            font-size: 0.9rem;
-            color: var(--mist-gray);
-            font-style: italic;
-        }
-
-        .feedback {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(212, 175, 55, 0.2);
-            display: none;
-            text-align: center;
-        }
-
-        .feedback.show {
-            display: block;
-        }
-
-        .feedback-text {
-            font-family: 'Cinzel', serif;
-            font-size: 0.85rem;
-            color: var(--mist-gray);
-            margin-bottom: 10px;
-        }
-
-        .feedback-btn {
-            padding: 8px 20px;
-            margin: 0 5px;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            background: rgba(212, 175, 55, 0.1);
-            color: var(--moonlight);
-            border-radius: 20px;
-            cursor: pointer;
-            font-family: 'Cinzel', serif;
-            font-size: 0.75rem;
-            transition: all 0.3s ease;
-        }
-
-        .feedback-btn:hover {
-            background: rgba(212, 175, 55, 0.2);
-        }
-
-        /* Suggestions */
-        .suggestions {
-            margin-top: auto;
-        }
-
-        .suggestions-title {
-            font-family: 'Cinzel', serif;
-            font-size: 0.75rem;
-            color: var(--mist-gray);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-
-        .chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-        }
-
-        .chip {
-            padding: 6px 14px;
-            background: rgba(26, 15, 46, 0.5);
-            border: 1px solid rgba(212, 175, 55, 0.15);
-            border-radius: 15px;
-            color: var(--mist-gray);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .chip:hover {
-            border-color: var(--arcane-gold);
-            color: var(--arcane-gold);
-        }
-
-        .stats {
-            margin-top: 15px;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            text-align: center;
-            font-size: 0.8rem;
-            color: var(--mist-gray);
-            font-family: 'Cinzel', serif;
-        }
-
-        .stats span {
-            color: var(--arcane-gold);
-            font-weight: 700;
-        }
-
-        /* Mobile */
-        @media (max-width: 900px) {
-            .app-container {
-                flex-direction: column;
-            }
-
-            .wizard-panel {
-                height: 40vh;
-                padding: 20px;
-            }
-
-            .wizard-avatar {
-                width: 200px;
-                height: 200px;
-            }
-
-            .wizard-icon {
-                font-size: 80px;
-            }
-
-            .interface-panel {
-                width: 100%;
-                height: 60vh;
-                border-left: none;
-                border-top: 1px solid rgba(212, 175, 55, 0.2);
-            }
-        }
-    </style>
-<base target="_blank">
-</head>
-<body>
-    <div class="app-container">
-        <!-- LEFT: Wizard -->
-        <div class="wizard-panel">
-            <div class="wizard-avatar" id="wizardAvatar" onclick="toggleListening()">
-                <div class="wizard-icon">🧙‍♂️</div>
-            </div>
-            <div class="wizard-status" id="wizardStatus">Click to Speak</div>
-            <div class="voice-hint" id="voiceHint">Or type your question →</div>
-        </div>
-
-        <!-- RIGHT: Interface -->
-        <div class="interface-panel">
-            <div class="header">
-                <div class="logo">Xyneth</div>
-                <div class="subtitle">Arcane Advisor of the Multiverse</div>
-            </div>
-
-            <div class="controls">
-                <button class="btn" onclick="testVoice()" title="Test Voice">🗣️</button>
-                <button class="btn" id="muteBtn" onclick="toggleMute()" title="Toggle Voice">🔊</button>
-            </div>
-
-            <div class="status-bar">
-                <div class="status-dot" id="statusDot"></div>
-                <span id="statusText">Loading voice...</span>
-            </div>
-
-            <div class="input-group">
-                <input type="text" class="text-input" id="textInput" placeholder="Ask about Trample, the Stack, Commander Damage..." autocomplete="off">
-                <button class="submit-btn" onclick="handleSubmit()">Ask Xyneth</button>
-            </div>
-
-            <div class="response-area">
-                <div class="loading" id="loading">Consulting the ancient tomes...</div>
-
-                <div class="query-box" id="queryBox">
-                    <div class="query-label">You asked:</div>
-                    <div id="queryText"></div>
-                </div>
-
-                <div class="response-box" id="responseBox">
-                    <div class="response-header">
-                        <div class="avatar-small">X</div>
-                        <div>
-                            <div class="response-title">Xyneth the Wise</div>
-                        </div>
-                        <span class="badge high" id="confidenceBadge">Ancient Wisdom</span>
+            resultsDiv.innerHTML = `
+                <div class="results">
+                    <h3>📊 ${name} Analysis</h3>
+                    <div class="stats">
+                        <div class="stat-box"><div class="stat-value">${totalCards}</div><div class="stat-label">Total Cards</div></div>
+                        <div class="stat-box"><div class="stat-value">${landCount}</div><div class="stat-label">Lands</div></div>
+                        <div class="stat-box"><div class="stat-value">${format}</div><div class="stat-label">Format</div></div>
                     </div>
-                    <div class="response-text" id="responseText"></div>
-                    <div class="rule-ref" id="ruleRef"></div>
+                    ${recs.length > 0 ? `<div style="margin-top: 20px;"><h4>💡 Suggestions:</h4><ul style="margin-top: 10px; padding-left: 20px;">${recs.map(r => `<li>${r}</li>`).join('')}</ul></div>` : '<p>✅ Basic structure looks good!</p>'}
+                </div>
+            `;
+            let decks = JSON.parse(localStorage.getItem('xyneth_decks') || '[]');
+            decks.push({ name, format, cards, date: new Date().toISOString() });
+            localStorage.setItem('xyneth_decks', JSON.stringify(decks));
+        }
 
-                    <div class="feedback" id="feedback">
-                        <div class="feedback-text">Was this counsel true?</div>
-                        <button class="feedback-btn" onclick="submitFeedback(true)">✓ Yes</button>
-                        <button class="feedback-btn" onclick="submitFeedback(false)">✗ No</button>
+        function askCoach() {
+            const situation = document.getElementById('coach-input').value;
+            const resultsDiv = document.getElementById('coach-results');
+            if (!situation) return;
+            resultsDiv.innerHTML = `
+                <div class="results">
+                    <h3>🧠 Xyneth's Coaching</h3>
+                    <div class="card-grid">
+                        <div class="card"><h4>📈 Resources</h4><p>Consider your cards in hand, mana available, and board state vs opponent's.</p></div>
+                        <div class="card"><h4>⚡ Tempo</h4><p>Are you the aggressor or defender? This changes which trades are favorable.</p></div>
+                        <div class="card"><h4>🎯 Win Condition</h4><p>What's your path to victory? Prioritize plays that advance that plan.</p></div>
                     </div>
                 </div>
-            </div>
-
-            <div class="suggestions">
-                <div class="suggestions-title">Try asking about</div>
-                <div class="chips">
-                    <span class="chip" onclick="quickAsk('How does Trample work?')">Trample</span>
-                    <span class="chip" onclick="quickAsk('What is the Stack?')">Stack</span>
-                    <span class="chip" onclick="quickAsk('Explain Deathtouch')">Deathtouch</span>
-                    <span class="chip" onclick="quickAsk('Commander Damage')">Commander</span>
-                    <span class="chip" onclick="quickAsk('How do counters work?')">Counters</span>
-                    <span class="chip" onclick="quickAsk('What is Hexproof?')">Hexproof</span>
-                </div>
-            </div>
-
-            <div class="stats">
-                Consultations: <span id="count">0</span> | 
-                Accuracy: <span id="accuracy">--</span>
-            </div>
-        </div>
-    </div>
-
-    <script>
-
-        // Xyneth Knowledge Base - 28 Core MTG Concepts
-        const knowledgeBase = {
-            'trample': {
-                answer: "When a creature with Trample deals combat damage, it must assign lethal damage to all blockers first. Any excess damage carries over to the defending player or planeswalker. This makes Trample powerful against multiple small blockers.",
-                rule: "Rule 702.19 - Trample",
-                confidence: 'high'
-            },
-            'deathtouch': {
-                answer: "A creature with Deathtouch destroys any creature it deals damage to, regardless of how much damage. Even 1 damage is lethal. This makes it extremely efficient in combat, especially when assigning damage to multiple blockers.",
-                rule: "Rule 702.2 - Deathtouch",
-                confidence: 'high'
-            },
-            'double strike': {
-                answer: "Creatures with Double Strike deal combat damage twice - once during the first strike damage step, and again during the normal damage step. If a creature is destroyed by the first strike, it won't deal damage back.",
-                rule: "Rule 702.7 - Double Strike",
-                confidence: 'high'
-            },
-            'first strike': {
-                answer: "First Strike creates an additional combat damage step before the normal one. Creatures with First Strike deal damage first, potentially destroying blockers before they can deal damage back.",
-                rule: "Rule 702.7 - First Strike",
-                confidence: 'high'
-            },
-            'flying': {
-                answer: "Flying is an evasion ability. Only creatures with Flying or Reach can block a creature with Flying. However, a creature with Flying can block ground creatures normally.",
-                rule: "Rule 702.9 - Flying",
-                confidence: 'high'
-            },
-            'reach': {
-                answer: "Reach allows a creature to block creatures with Flying as though it had Flying. It does not allow the creature to be blocked only by flyers - it can still be blocked normally by ground creatures.",
-                rule: "Rule 702.17 - Reach",
-                confidence: 'high'
-            },
-            'vigilance': {
-                answer: "Vigilance means the creature does not tap when attacking. This allows it to attack and still be available to block on your opponent's turn, or use tap abilities after attacking.",
-                rule: "Rule 702.20 - Vigilance",
-                confidence: 'high'
-            },
-            'haste': {
-                answer: "Haste allows a creature to attack and use activated abilities with the tap symbol immediately, ignoring summoning sickness. Without Haste, creatures must wait until they've been under your control since your last turn.",
-                rule: "Rule 702.10 - Haste",
-                confidence: 'high'
-            },
-            'lifelink': {
-                answer: "Lifelink means whenever the source deals damage, you gain that much life. This happens simultaneously with the damage. Multiple instances of Lifelink are redundant.",
-                rule: "Rule 702.15 - Lifelink",
-                confidence: 'high'
-            },
-            'menace': {
-                answer: "Menace means the creature cannot be blocked except by two or more creatures. If an opponent cannot assign at least two blockers, the creature cannot be blocked at all.",
-                rule: "Rule 702.110 - Menace",
-                confidence: 'high'
-            },
-            'hexproof': {
-                answer: "Hexproof means the permanent cannot be targeted by spells or abilities your opponents control. You can still target your own Hexproof permanents. Board wipes and non-targeted effects still affect it.",
-                rule: "Rule 702.11 - Hexproof",
-                confidence: 'high'
-            },
-            'shroud': {
-                answer: "Shroud means the permanent cannot be targeted by any spells or abilities, including your own. Only effects that don't target can affect it, such as board wipes.",
-                rule: "Rule 702.18 - Shroud",
-                confidence: 'high'
-            },
-            'protection': {
-                answer: "Protection provides four benefits (DEBT): Damage from the quality is prevented; cannot be Enchanted/Equipped by it; cannot be Blocked by it; cannot be Targeted by it. Protection is not absolute immunity.",
-                rule: "Rule 702.16 - Protection",
-                confidence: 'high'
-            },
-            'indestructible': {
-                answer: "Indestructible permanents cannot be destroyed by lethal damage or effects that say 'destroy.' They can still be exiled, returned to hand, sacrificed, or reduced to 0 toughness.",
-                rule: "Rule 702.12 - Indestructible",
-                confidence: 'high'
-            },
-            'the stack': {
-                answer: "The stack is where spells and abilities wait to resolve. When you cast a spell, it goes on the stack. Players can respond, adding more to the stack. It resolves Last-In-First-Out (LIFO).",
-                rule: "Rule 405 - Stack",
-                confidence: 'high'
-            },
-            'priority': {
-                answer: "Priority determines who can cast spells and activate abilities. The active player gets priority first. When both players pass priority consecutively, the top item on the stack resolves.",
-                rule: "Rule 117 - Timing and Priority",
-                confidence: 'high'
-            },
-            'instant': {
-                answer: "Instants can be cast at any time you have priority - during your turn, opponent's turn, during combat, or in response to spells. This makes them highly flexible for reactions.",
-                rule: "Rule 304 - Instants",
-                confidence: 'high'
-            },
-            'flash': {
-                answer: "Flash allows you to cast the spell at any time you could cast an Instant. This lets you play creatures and other permanents on your opponent's turn or in response to threats.",
-                rule: "Rule 702.8 - Flash",
-                confidence: 'high'
-            },
-            'counterspell': {
-                answer: "Countering a spell removes it from the stack without it resolving. The spell goes to the graveyard and has no effect. Counterspells target the spell on the stack.",
-                rule: "Rule 701.5 - Counter",
-                confidence: 'high'
-            },
-            'commander damage': {
-                answer: "In Commander, if a player is dealt 21 or more combat damage by the same commander over the course of the game, they lose. Only combat damage counts, not damage from abilities.",
-                rule: "Commander Rules - Commander Damage",
-                confidence: 'high'
-            },
-            'commander tax': {
-                answer: "Each time you cast your commander from the command zone, it costs 2 generic mana more for each previous time you've cast it from there this game. Returning it to hand avoids this tax.",
-                rule: "Commander Rules - Additional Cost",
-                confidence: 'high'
-            },
-            'color identity': {
-                answer: "A card's color identity includes all mana symbols in its cost and rules text. Your Commander deck can only contain cards whose color identity fits within your commander's.",
-                rule: "Commander Rules - Color Identity",
-                confidence: 'high'
-            },
-            'mana': {
-                answer: "Mana is the primary resource for casting spells. It comes in five colors and colorless. Mana empties from your mana pool at the end of each step and phase. There is no longer mana burn.",
-                rule: "Rule 106 - Mana",
-                confidence: 'high'
-            },
-            'tapping': {
-                answer: "Tapping turns a permanent sideways to indicate it's been used. Tapped creatures cannot attack or block. Tapped lands cannot be tapped for mana again until they untap.",
-                rule: "Rule 701.20 - Tap",
-                confidence: 'high'
-            },
-            'counters': {
-                answer: "Counters are markers on permanents. +1/+1 and -1/-1 counters modify power and toughness. When both exist on the same creature, they cancel out in pairs. Other counters track various game values.",
-                rule: "Rule 122 - Counters",
-                confidence: 'high'
-            },
-            'sacrifice': {
-                answer: "To sacrifice a permanent, you move it from the battlefield to its owner's graveyard. You can only sacrifice your own permanents. Unlike destruction, sacrifice cannot be prevented.",
-                rule: "Rule 701.17 - Sacrifice",
-                confidence: 'high'
-            },
-            'token': {
-                answer: "Tokens are game objects not represented by cards. If a token would leave the battlefield, it ceases to exist instead. Tokens can briefly enter the graveyard or exile, triggering abilities, before disappearing.",
-                rule: "Rule 111 - Tokens",
-                confidence: 'high'
-            },
-            'copy': {
-                answer: "A copy has all copiable values of the original: mana cost, name, text, type, power/toughness. Copies are not 'cast' so they don't trigger cast triggers. Token copies enter as tokens.",
-                rule: "Rule 707 - Copying Objects",
-                confidence: 'high'
-            }
-        };
-
-        // Synonyms for better matching
-        const synonyms = {
-            'trample damage': 'trample', 'tramples': 'trample',
-            'deathtouch damage': 'deathtouch',
-            'double damage': 'double strike', 'hits twice': 'double strike',
-            'first damage': 'first strike', 'strikes first': 'first strike',
-            'flies': 'flying', 'flyer': 'flying', 'flying creature': 'flying',
-            'anti-flying': 'reach', 'blocks flyers': 'reach', 'block flying': 'reach',
-            'doesnt tap': 'vigilance', 'no tap': 'vigilance', 'attacks without tapping': 'vigilance',
-            'no summoning sickness': 'haste', 'can attack immediately': 'haste',
-            'gain life from damage': 'lifelink', 'life link': 'lifelink', 'damage gains life': 'lifelink',
-            'cant be blocked by one': 'menace', 'needs two blockers': 'menace',
-            'cant be targeted': 'hexproof', 'untargetable': 'hexproof',
-            'protection from': 'protection',
-            'cant be destroyed': 'indestructible', 'wont die': 'indestructible',
-            'stack rules': 'the stack', 'spell stack': 'the stack', 'how does stack work': 'the stack',
-            'when can i play instants': 'instant', 'cast anytime': 'instant',
-            'cast at instant speed': 'flash', 'flash speed': 'flash',
-            '21 damage': 'commander damage', '21 commander': 'commander damage', 'commander 21': 'commander damage',
-            'commander cost': 'commander tax', 'extra cost commander': 'commander tax',
-            'deck colors': 'color identity', 'what colors can i play': 'color identity',
-            'mana pool': 'mana', 'mana types': 'mana',
-            'turn sideways': 'tapping', 'tap for mana': 'tapping',
-            '+1+1 counters': 'counters', 'plus one counters': 'counters', 'minus counters': 'counters',
-            'sac': 'sacrifice', 'sacs': 'sacrifice', 'sacking': 'sacrifice'
-        };
-
-        // State
-        let isListening = false;
-        let recognition = null;
-        let wizardVoice = null;
-        let voiceMuted = false;
-        let interactionData = [];
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            initVoice();
-            initSpeechRecognition();
-            loadData();
-            updateStats();
-
-            document.getElementById('textInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') handleSubmit();
-            });
-        });
-
-        // Voice Setup
-        function initVoice() {
-            if (!window.speechSynthesis) {
-                updateStatus('error', 'Voice not supported');
-                return;
-            }
-
-            const loadVoices = () => {
-                const voices = window.speechSynthesis.getVoices();
-                if (voices.length > 0) {
-                    // Prefer deep male voices
-                    const preferred = ['Google UK English Male', 'Microsoft David', 'Daniel', 'Arthur', 'Google US English', 'Microsoft Mark', 'Alex'];
-
-                    for (const name of preferred) {
-                        wizardVoice = voices.find(v => v.name.includes(name));
-                        if (wizardVoice) break;
-                    }
-
-                    if (!wizardVoice) {
-                        wizardVoice = voices.find(v => v.lang.startsWith('en')) || voices[0];
-                    }
-
-                    updateStatus('ready', 'Voice ready');
-                }
-            };
-
-            loadVoices();
-            if (speechSynthesis.onvoiceschanged !== undefined) {
-                speechSynthesis.onvoiceschanged = loadVoices;
-            }
-            setTimeout(loadVoices, 1000);
-        }
-
-        function updateStatus(status, text) {
-            const dot = document.getElementById('statusDot');
-            const label = document.getElementById('statusText');
-
-            dot.className = 'status-dot ' + status;
-            label.textContent = text;
-        }
-
-        function speak(text) {
-            if (voiceMuted || !window.speechSynthesis || !wizardVoice) return;
-
-            window.speechSynthesis.cancel();
-
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.voice = wizardVoice;
-            utterance.rate = 0.9;
-            utterance.pitch = 0.85;
-            utterance.volume = 1;
-
-            utterance.onstart = () => {
-                document.getElementById('wizardStatus').textContent = 'Speaking...';
-            };
-
-            utterance.onend = () => {
-                document.getElementById('wizardStatus').textContent = 'Click to Speak';
-            };
-
-            window.speechSynthesis.speak(utterance);
-        }
-
-        function testVoice() {
-            if (!wizardVoice) {
-                alert('Voice not loaded yet. Please wait a moment and try again.');
-                return;
-            }
-            speak("I am Xyneth, keeper of arcane wisdom. Speak your question, traveler.");
-        }
-
-        function toggleMute() {
-            voiceMuted = !voiceMuted;
-            const btn = document.getElementById('muteBtn');
-
-            if (voiceMuted) {
-                btn.textContent = '🔇';
-                btn.classList.add('muted');
-                window.speechSynthesis.cancel();
-            } else {
-                btn.textContent = '🔊';
-                btn.classList.remove('muted');
-                testVoice();
-            }
-        }
-
-        // Speech Recognition
-        function initSpeechRecognition() {
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                document.getElementById('wizardStatus').textContent = 'Type to Ask';
-                document.getElementById('voiceHint').textContent = 'Voice not available in this browser';
-                return;
-            }
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-
-            recognition.continuous = false;
-            recognition.interimResults = true;
-            recognition.lang = 'en-US';
-
-            recognition.onstart = () => {
-                isListening = true;
-                document.getElementById('wizardAvatar').classList.add('listening');
-                document.getElementById('wizardStatus').textContent = 'Listening...';
-            };
-
-            recognition.onend = () => {
-                isListening = false;
-                document.getElementById('wizardAvatar').classList.remove('listening');
-                document.getElementById('wizardStatus').textContent = 'Click to Speak';
-            };
-
-            recognition.onresult = (event) => {
-                let transcript = '';
-
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    if (event.results[i].isFinal) {
-                        transcript += event.results[i][0].transcript;
-                    }
-                }
-
-                if (transcript) {
-                    processQuery(transcript);
-                }
-            };
-
-            recognition.onerror = () => {
-                document.getElementById('wizardStatus').textContent = 'Try Typing';
-                isListening = false;
-                document.getElementById('wizardAvatar').classList.remove('listening');
-            };
-        }
-
-        function toggleListening() {
-            if (!recognition) {
-                document.getElementById('textInput').focus();
-                return;
-            }
-
-            if (isListening) {
-                recognition.stop();
-            } else {
-                recognition.start();
-            }
-        }
-
-        // Query Handling
-        function handleSubmit() {
-            const input = document.getElementById('textInput');
-            const query = input.value.trim();
-
-            if (query) {
-                processQuery(query);
-                input.value = '';
-            }
-        }
-
-        function quickAsk(query) {
-            processQuery(query);
-        }
-
-        function processQuery(query) {
-            // Show loading
-            document.getElementById('loading').classList.add('show');
-            document.getElementById('queryBox').classList.remove('show');
-            document.getElementById('responseBox').classList.remove('show');
-            document.getElementById('feedback').classList.remove('show');
-
-            // Simulate thinking delay
-            setTimeout(() => {
-                const result = findAnswer(query);
-                displayAnswer(query, result);
-                logInteraction(query, result);
-            }, 600);
-        }
-
-        function findAnswer(query) {
-            const lowerQuery = query.toLowerCase();
-
-            // Check exact matches
-            for (const [key, data] of Object.entries(knowledgeBase)) {
-                if (lowerQuery.includes(key)) {
-                    return { ...data, matched: key, type: 'exact' };
-                }
-            }
-
-            // Check synonyms
-            for (const [synonym, canonical] of Object.entries(synonyms)) {
-                if (lowerQuery.includes(synonym)) {
-                    return { ...knowledgeBase[canonical], matched: canonical, type: 'synonym' };
-                }
-            }
-
-            // No match
-            return {
-                answer: "The mists of knowledge obscure that particular path. I can guide you through Trample, the Stack, Commander Damage, Deathtouch, and many other mysteries of the Multiverse. Please ask about a specific keyword or mechanic.",
-                rule: "Unknown Incantation",
-                confidence: 'low',
-                matched: null,
-                type: 'none'
-            };
-        }
-
-        function displayAnswer(query, result) {
-            // Hide loading
-            document.getElementById('loading').classList.remove('show');
-
-            // Show query
-            document.getElementById('queryText').textContent = query;
-            document.getElementById('queryBox').classList.add('show');
-
-            // Show response
-            document.getElementById('responseText').textContent = result.answer;
-            document.getElementById('ruleRef').innerHTML = '<strong>Reference:</strong> ' + result.rule;
-
-            // Update badge
-            const badge = document.getElementById('confidenceBadge');
-            badge.className = 'badge ' + result.confidence;
-            badge.textContent = result.confidence === 'high' ? 'Ancient Wisdom' : 
-                               result.confidence === 'medium' ? 'Scholarly' : 'Uncertain';
-
-            // Show response box
-            document.getElementById('responseBox').classList.add('show');
-
-            // Show feedback for good answers
-            if (result.confidence !== 'low') {
-                document.getElementById('feedback').classList.add('show');
-            }
-
-            // Scroll to response
-            document.getElementById('responseBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-            // Speak answer
-            speak(result.answer);
-        }
-
-        // Data Logging
-        function logInteraction(query, result) {
-            interactionData.push({
-                timestamp: new Date().toISOString(),
-                query: query,
-                matched: result.matched,
-                confidence: result.confidence,
-                helpful: null
-            });
-
-            saveData();
-            updateStats();
-        }
-
-        function submitFeedback(wasHelpful) {
-            if (interactionData.length > 0) {
-                interactionData[interactionData.length - 1].helpful = wasHelpful;
-                saveData();
-                updateStats();
-            }
-
-            const feedbackDiv = document.getElementById('feedback');
-            const color = wasHelpful ? '#2ecc71' : '#e74c3c';
-            const msg = wasHelpful ? '✦ Wisdom confirmed ✦' : '✦ I shall study more ✦';
-
-            feedbackDiv.innerHTML = '<div style="color: ' + color + '; font-family: Cinzel, serif; font-size: 0.9rem;">' + msg + '</div>';
-        }
-
-        function saveData() {
-            try {
-                localStorage.setItem('xyneth_data', JSON.stringify(interactionData));
-            } catch (e) {}
-        }
-
-        function loadData() {
-            try {
-                const saved = localStorage.getItem('xyneth_data');
-                if (saved) interactionData = JSON.parse(saved);
-            } catch (e) {}
-        }
-
-        function updateStats() {
-            document.getElementById('count').textContent = interactionData.length;
-
-            const rated = interactionData.filter(i => i.helpful !== null);
-            if (rated.length > 0) {
-                const good = rated.filter(i => i.helpful).length;
-                const percent = Math.round((good / rated.length) * 100);
-                document.getElementById('accuracy').textContent = percent + '%';
-            }
+            `;
         }
     </script>
 </body>
