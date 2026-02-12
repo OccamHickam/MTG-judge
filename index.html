@@ -1,0 +1,2101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Xyneth - MTG Rules Assistant</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+
+        :root {
+            --void-black: #0a0a0f;
+            --deep-purple: #1a0f2e;
+            --wizard-blue: #2d4a6f;
+            --arcane-gold: #d4af37;
+            --moonlight: #e8e6e3;
+            --ethereal-cyan: #5dade2;
+            --mist-gray: #7f8c8d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: linear-gradient(135deg, var(--void-black) 0%, var(--deep-purple) 50%, #0f1419 100%);
+            color: var(--moonlight);
+        }
+
+        .app-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* LEFT - Wizard Character Area */
+        .wizard-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .wizard-avatar {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(45, 74, 111, 0.4));
+            border: 3px solid rgba(212, 175, 55, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 60px rgba(212, 175, 55, 0.2);
+        }
+
+        .wizard-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 80px rgba(212, 175, 55, 0.3);
+        }
+
+        .wizard-avatar.listening {
+            animation: listening-pulse 2s infinite;
+            border-color: var(--ethereal-cyan);
+            box-shadow: 0 0 100px rgba(93, 173, 226, 0.5);
+        }
+
+        @keyframes listening-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        .wizard-icon {
+            font-size: 120px;
+            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+        }
+
+        .wizard-status {
+            margin-top: 30px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: var(--arcane-gold);
+            letter-spacing: 3px;
+            text-align: center;
+        }
+
+        .voice-hint {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--mist-gray);
+            font-style: italic;
+        }
+
+        /* RIGHT - Interface Panel */
+        .interface-panel {
+            width: 450px;
+            background: rgba(10, 10, 15, 0.7);
+            border-left: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--arcane-gold), #f4e4c1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 4px;
+        }
+
+        .subtitle {
+            color: var(--mist-gray);
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--arcane-gold);
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: rgba(212, 175, 55, 0.2);
+            transform: scale(1.1);
+        }
+
+        .btn.muted {
+            color: var(--mist-gray);
+            border-color: rgba(127, 140, 141, 0.3);
+        }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: var(--mist-gray);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--mist-gray);
+        }
+
+        .status-dot.ready {
+            background: #2ecc71;
+            box-shadow: 0 0 10px #2ecc71;
+        }
+
+        /* Input */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(26, 15, 46, 0.5);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 12px;
+            color: var(--moonlight);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .text-input:focus {
+            border-color: var(--arcane-gold);
+        }
+
+        .text-input::placeholder {
+            color: var(--mist-gray);
+            font-style: italic;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--wizard-blue), var(--deep-purple));
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            color: var(--arcane-gold);
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            border-color: var(--arcane-gold);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Response Area */
+        .response-area {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            color: var(--arcane-gold);
+            font-family: 'Cinzel', serif;
+            animation: pulse 2s infinite;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .query-box {
+            background: rgba(26, 15, 46, 0.5);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .query-box.show {
+            display: block;
+        }
+
+        .query-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.7rem;
+            color: var(--arcane-gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .response-box {
+            background: rgba(26, 15, 46, 0.8);
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            border-radius: 12px;
+            padding: 20px;
+            display: none;
+            margin-bottom: 15px;
+        }
+
+        .response-box.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .response-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .avatar-small {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--arcane-gold), #8b6914);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            color: var(--void-black);
+            font-size: 1rem;
+        }
+
+        .response-title {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            color: var(--arcane-gold);
+            font-size: 1rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.6rem;
+            margin-left: 10px;
+        }
+
+        .badge.high { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+        .badge.medium { background: rgba(230, 126, 34, 0.2); color: #e67e22; }
+        .badge.low { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+
+        .response-text {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .rule-ref {
+            background: rgba(212, 175, 55, 0.1);
+            border-left: 3px solid var(--arcane-gold);
+            padding: 10px 15px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: var(--mist-gray);
+            font-style: italic;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            display: none;
+            text-align: center;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback-text {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            color: var(--mist-gray);
+            margin-bottom: 10px;
+        }
+
+        .feedback-btn {
+            padding: 8px 20px;
+            margin: 0 5px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--moonlight);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .feedback-btn:hover {
+            background: rgba(212, 175, 55, 0.2);
+        }
+
+        /* Suggestions */
+        .suggestions {
+            margin-top: auto;
+        }
+
+        .suggestions-title {
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            color: var(--mist-gray);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .chip {
+            padding: 6px 14px;
+            background: rgba(26, 15, 46, 0.5);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 15px;
+            color: var(--mist-gray);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chip:hover {
+            border-color: var(--arcane-gold);
+            color: var(--arcane-gold);
+        }
+
+        .stats {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--mist-gray);
+            font-family: 'Cinzel', serif;
+        }
+
+        .stats span {
+            color: var(--arcane-gold);
+            font-weight: 700;
+        }
+
+        /* Mobile */
+        @media (max-width: 900px) {
+            .app-container {
+                flex-direction: column;
+            }
+
+            .wizard-panel {
+                height: 40vh;
+                padding: 20px;
+            }
+
+            .wizard-avatar {
+                width: 200px;
+                height: 200px;
+            }
+
+            .wizard-icon {
+                font-size: 80px;
+            }
+
+            .interface-panel {
+                width: 100%;
+                height: 60vh;
+                border-left: none;
+                border-top: 1px solid rgba(212, 175, 55, 0.2);
+            }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="app-container">
+        <!-- LEFT: Wizard -->
+        <div class="wizard-panel">
+            <div class="wizard-avatar" id="wizardAvatar" onclick="toggleListening()">
+                <div class="wizard-icon">🧙‍♂️</div>
+            </div>
+            <div class="wizard-status" id="wizardStatus">Click to Speak</div>
+            <div class="voice-hint" id="voiceHint">Or type your question →</div>
+        </div>
+
+        <!-- RIGHT: Interface -->
+        <div class="interface-panel">
+            <div class="header">
+                <div class="logo">Xyneth</div>
+                <div class="subtitle">Arcane Advisor of the Multiverse</div>
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="testVoice()" title="Test Voice">🗣️</button>
+                <button class="btn" id="muteBtn" onclick="toggleMute()" title="Toggle Voice">🔊</button>
+            </div>
+
+            <div class="status-bar">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">Loading voice...</span>
+            </div>
+
+            <div class="input-group">
+                <input type="text" class="text-input" id="textInput" placeholder="Ask about Trample, the Stack, Commander Damage..." autocomplete="off">
+                <button class="submit-btn" onclick="handleSubmit()">Ask Xyneth</button>
+            </div>
+
+            <div class="response-area">
+                <div class="loading" id="loading">Consulting the ancient tomes...</div>
+
+                <div class="query-box" id="queryBox">
+                    <div class="query-label">You asked:</div>
+                    <div id="queryText"></div>
+                </div>
+
+                <div class="response-box" id="responseBox">
+                    <div class="response-header">
+                        <div class="avatar-small">X</div>
+                        <div>
+                            <div class="response-title">Xyneth the Wise</div>
+                        </div>
+                        <span class="badge high" id="confidenceBadge">Ancient Wisdom</span>
+                    </div>
+                    <div class="response-text" id="responseText"></div>
+                    <div class="rule-ref" id="ruleRef"></div>
+
+                    <div class="feedback" id="feedback">
+                        <div class="feedback-text">Was this counsel true?</div>
+                        <button class="feedback-btn" onclick="submitFeedback(true)">✓ Yes</button>
+                        <button class="feedback-btn" onclick="submitFeedback(false)">✗ No</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="suggestions">
+                <div class="suggestions-title">Try asking about</div>
+                <div class="chips">
+                    <span class="chip" onclick="quickAsk('How does Trample work?')">Trample</span>
+                    <span class="chip" onclick="quickAsk('What is the Stack?')">Stack</span>
+                    <span class="chip" onclick="quickAsk('Explain Deathtouch')">Deathtouch</span>
+                    <span class="chip" onclick="quickAsk('Commander Damage')">Commander</span>
+                    <span class="chip" onclick="quickAsk('How do counters work?')">Counters</span>
+                    <span class="chip" onclick="quickAsk('What is Hexproof?')">Hexproof</span>
+                </div>
+            </div>
+
+            <div class="stats">
+                Consultations: <span id="count">0</span> | 
+                Accuracy: <span id="accuracy">--</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        // Xyneth Knowledge Base - 28 Core MTG Concepts
+        const knowledgeBase = {
+            'trample': {
+                answer: "When a creature with Trample deals combat damage, it must assign lethal damage to all blockers first. Any excess damage carries over to the defending player or planeswalker. This makes Trample powerful against multiple small blockers.",
+                rule: "Rule 702.19 - Trample",
+                confidence: 'high'
+            },
+            'deathtouch': {
+                answer: "A creature with Deathtouch destroys any creature it deals damage to, regardless of how much damage. Even 1 damage is lethal. This makes it extremely efficient in combat, especially when assigning damage to multiple blockers.",
+                rule: "Rule 702.2 - Deathtouch",
+                confidence: 'high'
+            },
+            'double strike': {
+                answer: "Creatures with Double Strike deal combat damage twice - once during the first strike damage step, and again during the normal damage step. If a creature is destroyed by the first strike, it won't deal damage back.",
+                rule: "Rule 702.7 - Double Strike",
+                confidence: 'high'
+            },
+            'first strike': {
+                answer: "First Strike creates an additional combat damage step before the normal one. Creatures with First Strike deal damage first, potentially destroying blockers before they can deal damage back.",
+                rule: "Rule 702.7 - First Strike",
+                confidence: 'high'
+            },
+            'flying': {
+                answer: "Flying is an evasion ability. Only creatures with Flying or Reach can block a creature with Flying. However, a creature with Flying can block ground creatures normally.",
+                rule: "Rule 702.9 - Flying",
+                confidence: 'high'
+            },
+            'reach': {
+                answer: "Reach allows a creature to block creatures with Flying as though it had Flying. It does not allow the creature to be blocked only by flyers - it can still be blocked normally by ground creatures.",
+                rule: "Rule 702.17 - Reach",
+                confidence: 'high'
+            },
+            'vigilance': {
+                answer: "Vigilance means the creature does not tap when attacking. This allows it to attack and still be available to block on your opponent's turn, or use tap abilities after attacking.",
+                rule: "Rule 702.20 - Vigilance",
+                confidence: 'high'
+            },
+            'haste': {
+                answer: "Haste allows a creature to attack and use activated abilities with the tap symbol immediately, ignoring summoning sickness. Without Haste, creatures must wait until they've been under your control since your last turn.",
+                rule: "Rule 702.10 - Haste",
+                confidence: 'high'
+            },
+            'lifelink': {
+                answer: "Lifelink means whenever the source deals damage, you gain that much life. This happens simultaneously with the damage. Multiple instances of Lifelink are redundant.",
+                rule: "Rule 702.15 - Lifelink",
+                confidence: 'high'
+            },
+            'menace': {
+                answer: "Menace means the creature cannot be blocked except by two or more creatures. If an opponent cannot assign at least two blockers, the creature cannot be blocked at all.",
+                rule: "Rule 702.110 - Menace",
+                confidence: 'high'
+            },
+            'hexproof': {
+                answer: "Hexproof means the permanent cannot be targeted by spells or abilities your opponents control. You can still target your own Hexproof permanents. Board wipes and non-targeted effects still affect it.",
+                rule: "Rule 702.11 - Hexproof",
+                confidence: 'high'
+            },
+            'shroud': {
+                answer: "Shroud means the permanent cannot be targeted by any spells or abilities, including your own. Only effects that don't target can affect it, such as board wipes.",
+                rule: "Rule 702.18 - Shroud",
+                confidence: 'high'
+            },
+            'protection': {
+                answer: "Protection provides four benefits (DEBT): Damage from the quality is prevented; cannot be Enchanted/Equipped by it; cannot be Blocked by it; cannot be Targeted by it. Protection is not absolute immunity.",
+                rule: "Rule 702.16 - Protection",
+                confidence: 'high'
+            },
+            'indestructible': {
+                answer: "Indestructible permanents cannot be destroyed by lethal damage or effects that say 'destroy.' They can still be exiled, returned to hand, sacrificed, or reduced to 0 toughness.",
+                rule: "Rule 702.12 - Indestructible",
+                confidence: 'high'
+            },
+            'the stack': {
+                answer: "The stack is where spells and abilities wait to resolve. When you cast a spell, it goes on the stack. Players can respond, adding more to the stack. It resolves Last-In-First-Out (LIFO).",
+                rule: "Rule 405 - Stack",
+                confidence: 'high'
+            },
+            'priority': {
+                answer: "Priority determines who can cast spells and activate abilities. The active player gets priority first. When both players pass priority consecutively, the top item on the stack resolves.",
+                rule: "Rule 117 - Timing and Priority",
+                confidence: 'high'
+            },
+            'instant': {
+                answer: "Instants can be cast at any time you have priority - during your turn, opponent's turn, during combat, or in response to spells. This makes them highly flexible for reactions.",
+                rule: "Rule 304 - Instants",
+                confidence: 'high'
+            },
+            'flash': {
+                answer: "Flash allows you to cast the spell at any time you could cast an Instant. This lets you play creatures and other permanents on your opponent's turn or in response to threats.",
+                rule: "Rule 702.8 - Flash",
+                confidence: 'high'
+            },
+            'counterspell': {
+                answer: "Countering a spell removes it from the stack without it resolving. The spell goes to the graveyard and has no effect. Counterspells target the spell on the stack.",
+                rule: "Rule 701.5 - Counter",
+                confidence: 'high'
+            },
+            'commander damage': {
+                answer: "In Commander, if a player is dealt 21 or more combat damage by the same commander over the course of the game, they lose. Only combat damage counts, not damage from abilities.",
+                rule: "Commander Rules - Commander Damage",
+                confidence: 'high'
+            },
+            'commander tax': {
+                answer: "Each time you cast your commander from the command zone, it costs 2 generic mana more for each previous time you've cast it from there this game. Returning it to hand avoids this tax.",
+                rule: "Commander Rules - Additional Cost",
+                confidence: 'high'
+            },
+            'color identity': {
+                answer: "A card's color identity includes all mana symbols in its cost and rules text. Your Commander deck can only contain cards whose color identity fits within your commander's.",
+                rule: "Commander Rules - Color Identity",
+                confidence: 'high'
+            },
+            'mana': {
+                answer: "Mana is the primary resource for casting spells. It comes in five colors and colorless. Mana empties from your mana pool at the end of each step and phase. There is no longer mana burn.",
+                rule: "Rule 106 - Mana",
+                confidence: 'high'
+            },
+            'tapping': {
+                answer: "Tapping turns a permanent sideways to indicate it's been used. Tapped creatures cannot attack or block. Tapped lands cannot be tapped for mana again until they untap.",
+                rule: "Rule 701.20 - Tap",
+                confidence: 'high'
+            },
+            'counters': {
+                answer: "Counters are markers on permanents. +1/+1 and -1/-1 counters modify power and toughness. When both exist on the same creature, they cancel out in pairs. Other counters track various game values.",
+                rule: "Rule 122 - Counters",
+                confidence: 'high'
+            },
+            'sacrifice': {
+                answer: "To sacrifice a permanent, you move it from the battlefield to its owner's graveyard. You can only sacrifice your own permanents. Unlike destruction, sacrifice cannot be prevented.",
+                rule: "Rule 701.17 - Sacrifice",
+                confidence: 'high'
+            },
+            'token': {
+                answer: "Tokens are game objects not represented by cards. If a token would leave the battlefield, it ceases to exist instead. Tokens can briefly enter the graveyard or exile, triggering abilities, before disappearing.",
+                rule: "Rule 111 - Tokens",
+                confidence: 'high'
+            },
+            'copy': {
+                answer: "A copy has all copiable values of the original: mana cost, name, text, type, power/toughness. Copies are not 'cast' so they don't trigger cast triggers. Token copies enter as tokens.",
+                rule: "Rule 707 - Copying Objects",
+                confidence: 'high'
+            }
+        };
+
+        // Synonyms for better matching
+        const synonyms = {
+            'trample damage': 'trample', 'tramples': 'trample',
+            'deathtouch damage': 'deathtouch',
+            'double damage': 'double strike', 'hits twice': 'double strike',
+            'first damage': 'first strike', 'strikes first': 'first strike',
+            'flies': 'flying', 'flyer': 'flying', 'flying creature': 'flying',
+            'anti-flying': 'reach', 'blocks flyers': 'reach', 'block flying': 'reach',
+            'doesnt tap': 'vigilance', 'no tap': 'vigilance', 'attacks without tapping': 'vigilance',
+            'no summoning sickness': 'haste', 'can attack immediately': 'haste',
+            'gain life from damage': 'lifelink', 'life link': 'lifelink', 'damage gains life': 'lifelink',
+            'cant be blocked by one': 'menace', 'needs two blockers': 'menace',
+            'cant be targeted': 'hexproof', 'untargetable': 'hexproof',
+            'protection from': 'protection',
+            'cant be destroyed': 'indestructible', 'wont die': 'indestructible',
+            'stack rules': 'the stack', 'spell stack': 'the stack', 'how does stack work': 'the stack',
+            'when can i play instants': 'instant', 'cast anytime': 'instant',
+            'cast at instant speed': 'flash', 'flash speed': 'flash',
+            '21 damage': 'commander damage', '21 commander': 'commander damage', 'commander 21': 'commander damage',
+            'commander cost': 'commander tax', 'extra cost commander': 'commander tax',
+            'deck colors': 'color identity', 'what colors can i play': 'color identity',
+            'mana pool': 'mana', 'mana types': 'mana',
+            'turn sideways': 'tapping', 'tap for mana': 'tapping',
+            '+1+1 counters': 'counters', 'plus one counters': 'counters', 'minus counters': 'counters',
+            'sac': 'sacrifice', 'sacs': 'sacrifice', 'sacking': 'sacrifice'
+        };
+
+        // State
+        let isListening = false;
+        let recognition = null;
+        let wizardVoice = null;
+        let voiceMuted = false;
+        let interactionData = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initVoice();
+            initSpeechRecognition();
+            loadData();
+            updateStats();
+
+            document.getElementById('textInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleSubmit();
+            });
+        });
+
+        // Voice Setup
+        function initVoice() {
+            if (!window.speechSynthesis) {
+                updateStatus('error', 'Voice not supported');
+                return;
+            }
+
+            const loadVoices = () => {
+                const voices = window.speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    // Prefer deep male voices
+                    const preferred = ['Google UK English Male', 'Microsoft David', 'Daniel', 'Arthur', 'Google US English', 'Microsoft Mark', 'Alex'];
+
+                    for (const name of preferred) {
+                        wizardVoice = voices.find(v => v.name.includes(name));
+                        if (wizardVoice) break;
+                    }
+
+                    if (!wizardVoice) {
+                        wizardVoice = voices.find(v => v.lang.startsWith('en')) || voices[0];
+                    }
+
+                    updateStatus('ready', 'Voice ready');
+                }
+            };
+
+            loadVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = loadVoices;
+            }
+            setTimeout(loadVoices, 1000);
+        }
+
+        function updateStatus(status, text) {
+            const dot = document.getElementById('statusDot');
+            const label = document.getElementById('statusText');
+
+            dot.className = 'status-dot ' + status;
+            label.textContent = text;
+        }
+
+        function speak(text) {
+            if (voiceMuted || !window.speechSynthesis || !wizardVoice) return;
+
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.voice = wizardVoice;
+            utterance.rate = 0.9;
+            utterance.pitch = 0.85;
+            utterance.volume = 1;
+
+            utterance.onstart = () => {
+                document.getElementById('wizardStatus').textContent = 'Speaking...';
+            };
+
+            utterance.onend = () => {
+                document.getElementById('wizardStatus').textContent = 'Click to Speak';
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function testVoice() {
+            if (!wizardVoice) {
+                alert('Voice not loaded yet. Please wait a moment and try again.');
+                return;
+            }
+            speak("I am Xyneth, keeper of arcane wisdom. Speak your question, traveler.");
+        }
+
+        function toggleMute() {
+            voiceMuted = !voiceMuted;
+            const btn = document.getElementById('muteBtn');
+
+            if (voiceMuted) {
+                btn.textContent = '🔇';
+                btn.classList.add('muted');
+                window.speechSynthesis.cancel();
+            } else {
+                btn.textContent = '🔊';
+                btn.classList.remove('muted');
+                testVoice();
+            }
+        }
+
+        // Speech Recognition
+        function initSpeechRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                document.getElementById('wizardStatus').textContent = 'Type to Ask';
+                document.getElementById('voiceHint').textContent = 'Voice not available in this browser';
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                isListening = true;
+                document.getElementById('wizardAvatar').classList.add('listening');
+                document.getElementById('wizardStatus').textContent = 'Listening...';
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                document.getElementById('wizardAvatar').classList.remove('listening');
+                document.getElementById('wizardStatus').textContent = 'Click to Speak';
+            };
+
+            recognition.onresult = (event) => {
+                let transcript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        transcript += event.results[i][0].transcript;
+                    }
+                }
+
+                if (transcript) {
+                    processQuery(transcript);
+                }
+            };
+
+            recognition.onerror = () => {
+                document.getElementById('wizardStatus').textContent = 'Try Typing';
+                isListening = false;
+                document.getElementById('wizardAvatar').classList.remove('listening');
+            };
+        }
+
+        function toggleListening() {
+            if (!recognition) {
+                document.getElementById('textInput').focus();
+                return;
+            }
+
+            if (isListening) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        }
+
+        // Query Handling
+        function handleSubmit() {
+            const input = document.getElementById('textInput');
+            const query = input.value.trim();
+
+            if (query) {
+                processQuery(query);
+                input.value = '';
+            }
+        }
+
+        function quickAsk(query) {
+            processQuery(query);
+        }
+
+        function processQuery(query) {
+            // Show loading
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('queryBox').classList.remove('show');
+            document.getElementById('responseBox').classList.remove('show');
+            document.getElementById('feedback').classList.remove('show');
+
+            // Simulate thinking delay
+            setTimeout(() => {
+                const result = findAnswer(query);
+                displayAnswer(query, result);
+                logInteraction(query, result);
+            }, 600);
+        }
+
+        function findAnswer(query) {
+            const lowerQuery = query.toLowerCase();
+
+            // Check exact matches
+            for (const [key, data] of Object.entries(knowledgeBase)) {
+                if (lowerQuery.includes(key)) {
+                    return { ...data, matched: key, type: 'exact' };
+                }
+            }
+
+            // Check synonyms
+            for (const [synonym, canonical] of Object.entries(synonyms)) {
+                if (lowerQuery.includes(synonym)) {
+                    return { ...knowledgeBase[canonical], matched: canonical, type: 'synonym' };
+                }
+            }
+
+            // No match
+            return {
+                answer: "The mists of knowledge obscure that particular path. I can guide you through Trample, the Stack, Commander Damage, Deathtouch, and many other mysteries of the Multiverse. Please ask about a specific keyword or mechanic.",
+                rule: "Unknown Incantation",
+                confidence: 'low',
+                matched: null,
+                type: 'none'
+            };
+        }
+
+        function displayAnswer(query, result) {
+            // Hide loading
+            document.getElementById('loading').classList.remove('show');
+
+            // Show query
+            document.getElementById('queryText').textContent = query;
+            document.getElementById('queryBox').classList.add('show');
+
+            // Show response
+            document.getElementById('responseText').textContent = result.answer;
+            document.getElementById('ruleRef').innerHTML = '<strong>Reference:</strong> ' + result.rule;
+
+            // Update badge
+            const badge = document.getElementById('confidenceBadge');
+            badge.className = 'badge ' + result.confidence;
+            badge.textContent = result.confidence === 'high' ? 'Ancient Wisdom' : 
+                               result.confidence === 'medium' ? 'Scholarly' : 'Uncertain';
+
+            // Show response box
+            document.getElementById('responseBox').classList.add('show');
+
+            // Show feedback for good answers
+            if (result.confidence !== 'low') {
+                document.getElementById('feedback').classList.add('show');
+            }
+
+            // Scroll to response
+            document.getElementById('responseBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            // Speak answer
+            speak(result.answer);
+        }
+
+        // Data Logging
+        function logInteraction(query, result) {
+            interactionData.push({
+                timestamp: new Date().toISOString(),
+                query: query,
+                matched: result.matched,
+                confidence: result.confidence,
+                helpful: null
+            });
+
+            saveData();
+            updateStats();
+        }
+
+        function submitFeedback(wasHelpful) {
+            if (interactionData.length > 0) {
+                interactionData[interactionData.length - 1].helpful = wasHelpful;
+                saveData();
+                updateStats();
+            }
+
+            const feedbackDiv = document.getElementById('feedback');
+            const color = wasHelpful ? '#2ecc71' : '#e74c3c';
+            const msg = wasHelpful ? '✦ Wisdom confirmed ✦' : '✦ I shall study more ✦';
+
+            feedbackDiv.innerHTML = '<div style="color: ' + color + '; font-family: Cinzel, serif; font-size: 0.9rem;">' + msg + '</div>';
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('xyneth_data', JSON.stringify(interactionData));
+            } catch (e) {}
+        }
+
+        function loadData() {
+            try {
+                const saved = localStorage.getItem('xyneth_data');
+                if (saved) interactionData = JSON.parse(saved);
+            } catch (e) {}
+        }
+
+        function updateStats() {
+            document.getElementById('count').textContent = interactionData.length;
+
+            const rated = interactionData.filter(i => i.helpful !== null);
+            if (rated.length > 0) {
+                const good = rated.filter(i => i.helpful).length;
+                const percent = Math.round((good / rated.length) * 100);
+                document.getElementById('accuracy').textContent = percent + '%';
+            }
+        }
+    </script<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Xyneth - MTG Rules Assistant</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+
+        :root {
+            --void-black: #0a0a0f;
+            --deep-purple: #1a0f2e;
+            --wizard-blue: #2d4a6f;
+            --arcane-gold: #d4af37;
+            --moonlight: #e8e6e3;
+            --ethereal-cyan: #5dade2;
+            --mist-gray: #7f8c8d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: linear-gradient(135deg, var(--void-black) 0%, var(--deep-purple) 50%, #0f1419 100%);
+            color: var(--moonlight);
+        }
+
+        .app-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* LEFT - Wizard Character Area */
+        .wizard-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .wizard-avatar {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(45, 74, 111, 0.4));
+            border: 3px solid rgba(212, 175, 55, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 60px rgba(212, 175, 55, 0.2);
+        }
+
+        .wizard-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 80px rgba(212, 175, 55, 0.3);
+        }
+
+        .wizard-avatar.listening {
+            animation: listening-pulse 2s infinite;
+            border-color: var(--ethereal-cyan);
+            box-shadow: 0 0 100px rgba(93, 173, 226, 0.5);
+        }
+
+        @keyframes listening-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        .wizard-icon {
+            font-size: 120px;
+            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+        }
+
+        .wizard-status {
+            margin-top: 30px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: var(--arcane-gold);
+            letter-spacing: 3px;
+            text-align: center;
+        }
+
+        .voice-hint {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--mist-gray);
+            font-style: italic;
+        }
+
+        /* RIGHT - Interface Panel */
+        .interface-panel {
+            width: 450px;
+            background: rgba(10, 10, 15, 0.7);
+            border-left: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--arcane-gold), #f4e4c1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 4px;
+        }
+
+        .subtitle {
+            color: var(--mist-gray);
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--arcane-gold);
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: rgba(212, 175, 55, 0.2);
+            transform: scale(1.1);
+        }
+
+        .btn.muted {
+            color: var(--mist-gray);
+            border-color: rgba(127, 140, 141, 0.3);
+        }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: var(--mist-gray);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--mist-gray);
+        }
+
+        .status-dot.ready {
+            background: #2ecc71;
+            box-shadow: 0 0 10px #2ecc71;
+        }
+
+        /* Input */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(26, 15, 46, 0.5);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 12px;
+            color: var(--moonlight);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .text-input:focus {
+            border-color: var(--arcane-gold);
+        }
+
+        .text-input::placeholder {
+            color: var(--mist-gray);
+            font-style: italic;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--wizard-blue), var(--deep-purple));
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            color: var(--arcane-gold);
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            border-color: var(--arcane-gold);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Response Area */
+        .response-area {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            color: var(--arcane-gold);
+            font-family: 'Cinzel', serif;
+            animation: pulse 2s infinite;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .query-box {
+            background: rgba(26, 15, 46, 0.5);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .query-box.show {
+            display: block;
+        }
+
+        .query-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.7rem;
+            color: var(--arcane-gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .response-box {
+            background: rgba(26, 15, 46, 0.8);
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            border-radius: 12px;
+            padding: 20px;
+            display: none;
+            margin-bottom: 15px;
+        }
+
+        .response-box.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .response-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .avatar-small {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--arcane-gold), #8b6914);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            color: var(--void-black);
+            font-size: 1rem;
+        }
+
+        .response-title {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            color: var(--arcane-gold);
+            font-size: 1rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.6rem;
+            margin-left: 10px;
+        }
+
+        .badge.high { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+        .badge.medium { background: rgba(230, 126, 34, 0.2); color: #e67e22; }
+        .badge.low { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+
+        .response-text {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .rule-ref {
+            background: rgba(212, 175, 55, 0.1);
+            border-left: 3px solid var(--arcane-gold);
+            padding: 10px 15px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            color: var(--mist-gray);
+            font-style: italic;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            display: none;
+            text-align: center;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback-text {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            color: var(--mist-gray);
+            margin-bottom: 10px;
+        }
+
+        .feedback-btn {
+            padding: 8px 20px;
+            margin: 0 5px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--moonlight);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .feedback-btn:hover {
+            background: rgba(212, 175, 55, 0.2);
+        }
+
+        /* Suggestions */
+        .suggestions {
+            margin-top: auto;
+        }
+
+        .suggestions-title {
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            color: var(--mist-gray);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .chip {
+            padding: 6px 14px;
+            background: rgba(26, 15, 46, 0.5);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 15px;
+            color: var(--mist-gray);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chip:hover {
+            border-color: var(--arcane-gold);
+            color: var(--arcane-gold);
+        }
+
+        .stats {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--mist-gray);
+            font-family: 'Cinzel', serif;
+        }
+
+        .stats span {
+            color: var(--arcane-gold);
+            font-weight: 700;
+        }
+
+        /* Mobile */
+        @media (max-width: 900px) {
+            .app-container {
+                flex-direction: column;
+            }
+
+            .wizard-panel {
+                height: 40vh;
+                padding: 20px;
+            }
+
+            .wizard-avatar {
+                width: 200px;
+                height: 200px;
+            }
+
+            .wizard-icon {
+                font-size: 80px;
+            }
+
+            .interface-panel {
+                width: 100%;
+                height: 60vh;
+                border-left: none;
+                border-top: 1px solid rgba(212, 175, 55, 0.2);
+            }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="app-container">
+        <!-- LEFT: Wizard -->
+        <div class="wizard-panel">
+            <div class="wizard-avatar" id="wizardAvatar" onclick="toggleListening()">
+                <div class="wizard-icon">🧙‍♂️</div>
+            </div>
+            <div class="wizard-status" id="wizardStatus">Click to Speak</div>
+            <div class="voice-hint" id="voiceHint">Or type your question →</div>
+        </div>
+
+        <!-- RIGHT: Interface -->
+        <div class="interface-panel">
+            <div class="header">
+                <div class="logo">Xyneth</div>
+                <div class="subtitle">Arcane Advisor of the Multiverse</div>
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="testVoice()" title="Test Voice">🗣️</button>
+                <button class="btn" id="muteBtn" onclick="toggleMute()" title="Toggle Voice">🔊</button>
+            </div>
+
+            <div class="status-bar">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">Loading voice...</span>
+            </div>
+
+            <div class="input-group">
+                <input type="text" class="text-input" id="textInput" placeholder="Ask about Trample, the Stack, Commander Damage..." autocomplete="off">
+                <button class="submit-btn" onclick="handleSubmit()">Ask Xyneth</button>
+            </div>
+
+            <div class="response-area">
+                <div class="loading" id="loading">Consulting the ancient tomes...</div>
+
+                <div class="query-box" id="queryBox">
+                    <div class="query-label">You asked:</div>
+                    <div id="queryText"></div>
+                </div>
+
+                <div class="response-box" id="responseBox">
+                    <div class="response-header">
+                        <div class="avatar-small">X</div>
+                        <div>
+                            <div class="response-title">Xyneth the Wise</div>
+                        </div>
+                        <span class="badge high" id="confidenceBadge">Ancient Wisdom</span>
+                    </div>
+                    <div class="response-text" id="responseText"></div>
+                    <div class="rule-ref" id="ruleRef"></div>
+
+                    <div class="feedback" id="feedback">
+                        <div class="feedback-text">Was this counsel true?</div>
+                        <button class="feedback-btn" onclick="submitFeedback(true)">✓ Yes</button>
+                        <button class="feedback-btn" onclick="submitFeedback(false)">✗ No</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="suggestions">
+                <div class="suggestions-title">Try asking about</div>
+                <div class="chips">
+                    <span class="chip" onclick="quickAsk('How does Trample work?')">Trample</span>
+                    <span class="chip" onclick="quickAsk('What is the Stack?')">Stack</span>
+                    <span class="chip" onclick="quickAsk('Explain Deathtouch')">Deathtouch</span>
+                    <span class="chip" onclick="quickAsk('Commander Damage')">Commander</span>
+                    <span class="chip" onclick="quickAsk('How do counters work?')">Counters</span>
+                    <span class="chip" onclick="quickAsk('What is Hexproof?')">Hexproof</span>
+                </div>
+            </div>
+
+            <div class="stats">
+                Consultations: <span id="count">0</span> | 
+                Accuracy: <span id="accuracy">--</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        // Xyneth Knowledge Base - 28 Core MTG Concepts
+        const knowledgeBase = {
+            'trample': {
+                answer: "When a creature with Trample deals combat damage, it must assign lethal damage to all blockers first. Any excess damage carries over to the defending player or planeswalker. This makes Trample powerful against multiple small blockers.",
+                rule: "Rule 702.19 - Trample",
+                confidence: 'high'
+            },
+            'deathtouch': {
+                answer: "A creature with Deathtouch destroys any creature it deals damage to, regardless of how much damage. Even 1 damage is lethal. This makes it extremely efficient in combat, especially when assigning damage to multiple blockers.",
+                rule: "Rule 702.2 - Deathtouch",
+                confidence: 'high'
+            },
+            'double strike': {
+                answer: "Creatures with Double Strike deal combat damage twice - once during the first strike damage step, and again during the normal damage step. If a creature is destroyed by the first strike, it won't deal damage back.",
+                rule: "Rule 702.7 - Double Strike",
+                confidence: 'high'
+            },
+            'first strike': {
+                answer: "First Strike creates an additional combat damage step before the normal one. Creatures with First Strike deal damage first, potentially destroying blockers before they can deal damage back.",
+                rule: "Rule 702.7 - First Strike",
+                confidence: 'high'
+            },
+            'flying': {
+                answer: "Flying is an evasion ability. Only creatures with Flying or Reach can block a creature with Flying. However, a creature with Flying can block ground creatures normally.",
+                rule: "Rule 702.9 - Flying",
+                confidence: 'high'
+            },
+            'reach': {
+                answer: "Reach allows a creature to block creatures with Flying as though it had Flying. It does not allow the creature to be blocked only by flyers - it can still be blocked normally by ground creatures.",
+                rule: "Rule 702.17 - Reach",
+                confidence: 'high'
+            },
+            'vigilance': {
+                answer: "Vigilance means the creature does not tap when attacking. This allows it to attack and still be available to block on your opponent's turn, or use tap abilities after attacking.",
+                rule: "Rule 702.20 - Vigilance",
+                confidence: 'high'
+            },
+            'haste': {
+                answer: "Haste allows a creature to attack and use activated abilities with the tap symbol immediately, ignoring summoning sickness. Without Haste, creatures must wait until they've been under your control since your last turn.",
+                rule: "Rule 702.10 - Haste",
+                confidence: 'high'
+            },
+            'lifelink': {
+                answer: "Lifelink means whenever the source deals damage, you gain that much life. This happens simultaneously with the damage. Multiple instances of Lifelink are redundant.",
+                rule: "Rule 702.15 - Lifelink",
+                confidence: 'high'
+            },
+            'menace': {
+                answer: "Menace means the creature cannot be blocked except by two or more creatures. If an opponent cannot assign at least two blockers, the creature cannot be blocked at all.",
+                rule: "Rule 702.110 - Menace",
+                confidence: 'high'
+            },
+            'hexproof': {
+                answer: "Hexproof means the permanent cannot be targeted by spells or abilities your opponents control. You can still target your own Hexproof permanents. Board wipes and non-targeted effects still affect it.",
+                rule: "Rule 702.11 - Hexproof",
+                confidence: 'high'
+            },
+            'shroud': {
+                answer: "Shroud means the permanent cannot be targeted by any spells or abilities, including your own. Only effects that don't target can affect it, such as board wipes.",
+                rule: "Rule 702.18 - Shroud",
+                confidence: 'high'
+            },
+            'protection': {
+                answer: "Protection provides four benefits (DEBT): Damage from the quality is prevented; cannot be Enchanted/Equipped by it; cannot be Blocked by it; cannot be Targeted by it. Protection is not absolute immunity.",
+                rule: "Rule 702.16 - Protection",
+                confidence: 'high'
+            },
+            'indestructible': {
+                answer: "Indestructible permanents cannot be destroyed by lethal damage or effects that say 'destroy.' They can still be exiled, returned to hand, sacrificed, or reduced to 0 toughness.",
+                rule: "Rule 702.12 - Indestructible",
+                confidence: 'high'
+            },
+            'the stack': {
+                answer: "The stack is where spells and abilities wait to resolve. When you cast a spell, it goes on the stack. Players can respond, adding more to the stack. It resolves Last-In-First-Out (LIFO).",
+                rule: "Rule 405 - Stack",
+                confidence: 'high'
+            },
+            'priority': {
+                answer: "Priority determines who can cast spells and activate abilities. The active player gets priority first. When both players pass priority consecutively, the top item on the stack resolves.",
+                rule: "Rule 117 - Timing and Priority",
+                confidence: 'high'
+            },
+            'instant': {
+                answer: "Instants can be cast at any time you have priority - during your turn, opponent's turn, during combat, or in response to spells. This makes them highly flexible for reactions.",
+                rule: "Rule 304 - Instants",
+                confidence: 'high'
+            },
+            'flash': {
+                answer: "Flash allows you to cast the spell at any time you could cast an Instant. This lets you play creatures and other permanents on your opponent's turn or in response to threats.",
+                rule: "Rule 702.8 - Flash",
+                confidence: 'high'
+            },
+            'counterspell': {
+                answer: "Countering a spell removes it from the stack without it resolving. The spell goes to the graveyard and has no effect. Counterspells target the spell on the stack.",
+                rule: "Rule 701.5 - Counter",
+                confidence: 'high'
+            },
+            'commander damage': {
+                answer: "In Commander, if a player is dealt 21 or more combat damage by the same commander over the course of the game, they lose. Only combat damage counts, not damage from abilities.",
+                rule: "Commander Rules - Commander Damage",
+                confidence: 'high'
+            },
+            'commander tax': {
+                answer: "Each time you cast your commander from the command zone, it costs 2 generic mana more for each previous time you've cast it from there this game. Returning it to hand avoids this tax.",
+                rule: "Commander Rules - Additional Cost",
+                confidence: 'high'
+            },
+            'color identity': {
+                answer: "A card's color identity includes all mana symbols in its cost and rules text. Your Commander deck can only contain cards whose color identity fits within your commander's.",
+                rule: "Commander Rules - Color Identity",
+                confidence: 'high'
+            },
+            'mana': {
+                answer: "Mana is the primary resource for casting spells. It comes in five colors and colorless. Mana empties from your mana pool at the end of each step and phase. There is no longer mana burn.",
+                rule: "Rule 106 - Mana",
+                confidence: 'high'
+            },
+            'tapping': {
+                answer: "Tapping turns a permanent sideways to indicate it's been used. Tapped creatures cannot attack or block. Tapped lands cannot be tapped for mana again until they untap.",
+                rule: "Rule 701.20 - Tap",
+                confidence: 'high'
+            },
+            'counters': {
+                answer: "Counters are markers on permanents. +1/+1 and -1/-1 counters modify power and toughness. When both exist on the same creature, they cancel out in pairs. Other counters track various game values.",
+                rule: "Rule 122 - Counters",
+                confidence: 'high'
+            },
+            'sacrifice': {
+                answer: "To sacrifice a permanent, you move it from the battlefield to its owner's graveyard. You can only sacrifice your own permanents. Unlike destruction, sacrifice cannot be prevented.",
+                rule: "Rule 701.17 - Sacrifice",
+                confidence: 'high'
+            },
+            'token': {
+                answer: "Tokens are game objects not represented by cards. If a token would leave the battlefield, it ceases to exist instead. Tokens can briefly enter the graveyard or exile, triggering abilities, before disappearing.",
+                rule: "Rule 111 - Tokens",
+                confidence: 'high'
+            },
+            'copy': {
+                answer: "A copy has all copiable values of the original: mana cost, name, text, type, power/toughness. Copies are not 'cast' so they don't trigger cast triggers. Token copies enter as tokens.",
+                rule: "Rule 707 - Copying Objects",
+                confidence: 'high'
+            }
+        };
+
+        // Synonyms for better matching
+        const synonyms = {
+            'trample damage': 'trample', 'tramples': 'trample',
+            'deathtouch damage': 'deathtouch',
+            'double damage': 'double strike', 'hits twice': 'double strike',
+            'first damage': 'first strike', 'strikes first': 'first strike',
+            'flies': 'flying', 'flyer': 'flying', 'flying creature': 'flying',
+            'anti-flying': 'reach', 'blocks flyers': 'reach', 'block flying': 'reach',
+            'doesnt tap': 'vigilance', 'no tap': 'vigilance', 'attacks without tapping': 'vigilance',
+            'no summoning sickness': 'haste', 'can attack immediately': 'haste',
+            'gain life from damage': 'lifelink', 'life link': 'lifelink', 'damage gains life': 'lifelink',
+            'cant be blocked by one': 'menace', 'needs two blockers': 'menace',
+            'cant be targeted': 'hexproof', 'untargetable': 'hexproof',
+            'protection from': 'protection',
+            'cant be destroyed': 'indestructible', 'wont die': 'indestructible',
+            'stack rules': 'the stack', 'spell stack': 'the stack', 'how does stack work': 'the stack',
+            'when can i play instants': 'instant', 'cast anytime': 'instant',
+            'cast at instant speed': 'flash', 'flash speed': 'flash',
+            '21 damage': 'commander damage', '21 commander': 'commander damage', 'commander 21': 'commander damage',
+            'commander cost': 'commander tax', 'extra cost commander': 'commander tax',
+            'deck colors': 'color identity', 'what colors can i play': 'color identity',
+            'mana pool': 'mana', 'mana types': 'mana',
+            'turn sideways': 'tapping', 'tap for mana': 'tapping',
+            '+1+1 counters': 'counters', 'plus one counters': 'counters', 'minus counters': 'counters',
+            'sac': 'sacrifice', 'sacs': 'sacrifice', 'sacking': 'sacrifice'
+        };
+
+        // State
+        let isListening = false;
+        let recognition = null;
+        let wizardVoice = null;
+        let voiceMuted = false;
+        let interactionData = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initVoice();
+            initSpeechRecognition();
+            loadData();
+            updateStats();
+
+            document.getElementById('textInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleSubmit();
+            });
+        });
+
+        // Voice Setup
+        function initVoice() {
+            if (!window.speechSynthesis) {
+                updateStatus('error', 'Voice not supported');
+                return;
+            }
+
+            const loadVoices = () => {
+                const voices = window.speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    // Prefer deep male voices
+                    const preferred = ['Google UK English Male', 'Microsoft David', 'Daniel', 'Arthur', 'Google US English', 'Microsoft Mark', 'Alex'];
+
+                    for (const name of preferred) {
+                        wizardVoice = voices.find(v => v.name.includes(name));
+                        if (wizardVoice) break;
+                    }
+
+                    if (!wizardVoice) {
+                        wizardVoice = voices.find(v => v.lang.startsWith('en')) || voices[0];
+                    }
+
+                    updateStatus('ready', 'Voice ready');
+                }
+            };
+
+            loadVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = loadVoices;
+            }
+            setTimeout(loadVoices, 1000);
+        }
+
+        function updateStatus(status, text) {
+            const dot = document.getElementById('statusDot');
+            const label = document.getElementById('statusText');
+
+            dot.className = 'status-dot ' + status;
+            label.textContent = text;
+        }
+
+        function speak(text) {
+            if (voiceMuted || !window.speechSynthesis || !wizardVoice) return;
+
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.voice = wizardVoice;
+            utterance.rate = 0.9;
+            utterance.pitch = 0.85;
+            utterance.volume = 1;
+
+            utterance.onstart = () => {
+                document.getElementById('wizardStatus').textContent = 'Speaking...';
+            };
+
+            utterance.onend = () => {
+                document.getElementById('wizardStatus').textContent = 'Click to Speak';
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function testVoice() {
+            if (!wizardVoice) {
+                alert('Voice not loaded yet. Please wait a moment and try again.');
+                return;
+            }
+            speak("I am Xyneth, keeper of arcane wisdom. Speak your question, traveler.");
+        }
+
+        function toggleMute() {
+            voiceMuted = !voiceMuted;
+            const btn = document.getElementById('muteBtn');
+
+            if (voiceMuted) {
+                btn.textContent = '🔇';
+                btn.classList.add('muted');
+                window.speechSynthesis.cancel();
+            } else {
+                btn.textContent = '🔊';
+                btn.classList.remove('muted');
+                testVoice();
+            }
+        }
+
+        // Speech Recognition
+        function initSpeechRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                document.getElementById('wizardStatus').textContent = 'Type to Ask';
+                document.getElementById('voiceHint').textContent = 'Voice not available in this browser';
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                isListening = true;
+                document.getElementById('wizardAvatar').classList.add('listening');
+                document.getElementById('wizardStatus').textContent = 'Listening...';
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                document.getElementById('wizardAvatar').classList.remove('listening');
+                document.getElementById('wizardStatus').textContent = 'Click to Speak';
+            };
+
+            recognition.onresult = (event) => {
+                let transcript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        transcript += event.results[i][0].transcript;
+                    }
+                }
+
+                if (transcript) {
+                    processQuery(transcript);
+                }
+            };
+
+            recognition.onerror = () => {
+                document.getElementById('wizardStatus').textContent = 'Try Typing';
+                isListening = false;
+                document.getElementById('wizardAvatar').classList.remove('listening');
+            };
+        }
+
+        function toggleListening() {
+            if (!recognition) {
+                document.getElementById('textInput').focus();
+                return;
+            }
+
+            if (isListening) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        }
+
+        // Query Handling
+        function handleSubmit() {
+            const input = document.getElementById('textInput');
+            const query = input.value.trim();
+
+            if (query) {
+                processQuery(query);
+                input.value = '';
+            }
+        }
+
+        function quickAsk(query) {
+            processQuery(query);
+        }
+
+        function processQuery(query) {
+            // Show loading
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('queryBox').classList.remove('show');
+            document.getElementById('responseBox').classList.remove('show');
+            document.getElementById('feedback').classList.remove('show');
+
+            // Simulate thinking delay
+            setTimeout(() => {
+                const result = findAnswer(query);
+                displayAnswer(query, result);
+                logInteraction(query, result);
+            }, 600);
+        }
+
+        function findAnswer(query) {
+            const lowerQuery = query.toLowerCase();
+
+            // Check exact matches
+            for (const [key, data] of Object.entries(knowledgeBase)) {
+                if (lowerQuery.includes(key)) {
+                    return { ...data, matched: key, type: 'exact' };
+                }
+            }
+
+            // Check synonyms
+            for (const [synonym, canonical] of Object.entries(synonyms)) {
+                if (lowerQuery.includes(synonym)) {
+                    return { ...knowledgeBase[canonical], matched: canonical, type: 'synonym' };
+                }
+            }
+
+            // No match
+            return {
+                answer: "The mists of knowledge obscure that particular path. I can guide you through Trample, the Stack, Commander Damage, Deathtouch, and many other mysteries of the Multiverse. Please ask about a specific keyword or mechanic.",
+                rule: "Unknown Incantation",
+                confidence: 'low',
+                matched: null,
+                type: 'none'
+            };
+        }
+
+        function displayAnswer(query, result) {
+            // Hide loading
+            document.getElementById('loading').classList.remove('show');
+
+            // Show query
+            document.getElementById('queryText').textContent = query;
+            document.getElementById('queryBox').classList.add('show');
+
+            // Show response
+            document.getElementById('responseText').textContent = result.answer;
+            document.getElementById('ruleRef').innerHTML = '<strong>Reference:</strong> ' + result.rule;
+
+            // Update badge
+            const badge = document.getElementById('confidenceBadge');
+            badge.className = 'badge ' + result.confidence;
+            badge.textContent = result.confidence === 'high' ? 'Ancient Wisdom' : 
+                               result.confidence === 'medium' ? 'Scholarly' : 'Uncertain';
+
+            // Show response box
+            document.getElementById('responseBox').classList.add('show');
+
+            // Show feedback for good answers
+            if (result.confidence !== 'low') {
+                document.getElementById('feedback').classList.add('show');
+            }
+
+            // Scroll to response
+            document.getElementById('responseBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            // Speak answer
+            speak(result.answer);
+        }
+
+        // Data Logging
+        function logInteraction(query, result) {
+            interactionData.push({
+                timestamp: new Date().toISOString(),
+                query: query,
+                matched: result.matched,
+                confidence: result.confidence,
+                helpful: null
+            });
+
+            saveData();
+            updateStats();
+        }
+
+        function submitFeedback(wasHelpful) {
+            if (interactionData.length > 0) {
+                interactionData[interactionData.length - 1].helpful = wasHelpful;
+                saveData();
+                updateStats();
+            }
+
+            const feedbackDiv = document.getElementById('feedback');
+            const color = wasHelpful ? '#2ecc71' : '#e74c3c';
+            const msg = wasHelpful ? '✦ Wisdom confirmed ✦' : '✦ I shall study more ✦';
+
+            feedbackDiv.innerHTML = '<div style="color: ' + color + '; font-family: Cinzel, serif; font-size: 0.9rem;">' + msg + '</div>';
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('xyneth_data', JSON.stringify(interactionData));
+            } catch (e) {}
+        }
+
+        function loadData() {
+            try {
+                const saved = localStorage.getItem('xyneth_data');
+                if (saved) interactionData = JSON.parse(saved);
+            } catch (e) {}
+        }
+
+        function updateStats() {
+            document.getElementById('count').textContent = interactionData.length;
+
+            const rated = interactionData.filter(i => i.helpful !== null);
+            if (rated.length > 0) {
+                const good = rated.filter(i => i.helpful).length;
+                const percent = Math.round((good / rated.length) * 100);
+                document.getElementById('accuracy').textContent = percent + '%';
+            }
+        }
+    </script>
+</body>
+</html>
