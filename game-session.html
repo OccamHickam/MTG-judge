@@ -1,0 +1,474 @@
+game_session = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xyneth - Game Session</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 2px solid #334155;
+            margin-bottom: 30px;
+        }
+        .back-link {
+            color: #14b8a6;
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .session-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #64748b;
+        }
+        .status-indicator.active {
+            background: #22c55e;
+            box-shadow: 0 0 10px #22c55e;
+        }
+        .status-indicator.recording {
+            background: #ef4444;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .main-controls {
+            text-align: center;
+            padding: 40px;
+            background: #1e293b;
+            border-radius: 16px;
+            border: 1px solid #334155;
+            margin-bottom: 30px;
+        }
+        .mic-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #14b8a6, #2dd4bf);
+            border: none;
+            cursor: pointer;
+            font-size: 3rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
+        }
+        .mic-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(20, 184, 166, 0.5);
+        }
+        .mic-button.recording {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            animation: pulse 1.5s infinite;
+        }
+        .transcript-box {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            min-height: 200px;
+            border: 1px solid #334155;
+        }
+        .transcript-box h3 {
+            color: #14b8a6;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .transcript-content {
+            color: #94a3b8;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        .transcript-content .timestamp {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-right: 10px;
+        }
+        .transcript-content .player {
+            color: #14b8a6;
+            font-weight: bold;
+        }
+        .insights-panel {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #334155;
+        }
+        .insights-panel h3 {
+            color: #14b8a6;
+            margin-bottom: 15px;
+        }
+        .insight-card {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid #14b8a6;
+        }
+        .insight-card h4 {
+            color: #e2e8f0;
+            margin-bottom: 5px;
+        }
+        .insight-card p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+        .setup-form {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid #334155;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #14b8a6;
+            font-weight: 600;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 1rem;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #14b8a6;
+        }
+        .player-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .player-tag {
+            background: #334155;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .player-tag button {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="back-link">← Back to Home</a>
+            <div class="session-status">
+                <span id="status-text">Ready to start</span>
+                <div id="status-light" class="status-indicator"></div>
+            </div>
+        </header>
+
+        <!-- Setup Form -->
+        <div id="setup-section" class="setup-form">
+            <h2 style="color: #14b8a6; margin-bottom: 20px;">🎮 New Game Session</h2>
+            
+            <div class="form-group">
+                <label>Game Format:</label>
+                <select id="game-format">
+                    <option value="commander">Commander / EDH</option>
+                    <option value="standard">Standard</option>
+                    <option value="modern">Modern</option>
+                    <option value="draft">Draft</option>
+                    <option value="sealed">Sealed</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Your Deck/Strategy:</label>
+                <input type="text" id="your-deck" placeholder="e.g., 'Atraxa Superfriends' or 'Mono-red Aggro'">
+            </div>
+
+            <div class="form-group">
+                <label>Opponent Decks (optional):</label>
+                <input type="text" id="opponent-input" placeholder="e.g., 'Yuriko Ninjas'">
+                <button onclick="addOpponent()" style="margin-top: 10px; padding: 8px 16px; font-size: 0.9rem;">Add Opponent</button>
+                <div id="opponent-list" class="player-tags"></div>
+            </div>
+
+            <button onclick="startSession()" style="width: 100%; margin-top: 10px;">Start Listening</button>
+        </div>
+
+        <!-- Active Session -->
+        <div id="session-section" class="hidden">
+            <div class="main-controls">
+                <button id="mic-btn" class="mic-button" onclick="toggleListening()">🎤</button>
+                <p style="margin-top: 20px; color: #94a3b8;">Tap to start/stop listening</p>
+                <p style="margin-top: 10px; font-size: 0.9rem; color: #64748b;">Xyneth will transcribe game actions and offer insights</p>
+            </div>
+
+            <div class="transcript-box">
+                <h3>
+                    📝 Game Transcript
+                    <button onclick="clearTranscript()" style="padding: 6px 12px; font-size: 0.8rem;">Clear</button>
+                </h3>
+                <div id="transcript" class="transcript-content">
+                    <span style="color: #64748b;">Game transcript will appear here...</span>
+                </div>
+            </div>
+
+            <div class="insights-panel">
+                <h3>💡 Xyneth's Insights</h3>
+                <div id="insights">
+                    <div class="insight-card">
+                        <h4>Waiting for game to start...</h4>
+                        <p>Start the microphone and begin playing. Xyneth will listen for rules questions and strategic moments.</p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="endSession()" style="width: 100%; margin-top: 20px; background: linear-gradient(90deg, #dc2626, #ef4444);">End Session</button>
+        </div>
+    </div>
+
+    <script>
+        let recognition = null;
+        let isListening = false;
+        let sessionData = {
+            format: '',
+            yourDeck: '',
+            opponents: [],
+            transcript: [],
+            startTime: null
+        };
+        let opponents = [];
+
+        // Initialize speech recognition
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = (event) => {
+                const results = event.results;
+                const lastResult = results[results.length - 1];
+                
+                if (lastResult.isFinal) {
+                    const transcript = lastResult[0].transcript;
+                    addToTranscript(transcript);
+                    analyzeTranscript(transcript);
+                }
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                if (event.error === 'no-speech') return;
+                stopListening();
+            };
+
+            recognition.onend = () => {
+                if (isListening) {
+                    recognition.start(); // Restart if still supposed to be listening
+                }
+            };
+        } else {
+            alert('Speech recognition not supported in this browser. Try Chrome or Edge.');
+        }
+
+        function addOpponent() {
+            const input = document.getElementById('opponent-input');
+            const name = input.value.trim();
+            if (name && !opponents.includes(name)) {
+                opponents.push(name);
+                renderOpponents();
+                input.value = '';
+            }
+        }
+
+        function removeOpponent(name) {
+            opponents = opponents.filter(o => o !== name);
+            renderOpponents();
+        }
+
+        function renderOpponents() {
+            const container = document.getElementById('opponent-list');
+            container.innerHTML = opponents.map(o => 
+                `<span class="player-tag">${o} <button onclick="removeOpponent('${o}')">×</button></span>`
+            ).join('');
+        }
+
+        function startSession() {
+            sessionData = {
+                format: document.getElementById('game-format').value,
+                yourDeck: document.getElementById('your-deck').value,
+                opponents: [...opponents],
+                transcript: [],
+                startTime: new Date().toISOString()
+            };
+
+            document.getElementById('setup-section').classList.add('hidden');
+            document.getElementById('session-section').classList.remove('hidden');
+            
+            updateStatus('Session active - Tap mic to listen', 'active');
+            
+            // Save to localStorage
+            let sessions = JSON.parse(localStorage.getItem('xyneth_sessions') || '[]');
+            sessions.push(sessionData);
+            localStorage.setItem('xyneth_sessions', JSON.stringify(sessions));
+        }
+
+        function toggleListening() {
+            if (!recognition) {
+                alert('Speech recognition not available');
+                return;
+            }
+
+            const btn = document.getElementById('mic-btn');
+            
+            if (isListening) {
+                stopListening();
+            } else {
+                startListening();
+            }
+        }
+
+        function startListening() {
+            isListening = true;
+            recognition.start();
+            document.getElementById('mic-btn').classList.add('recording');
+            updateStatus('🔴 Recording - Listening to game', 'recording');
+        }
+
+        function stopListening() {
+            isListening = false;
+            if (recognition) recognition.stop();
+            document.getElementById('mic-btn').classList.remove('recording');
+            updateStatus('Session active - Tap mic to listen', 'active');
+        }
+
+        function updateStatus(text, state) {
+            document.getElementById('status-text').textContent = text;
+            const light = document.getElementById('status-light');
+            light.className = 'status-indicator ' + state;
+        }
+
+        function addToTranscript(text) {
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = { time: timestamp, text: text };
+            sessionData.transcript.push(entry);
+            
+            const container = document.getElementById('transcript');
+            if (container.innerHTML.includes('Game transcript will appear')) {
+                container.innerHTML = '';
+            }
+            
+            container.innerHTML += `<div><span class="timestamp">${timestamp}</span> ${text}</div>`;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function analyzeTranscript(text) {
+            const lower = text.toLowerCase();
+            let insight = null;
+
+            // Simple keyword detection for demo
+            if (lower.includes('attack') || lower.includes('combat')) {
+                insight = {
+                    title: '⚔️ Combat Detected',
+                    text: 'Consider: blockers, combat tricks, and life total before declaring attackers.'
+                };
+            } else if (lower.includes('counter') || lower.includes('spell')) {
+                insight = {
+                    title: '📜 Spell on Stack',
+                    text: 'Check: Do you have responses? Mana open? Is this the right timing?'
+                };
+            } else if (lower.includes('trigger')) {
+                insight = {
+                    title: '⚡ Trigger Detected',
+                    text: 'Remember: "When" triggers go on stack in APNAP order (Active Player, Non-Active Player).'
+                };
+            } else if (lower.includes('search') || lower.includes('tutor')) {
+                insight = {
+                    title: '🔍 Searching Library',
+                    text: 'Note: Shuffle after searching. Opponent may respond before you find the card.'
+                };
+            }
+
+            if (insight) {
+                addInsight(insight.title, insight.text);
+            }
+        }
+
+        function addInsight(title, text) {
+            const container = document.getElementById('insights');
+            const card = document.createElement('div');
+            card.className = 'insight-card';
+            card.innerHTML = `<h4>${title}</h4><p>${text}</p>`;
+            container.insertBefore(card, container.firstChild);
+            
+            // Keep only last 5 insights
+            while (container.children.length > 5) {
+                container.removeChild(container.lastChild);
+            }
+        }
+
+        function clearTranscript() {
+            document.getElementById('transcript').innerHTML = '<span style="color: #64748b;">Game transcript cleared...</span>';
+            sessionData.transcript = [];
+        }
+
+        function endSession() {
+            stopListening();
+            
+            // Save final session data
+            let sessions = JSON.parse(localStorage.getItem('xyneth_sessions') || '[]');
+            const currentSession = sessions[sessions.length - 1];
+            if (currentSession) {
+                currentSession.endTime = new Date().toISOString();
+                currentSession.transcript = sessionData.transcript;
+            }
+            localStorage.setItem('xyneth_sessions', JSON.stringify(sessions));
+            
+            alert('Session saved! Data stored locally for analysis.');
+            window.location.href = 'index.html';
+        }
+
+        // Handle Enter key in opponent input
+        document.getElementById('opponent-input')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addOpponent();
+        });
+    </script>
+</body>
+</html>'''
+
+print(game_session)
