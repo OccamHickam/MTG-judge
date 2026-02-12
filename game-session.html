@@ -60,23 +60,12 @@
         .particle:nth-child(20) { left: 50%; animation-delay: 6s; animation-duration: 14s; }
         
         @keyframes float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100vh) rotate(720deg);
-                opacity: 0;
-            }
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
         }
         
-        /* Additional ambient glow */
         .ambient-glow {
             position: fixed;
             width: 300px;
@@ -87,35 +76,16 @@
             animation: drift 20s infinite ease-in-out;
         }
         
-        .ambient-glow:nth-child(1) {
-            top: 20%;
-            left: 20%;
-            animation-delay: 0s;
-        }
-        
-        .ambient-glow:nth-child(2) {
-            top: 60%;
-            right: 20%;
-            animation-delay: -10s;
-            background: radial-gradient(circle, rgba(45, 212, 191, 0.1) 0%, transparent 70%);
-        }
+        .ambient-glow:nth-child(1) { top: 20%; left: 20%; animation-delay: 0s; }
+        .ambient-glow:nth-child(2) { top: 60%; right: 20%; animation-delay: -10s; background: radial-gradient(circle, rgba(45, 212, 191, 0.1) 0%, transparent 70%); }
         
         @keyframes drift {
-            0%, 100% {
-                transform: translate(0, 0) scale(1);
-            }
-            25% {
-                transform: translate(50px, -30px) scale(1.1);
-            }
-            50% {
-                transform: translate(-30px, 50px) scale(0.9);
-            }
-            75% {
-                transform: translate(-50px, -20px) scale(1.05);
-            }
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -30px) scale(1.1); }
+            50% { transform: translate(-30px, 50px) scale(0.9); }
+            75% { transform: translate(-50px, -20px) scale(1.05); }
         }
         
-        /* Recording state - particles turn red */
         body.recording .particle {
             background: rgba(239, 68, 68, 0.6);
             box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
@@ -139,7 +109,6 @@
         }
         .back-link:hover { opacity: 1; color: #14b8a6; }
         
-        /* Status indicator */
         .status-bar {
             position: fixed;
             top: 30px;
@@ -182,85 +151,148 @@
             font-size: 0.85rem;
         }
         
-        /* Veritas character */
-        .veritas-container {
+        /* FULL PLATE ANSWER CARD */
+        .answer-plate {
             position: fixed;
-            bottom: 100px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%) translateY(300px);
+            transform: translate(-50%, -50%) scale(0.9);
             opacity: 0;
-            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            text-align: center;
-            z-index: 10;
+            width: 90%;
+            max-width: 600px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid #14b8a6;
+            border-radius: 20px;
+            padding: 0;
+            z-index: 100;
             pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 25px 80px rgba(0,0,0,0.6), 0 0 40px rgba(20, 184, 166, 0.2);
         }
-        .veritas-container.active {
-            transform: translateX(-50%) translateY(0);
+        
+        .answer-plate.active {
+            transform: translate(-50%, -50%) scale(1);
             opacity: 1;
             pointer-events: auto;
         }
         
-        .veritas-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #14b8a6, #2dd4bf);
+        .plate-header {
+            background: linear-gradient(90deg, #14b8a6, #2dd4bf);
+            color: #0f172a;
+            padding: 20px 25px;
+            border-radius: 18px 18px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .plate-header h2 {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .plate-close {
+            background: none;
+            border: none;
+            color: #0f172a;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
-            margin: 0 auto 20px;
-            box-shadow: 0 0 60px rgba(20, 184, 166, 0.5);
-            animation: avatarFloat 3s ease-in-out infinite;
+            border-radius: 50%;
+            transition: background 0.2s;
         }
         
-        @keyframes avatarFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
+        .plate-close:hover {
+            background: rgba(0,0,0,0.1);
         }
         
-        .speech-bubble {
-            background: rgba(30, 41, 59, 0.95);
-            border: 1px solid #334155;
-            border-radius: 20px;
-            padding: 25px 30px;
-            max-width: 500px;
-            position: relative;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        .plate-content {
+            padding: 25px;
         }
         
-        .speech-bubble::before {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 10px solid rgba(30, 41, 59, 0.95);
+        .plate-section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #334155;
         }
         
-        .speech-bubble h3 {
+        .plate-section:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .plate-section h3 {
             color: #14b8a6;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             margin-bottom: 10px;
-            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        .speech-bubble p {
-            color: #94a3b8;
-            line-height: 1.6;
+        .plate-section p, .plate-section li {
+            color: #e2e8f0;
+            line-height: 1.7;
+            font-size: 1.05rem;
         }
         
-        .speech-bubble .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: none;
-            border: none;
+        .plate-section ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .plate-section li {
+            margin-bottom: 8px;
+        }
+        
+        .rule-reference {
+            display: inline-block;
+            background: #334155;
+            color: #14b8a6;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-family: monospace;
+            margin-top: 10px;
+        }
+        
+        .action-box {
+            background: rgba(20, 184, 166, 0.1);
+            border-left: 4px solid #14b8a6;
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 10px;
+        }
+        
+        .action-box strong {
+            color: #2dd4bf;
+        }
+        
+        /* Start hint */
+        .start-hint {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
             color: #64748b;
-            font-size: 1.2rem;
-            cursor: pointer;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .start-hint.hidden {
+            opacity: 0;
+            transition: opacity 0.5s;
         }
         
         /* Transcript drawer */
@@ -297,7 +329,6 @@
             max-height: 50vh;
             overflow-y: auto;
             z-index: 20;
-            backdrop-filter: blur(20px);
         }
         
         .transcript-drawer.open {
@@ -324,7 +355,6 @@
         
         .transcript-text {
             color: #e2e8f0;
-            font-size: 1.1rem;
         }
         
         .transcript-text.question {
@@ -345,12 +375,6 @@
             font-size: 0.9rem;
             z-index: 10;
             backdrop-filter: blur(10px);
-            transition: all 0.3s;
-        }
-        
-        .end-session:hover {
-            background: rgba(220, 38, 38, 1);
-            transform: translateY(-2px);
         }
         
         /* Summary screen */
@@ -365,7 +389,7 @@
             transition: transform 0.5s;
             overflow-y: auto;
             padding: 40px;
-            z-index: 100;
+            z-index: 200;
         }
         
         .summary-screen.active {
@@ -385,7 +409,6 @@
         .summary-header h2 {
             color: #14b8a6;
             font-size: 2.5rem;
-            margin-bottom: 10px;
         }
         
         .summary-stats {
@@ -400,7 +423,6 @@
             padding: 25px;
             border-radius: 12px;
             text-align: center;
-            border: 1px solid #334155;
         }
         
         .summary-stat-value {
@@ -409,37 +431,18 @@
             font-weight: bold;
         }
         
-        .summary-stat-label {
-            color: #64748b;
-            margin-top: 5px;
-        }
-        
-        .transcript-summary {
-            background: #1e293b;
-            border-radius: 12px;
-            padding: 25px;
-            border: 1px solid #334155;
-            margin-bottom: 30px;
-        }
-        
-        .transcript-summary h3 {
-            color: #14b8a6;
-            margin-bottom: 20px;
-        }
-        
         .summary-actions {
             display: flex;
             gap: 15px;
             justify-content: center;
         }
         
-        .summary-actions button {
+        button {
             padding: 15px 30px;
             border-radius: 8px;
-            font-size: 1rem;
             border: none;
             cursor: pointer;
-            transition: all 0.2s;
+            font-size: 1rem;
         }
         
         .btn-primary {
@@ -452,51 +455,19 @@
             background: #334155;
             color: #e2e8f0;
         }
-        
-        /* Initial hint */
-        .start-hint {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            color: #64748b;
-            opacity: 0.7;
-            pointer-events: none;
-            z-index: 5;
-        }
-        
-        .start-hint.hidden {
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
     </style>
 </head>
 <body>
     <!-- Animated background -->
     <div class="particles">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div>
     </div>
-    
     <div class="ambient-glow"></div>
     <div class="ambient-glow"></div>
     
@@ -508,64 +479,67 @@
         <span class="status-text" id="statusText">Listening...</span>
     </div>
     
-    <!-- Start hint -->
     <div class="start-hint" id="startHint">
         <p style="font-size: 1.2rem; margin-bottom: 10px;">🎙️ Veritas is listening</p>
-        <p style="font-size: 0.9rem;">Ask a rules question to begin</p>
+        <p style="font-size: 0.9rem;">Ask a rules question</p>
     </div>
     
-    <!-- Veritas character -->
-    <div class="veritas-container" id="veritas">
-        <div class="veritas-avatar">⚖️</div>
-        <div class="speech-bubble">
-            <button class="close-btn" onclick="dismissVeritas()">×</button>
-            <h3 id="veritas-title">Veritas</h3>
-            <p id="veritas-message">Listening for your questions...</p>
+    <!-- FULL ANSWER PLATE -->
+    <div class="answer-plate" id="answerPlate">
+        <div class="plate-header">
+            <h2 id="plateTitle">Rule Clarification</h2>
+            <button class="plate-close" onclick="dismissPlate()">×</button>
+        </div>
+        <div class="plate-content">
+            <div class="plate-section">
+                <h3>📜 The Rule</h3>
+                <p id="plateRule">Rule text goes here...</p>
+                <span class="rule-reference" id="plateReference">CR 702.11c</span>
+            </div>
+            
+            <div class="plate-section">
+                <h3>💡 What This Means</h3>
+                <p id="plateExplanation">Explanation goes here...</p>
+            </div>
+            
+            <div class="plate-section">
+                <h3>✅ What To Do</h3>
+                <div class="action-box">
+                    <p id="plateAction">Actionable guidance goes here...</p>
+                </div>
+            </div>
         </div>
     </div>
     
-    <!-- Controls -->
     <button class="transcript-toggle" onclick="toggleTranscript()">📝 History</button>
-    
     <button class="end-session" onclick="endSession()">End Session</button>
     
-    <!-- Transcript drawer -->
     <div class="transcript-drawer" id="transcriptDrawer">
         <div class="transcript-content" id="transcriptContent">
             <p style="color: #64748b; text-align: center;">Ask a question to see the transcript...</p>
         </div>
     </div>
     
-    <!-- Summary screen -->
     <div class="summary-screen" id="summaryScreen">
         <div class="summary-content">
             <div class="summary-header">
                 <h2>🧠 Session Complete</h2>
                 <p style="color: #64748b;">Here's what we covered</p>
             </div>
-            
             <div class="summary-stats">
                 <div class="summary-stat">
                     <div class="summary-stat-value" id="statQuestions">0</div>
-                    <div class="summary-stat-label">Questions</div>
+                    <div style="color: #64748b; margin-top: 5px;">Questions</div>
                 </div>
                 <div class="summary-stat">
                     <div class="summary-stat-value" id="statDuration">0:00</div>
-                    <div class="summary-stat-label">Duration</div>
+                    <div style="color: #64748b; margin-top: 5px;">Duration</div>
                 </div>
                 <div class="summary-stat">
                     <div class="summary-stat-value" id="statRules">0</div>
-                    <div class="summary-stat-label">Rules Explained</div>
+                    <div style="color: #64748b; margin-top: 5px;">Rules Explained</div>
                 </div>
             </div>
-            
-            <div class="transcript-summary">
-                <h3>📝 Full Transcript</h3>
-                <div id="summaryTranscript" style="color: #94a3b8; line-height: 1.6;">
-                    <p>No questions asked during this session.</p>
-                </div>
-            </div>
-            
             <div class="summary-actions">
                 <button class="btn-secondary" onclick="window.location.href='index.html'">← Back to Home</button>
                 <button class="btn-primary" onclick="location.reload()">🎮 New Session</button>
@@ -582,35 +556,96 @@
             startTime: new Date(),
             rulesExplained: 0
         };
-        let veritasVisible = false;
-        let dismissTimeout = null;
+        let plateVisible = false;
 
-        // Question patterns
         const questionPatterns = [
-            /can i/i, /can you/i, /can we/i,
-            /does/i, /do /i, /is /i, /are /i,
-            /how does/i, /what happens/i, /what if/i,
-            /wait/i, /hold on/i, /actually/i,
+            /can i/i, /can you/i, /can we/i, /does/i, /do /i, /is /i, /are /i,
+            /how does/i, /what happens/i, /what if/i, /wait/i, /hold on/i,
             /target/i, /respond/i, /trigger/i, /stack/i,
             /hexproof/i, /flying/i, /trample/i, /indestructible/i,
             /commander/i, /combat/i, /attack/i, /block/i
         ];
 
-        // Rules database
-        const rules = {
-            'hexproof': 'Hexproof means this permanent can\'t be targeted by spells or abilities your opponents control. But it can still be affected by board wipes, sacrifice effects, or spells that don\'t target.',
-            'trample': 'Trample lets excess combat damage spill over to the defending player. If a 5/5 with trample is blocked by a 2/2, 2 damage kills the blocker and 3 hits the player.',
-            'flying': 'Flying creatures can only be blocked by other creatures with flying or reach. Ground creatures can\'t block them.',
-            'indestructible': 'Indestructible means damage and "destroy" effects don\'t kill it. But it can still be exiled, sacrificed, or have its toughness reduced to 0.',
-            'commander tax': 'Each time you cast your commander from the command zone after the first, it costs 2 more generic mana. This tax accumulates.',
-            'commander damage': 'If a single commander deals 21 or more combat damage to you over the course of the game, you lose.',
-            'the stack': 'Spells and abilities wait on the stack to resolve. Last one cast resolves first (LIFO). Players can respond before each resolution.',
-            'priority': 'The active player gets priority first. When they pass, the non-active player can respond. Most actions use the stack.',
-            'target': 'To target, you must choose a legal target when casting. Hexproof and shroud prevent targeting. Removing the target counters the spell.',
-            'trigger': 'Triggers go on the stack when their condition is met. In multiplayer, APNAP order applies: Active Player, then Non-Active Players.'
+        const rulesDatabase = {
+            'hexproof': {
+                title: 'Hexproof',
+                rule: 'A permanent with hexproof can\'t be targeted by spells or abilities your opponents control.',
+                reference: 'CR 702.11c',
+                explanation: 'This means your opponents cannot choose your hexproof creature as a target for their spells or abilities. However, hexproof does NOT protect against board wipes (like "destroy all creatures"), sacrifice effects, or spells that don\'t target.',
+                action: 'Your creature is safe from targeted removal like Doom Blade or Path to Exile, but watch out for board wipes like Wrath of God or "sacrifice a creature" effects.'
+            },
+            'trample': {
+                title: 'Trample',
+                rule: 'When a creature with trample assigns combat damage, it must assign lethal damage to all blocking creatures before assigning excess damage to the defending player.',
+                reference: 'CR 702.19b',
+                explanation: 'If a 5/5 with trample is blocked by a 2/2, only 2 damage is needed to kill the blocker. The remaining 3 damage "tramples over" and hits the defending player or planeswalker.',
+                action: 'When blocking a trampler, consider whether chump-blocking (sacrificing a small creature to prevent some damage) is better than taking the full hit.'
+            },
+            'flying': {
+                title: 'Flying',
+                rule: 'A creature with flying can\'t be blocked except by creatures with flying or reach.',
+                reference: 'CR 702.9b',
+                explanation: 'Flying creates an evasion ability. Ground creatures without reach cannot block flyers, making them difficult to stop in combat.',
+                action: 'If you have flyers, attack freely unless they have flyers/reach. If facing flyers, you need either flying creatures, reach creatures, or removal spells.'
+            },
+            'indestructible': {
+                title: 'Indestructible',
+                rule: 'A permanent with indestructible can\'t be destroyed by damage or effects that say "destroy."',
+                reference: 'CR 702.12b',
+                explanation: 'Indestructible creatures survive lethal damage and board wipes. However, they can still be exiled, sacrificed, returned to hand, or have toughness reduced to 0.',
+                action: 'Don\'t waste "destroy" effects on indestructible creatures. Use exile, bounce, -X/-X effects, or force them to be sacrificed instead.'
+            },
+            'commander tax': {
+                title: 'Commander Tax',
+                rule: 'Each time you cast your commander from the command zone, it costs {2} more for each previous time you\'ve cast it from the command zone this game.',
+                reference: 'CR 903.8',
+                explanation: 'First cast: normal cost. Second cast: +{2}. Third cast: +{4}. This tax accumulates for the rest of the game.',
+                action: 'Protect your commander once it\'s on the board — returning it to hand or keeping it safe is often better than letting it die and paying the tax again.'
+            },
+            'commander damage': {
+                title: 'Commander Damage',
+                rule: 'A player loses the game if they\'ve been dealt 21 or more combat damage by the same commander.',
+                reference: 'CR 903.10a',
+                explanation: 'This is tracked per commander. If one commander deals you 21 damage, you lose. Damage from multiple different commanders doesn\'t combine.',
+                action: 'Track commander damage carefully. If someone is at 15+ damage from one commander, they\'re in lethal range. Prioritize blocking or removing that commander.'
+            },
+            'the stack': {
+                title: 'The Stack',
+                rule: 'The stack is the zone where spells and abilities wait to resolve. The last spell/ability put on the stack resolves first (LIFO).',
+                reference: 'CR 405.1',
+                explanation: 'When you cast a spell, it goes on the stack. Players can respond by adding more spells/abilities. Once everyone passes, the top item resolves, then players can respond again.',
+                action: 'You can respond to almost everything. Wait for your opponent to cast something, then respond with your counterspell or instant. Remember: last in, first out.'
+            },
+            'priority': {
+                title: 'Priority',
+                rule: 'The active player receives priority first. After they pass, the non-active player receives priority.',
+                reference: 'CR 117.1',
+                explanation: 'Priority determines who can cast spells and activate abilities. You can only do things when you have priority, or when casting an instant/activating an ability in response.',
+                action: 'If you want to do something at a specific time, you need priority. The active player controls the pace, but you can respond to their actions.'
+            },
+            'target': {
+                title: 'Targeting',
+                rule: 'When you cast a spell or activate an ability that targets, you must choose legal targets. If all targets become illegal, the spell is countered.',
+                reference: 'CR 115.1',
+                explanation: 'Hexproof and shroud prevent targeting. Once targets are chosen, the spell remembers them. If the target gains hexproof later, the spell is countered on resolution.',
+                action: 'Check if your target is legal before casting. If they have hexproof, you can\'t target them. You can respond to their spell by giving your creature hexproof to counter their spell.'
+            },
+            'trigger': {
+                title: 'Triggered Abilities',
+                rule: 'When a triggered ability\'s condition is met, it goes on the stack the next time a player receives priority.',
+                reference: 'CR 603.2',
+                explanation: 'Triggers use the stack and can be responded to. In multiplayer, triggers go on the stack in APNAP order: Active Player, then Non-Active Players in turn order.',
+                action: 'Don\'t miss your triggers — they\'re mandatory if they don\'t say "may." You can respond to triggers before they resolve, and in multiplayer, the order matters.'
+            },
+            'default': {
+                title: 'Rules Question',
+                rule: 'The specific rule depends on your exact situation.',
+                reference: 'Comprehensive Rules',
+                explanation: 'I heard your question but need more context to give you the precise rule. Try asking about a specific keyword ability or game concept.',
+                action: 'For the most accurate answer, mention specific cards or abilities. You can also check the official Comprehensive Rules or ask a judge for complex interactions.'
+            }
         };
 
-        // Initialize
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
@@ -653,13 +688,9 @@
                 document.body.classList.add('recording');
                 document.getElementById('statusText').textContent = 'Processing...';
                 
-                let answer = findAnswer(text);
-                if (answer) {
-                    sessionData.rulesExplained++;
-                    showVeritas(answer.title, answer.text);
-                } else {
-                    showVeritas('Question Heard', `You asked: "${text}"\n\nIn the full version, I'll provide detailed rules analysis for this.`);
-                }
+                const answer = findAnswer(text);
+                sessionData.rulesExplained++;
+                showPlate(answer);
                 
                 setTimeout(() => {
                     document.body.classList.remove('recording');
@@ -675,32 +706,28 @@
 
         function findAnswer(text) {
             const lower = text.toLowerCase();
-            for (const [keyword, explanation] of Object.entries(rules)) {
+            for (const [keyword, data] of Object.entries(rulesDatabase)) {
                 if (lower.includes(keyword)) {
-                    return { title: keyword.charAt(0).toUpperCase() + keyword.slice(1), text: explanation };
+                    return data;
                 }
             }
-            return null;
+            return rulesDatabase['default'];
         }
 
-        function showVeritas(title, message) {
-            clearTimeout(dismissTimeout);
+        function showPlate(answer) {
+            document.getElementById('plateTitle').textContent = answer.title;
+            document.getElementById('plateRule').textContent = answer.rule;
+            document.getElementById('plateReference').textContent = answer.reference;
+            document.getElementById('plateExplanation').textContent = answer.explanation;
+            document.getElementById('plateAction').textContent = answer.action;
             
-            document.getElementById('veritas-title').textContent = title;
-            document.getElementById('veritas-message').textContent = message;
-            document.getElementById('veritas').classList.add('active');
-            veritasVisible = true;
-            
-            dismissTimeout = setTimeout(() => {
-                if (!document.querySelector('.veritas-container:hover')) {
-                    dismissVeritas();
-                }
-            }, 10000);
+            document.getElementById('answerPlate').classList.add('active');
+            plateVisible = true;
         }
 
-        function dismissVeritas() {
-            document.getElementById('veritas').classList.remove('active');
-            veritasVisible = false;
+        function dismissPlate() {
+            document.getElementById('answerPlate').classList.remove('active');
+            plateVisible = false;
         }
 
         function updateTranscript() {
@@ -735,15 +762,6 @@
             document.getElementById('statDuration').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
             document.getElementById('statRules').textContent = sessionData.rulesExplained;
             
-            const summaryDiv = document.getElementById('summaryTranscript');
-            if (sessionData.transcript.length > 0) {
-                summaryDiv.innerHTML = sessionData.transcript.map(entry => `
-                    <p style="margin-bottom: 10px; ${entry.isQuestion ? 'color: #14b8a6;' : ''}">
-                        <strong>${entry.time}</strong> ${entry.text}
-                    </p>
-                `).join('');
-            }
-            
             let sessions = JSON.parse(localStorage.getItem('veritas_sessions') || '[]');
             sessions.push({
                 ...sessionData,
@@ -754,6 +772,13 @@
             
             document.getElementById('summaryScreen').classList.add('active');
         }
+
+        // Close plate on background click
+        document.addEventListener('click', (e) => {
+            if (plateVisible && !e.target.closest('.answer-plate')) {
+                dismissPlate();
+            }
+        });
     </script>
 </body>
 </html>
