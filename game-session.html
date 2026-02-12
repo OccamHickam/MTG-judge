@@ -41,22 +41,22 @@
         .particle:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 12s; }
         .particle:nth-child(2) { left: 20%; animation-delay: 1s; animation-duration: 18s; width: 6px; height: 6px; }
         .particle:nth-child(3) { left: 30%; animation-delay: 2s; animation-duration: 14s; }
-        .particle:nth-child(4) { left: 40%; animation-delay: 0.5s; animation-duration: 16s; width: 3px; height: 3px; background: rgba(45, 212, 191, 0.5); }
+        .particle:nth-child(4) { left: 40%; animation-delay: 0.5s; animation-duration: 16s; width: 3px; height: 3px; }
         .particle:nth-child(5) { left: 50%; animation-delay: 3s; animation-duration: 20s; width: 5px; height: 5px; }
         .particle:nth-child(6) { left: 60%; animation-delay: 1.5s; animation-duration: 13s; }
-        .particle:nth-child(7) { left: 70%; animation-delay: 2.5s; animation-duration: 17s; width: 4px; height: 4px; background: rgba(20, 184, 166, 0.4); }
+        .particle:nth-child(7) { left: 70%; animation-delay: 2.5s; animation-duration: 17s; width: 4px; height: 4px; }
         .particle:nth-child(8) { left: 80%; animation-delay: 0s; animation-duration: 19s; width: 6px; height: 6px; }
         .particle:nth-child(9) { left: 90%; animation-delay: 4s; animation-duration: 15s; }
-        .particle:nth-child(10) { left: 15%; animation-delay: 2s; animation-duration: 21s; width: 3px; height: 3px; background: rgba(45, 212, 191, 0.6); }
+        .particle:nth-child(10) { left: 15%; animation-delay: 2s; animation-duration: 21s; width: 3px; height: 3px; }
         .particle:nth-child(11) { left: 25%; animation-delay: 5s; animation-duration: 14s; }
         .particle:nth-child(12) { left: 35%; animation-delay: 1s; animation-duration: 18s; width: 5px; height: 5px; }
         .particle:nth-child(13) { left: 45%; animation-delay: 3.5s; animation-duration: 16s; }
-        .particle:nth-child(14) { left: 55%; animation-delay: 0.5s; animation-duration: 20s; width: 4px; height: 4px; background: rgba(20, 184, 166, 0.5); }
+        .particle:nth-child(14) { left: 55%; animation-delay: 0.5s; animation-duration: 20s; width: 4px; height: 4px; }
         .particle:nth-child(15) { left: 65%; animation-delay: 4.5s; animation-duration: 13s; }
         .particle:nth-child(16) { left: 75%; animation-delay: 2.5s; animation-duration: 17s; width: 6px; height: 6px; }
         .particle:nth-child(17) { left: 85%; animation-delay: 1s; animation-duration: 19s; }
         .particle:nth-child(18) { left: 5%; animation-delay: 3s; animation-duration: 15s; width: 3px; height: 3px; }
-        .particle:nth-child(19) { left: 95%; animation-delay: 0s; animation-duration: 22s; width: 5px; height: 5px; background: rgba(45, 212, 191, 0.4); }
+        .particle:nth-child(19) { left: 95%; animation-delay: 0s; animation-duration: 22s; width: 5px; height: 5px; }
         .particle:nth-child(20) { left: 50%; animation-delay: 6s; animation-duration: 14s; }
         
         @keyframes float {
@@ -66,36 +66,11 @@
             100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
         }
         
-        .ambient-glow {
-            position: fixed;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(20, 184, 166, 0.15) 0%, transparent 70%);
-            pointer-events: none;
-            animation: drift 20s infinite ease-in-out;
-        }
-        
-        .ambient-glow:nth-child(1) { top: 20%; left: 20%; animation-delay: 0s; }
-        .ambient-glow:nth-child(2) { top: 60%; right: 20%; animation-delay: -10s; background: radial-gradient(circle, rgba(45, 212, 191, 0.1) 0%, transparent 70%); }
-        
-        @keyframes drift {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(50px, -30px) scale(1.1); }
-            50% { transform: translate(-30px, 50px) scale(0.9); }
-            75% { transform: translate(-50px, -20px) scale(1.05); }
-        }
-        
         body.recording .particle {
             background: rgba(239, 68, 68, 0.6);
             box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
         }
         
-        body.recording .ambient-glow {
-            background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 70%);
-        }
-        
-        /* UI Elements */
         .back-link {
             position: fixed;
             top: 30px;
@@ -151,7 +126,7 @@
             font-size: 0.85rem;
         }
         
-        /* FULL PLATE ANSWER CARD */
+        /* ANSWER PLATE */
         .answer-plate {
             position: fixed;
             top: 50%;
@@ -163,11 +138,10 @@
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             border: 2px solid #14b8a6;
             border-radius: 20px;
-            padding: 0;
             z-index: 100;
             pointer-events: none;
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 25px 80px rgba(0,0,0,0.6), 0 0 40px rgba(20, 184, 166, 0.2);
+            box-shadow: 0 25px 80px rgba(0,0,0,0.6);
         }
         
         .answer-plate.active {
@@ -234,24 +208,12 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
         
         .plate-section p, .plate-section li {
             color: #e2e8f0;
             line-height: 1.7;
             font-size: 1.05rem;
-        }
-        
-        .plate-section ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-        
-        .plate-section li {
-            margin-bottom: 8px;
         }
         
         .rule-reference {
@@ -273,11 +235,6 @@
             margin-top: 10px;
         }
         
-        .action-box strong {
-            color: #2dd4bf;
-        }
-        
-        /* Start hint */
         .start-hint {
             position: fixed;
             top: 50%;
@@ -295,7 +252,6 @@
             transition: opacity 0.5s;
         }
         
-        /* Transcript drawer */
         .transcript-toggle {
             position: fixed;
             bottom: 30px;
@@ -308,7 +264,6 @@
             cursor: pointer;
             font-size: 0.9rem;
             z-index: 10;
-            backdrop-filter: blur(10px);
             transition: all 0.3s;
         }
         
@@ -361,7 +316,6 @@
             color: #14b8a6;
         }
         
-        /* End session */
         .end-session {
             position: fixed;
             bottom: 30px;
@@ -374,10 +328,8 @@
             cursor: pointer;
             font-size: 0.9rem;
             z-index: 10;
-            backdrop-filter: blur(10px);
         }
         
-        /* Summary screen */
         .summary-screen {
             position: fixed;
             top: 0;
@@ -437,41 +389,51 @@
             justify-content: center;
         }
         
-        button {
-            padding: 15px 30px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-        
         .btn-primary {
             background: linear-gradient(90deg, #14b8a6, #2dd4bf);
             color: #0f172a;
             font-weight: bold;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
         }
         
         .btn-secondary {
             background: #334155;
             color: #e2e8f0;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <!-- Animated background -->
     <div class="particles">
-        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
-        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
-        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
-        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
-        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
-        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
-        <div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
     </div>
-    <div class="ambient-glow"></div>
-    <div class="ambient-glow"></div>
     
-    <!-- UI -->
     <a href="index.html" class="back-link">← Back</a>
     
     <div class="status-bar">
@@ -484,28 +446,26 @@
         <p style="font-size: 0.9rem;">Ask a rules question</p>
     </div>
     
-    <!-- FULL ANSWER PLATE -->
+    <!-- ANSWER PLATE -->
     <div class="answer-plate" id="answerPlate">
         <div class="plate-header">
-            <h2 id="plateTitle">Rule Clarification</h2>
-            <button class="plate-close" onclick="dismissPlate()">×</button>
+            <h2 id="plateTitle">Rule Title</h2>
+            <button class="plate-close" onclick="closePlate()">×</button>
         </div>
         <div class="plate-content">
             <div class="plate-section">
                 <h3>📜 The Rule</h3>
-                <p id="plateRule">Rule text goes here...</p>
-                <span class="rule-reference" id="plateReference">CR 702.11c</span>
+                <p id="plateRule">Rule text here...</p>
+                <span class="rule-reference" id="plateRef">CR 702.11c</span>
             </div>
-            
             <div class="plate-section">
                 <h3>💡 What This Means</h3>
-                <p id="plateExplanation">Explanation goes here...</p>
+                <p id="plateExplain">Explanation here...</p>
             </div>
-            
             <div class="plate-section">
                 <h3>✅ What To Do</h3>
                 <div class="action-box">
-                    <p id="plateAction">Actionable guidance goes here...</p>
+                    <p id="plateAction">Action here...</p>
                 </div>
             </div>
         </div>
@@ -537,7 +497,7 @@
                 </div>
                 <div class="summary-stat">
                     <div class="summary-stat-value" id="statRules">0</div>
-                    <div style="color: #64748b; margin-top: 5px;">Rules Explained</div>
+                    <div style="color: #64748b; margin-top: 5px;">Rules</div>
                 </div>
             </div>
             <div class="summary-actions">
@@ -548,6 +508,7 @@
     </div>
 
     <script>
+        // Initialize variables
         let recognition = null;
         let isListening = true;
         let sessionData = {
@@ -558,102 +519,63 @@
         };
         let plateVisible = false;
 
+        // Question patterns
         const questionPatterns = [
-            /can i/i, /can you/i, /can we/i, /does/i, /do /i, /is /i, /are /i,
-            /how does/i, /what happens/i, /what if/i, /wait/i, /hold on/i,
+            /can i/i, /can you/i, /can we/i,
+            /does/i, /do /i, /is /i, /are /i,
+            /how does/i, /what happens/i, /what if/i,
+            /wait/i, /hold on/i,
             /target/i, /respond/i, /trigger/i, /stack/i,
             /hexproof/i, /flying/i, /trample/i, /indestructible/i,
             /commander/i, /combat/i, /attack/i, /block/i
         ];
 
-        const rulesDatabase = {
+        // Rules database
+        const rulesDB = {
             'hexproof': {
                 title: 'Hexproof',
                 rule: 'A permanent with hexproof can\'t be targeted by spells or abilities your opponents control.',
-                reference: 'CR 702.11c',
-                explanation: 'This means your opponents cannot choose your hexproof creature as a target for their spells or abilities. However, hexproof does NOT protect against board wipes (like "destroy all creatures"), sacrifice effects, or spells that don\'t target.',
-                action: 'Your creature is safe from targeted removal like Doom Blade or Path to Exile, but watch out for board wipes like Wrath of God or "sacrifice a creature" effects.'
+                ref: 'CR 702.11c',
+                explain: 'Your opponents cannot choose your hexproof creature as a target. However, hexproof does NOT protect against board wipes, sacrifice effects, or spells that don\'t target.',
+                action: 'Your creature is safe from Doom Blade, but watch out for Wrath of God or "sacrifice a creature" effects.'
             },
             'trample': {
                 title: 'Trample',
-                rule: 'When a creature with trample assigns combat damage, it must assign lethal damage to all blocking creatures before assigning excess damage to the defending player.',
-                reference: 'CR 702.19b',
-                explanation: 'If a 5/5 with trample is blocked by a 2/2, only 2 damage is needed to kill the blocker. The remaining 3 damage "tramples over" and hits the defending player or planeswalker.',
-                action: 'When blocking a trampler, consider whether chump-blocking (sacrificing a small creature to prevent some damage) is better than taking the full hit.'
+                rule: 'A creature with trample assigns lethal damage to blockers, then excess damage goes to the player.',
+                ref: 'CR 702.19b',
+                explain: 'If a 5/5 with trample is blocked by a 2/2, only 2 damage kills the blocker. The remaining 3 damage "tramples over" to the player.',
+                action: 'When blocking a trampler, decide if chump-blocking (sacrificing a small creature) is better than taking the hit.'
             },
             'flying': {
                 title: 'Flying',
                 rule: 'A creature with flying can\'t be blocked except by creatures with flying or reach.',
-                reference: 'CR 702.9b',
-                explanation: 'Flying creates an evasion ability. Ground creatures without reach cannot block flyers, making them difficult to stop in combat.',
-                action: 'If you have flyers, attack freely unless they have flyers/reach. If facing flyers, you need either flying creatures, reach creatures, or removal spells.'
-            },
-            'indestructible': {
-                title: 'Indestructible',
-                rule: 'A permanent with indestructible can\'t be destroyed by damage or effects that say "destroy."',
-                reference: 'CR 702.12b',
-                explanation: 'Indestructible creatures survive lethal damage and board wipes. However, they can still be exiled, sacrificed, returned to hand, or have toughness reduced to 0.',
-                action: 'Don\'t waste "destroy" effects on indestructible creatures. Use exile, bounce, -X/-X effects, or force them to be sacrificed instead.'
-            },
-            'commander tax': {
-                title: 'Commander Tax',
-                rule: 'Each time you cast your commander from the command zone, it costs {2} more for each previous time you\'ve cast it from the command zone this game.',
-                reference: 'CR 903.8',
-                explanation: 'First cast: normal cost. Second cast: +{2}. Third cast: +{4}. This tax accumulates for the rest of the game.',
-                action: 'Protect your commander once it\'s on the board — returning it to hand or keeping it safe is often better than letting it die and paying the tax again.'
-            },
-            'commander damage': {
-                title: 'Commander Damage',
-                rule: 'A player loses the game if they\'ve been dealt 21 or more combat damage by the same commander.',
-                reference: 'CR 903.10a',
-                explanation: 'This is tracked per commander. If one commander deals you 21 damage, you lose. Damage from multiple different commanders doesn\'t combine.',
-                action: 'Track commander damage carefully. If someone is at 15+ damage from one commander, they\'re in lethal range. Prioritize blocking or removing that commander.'
-            },
-            'the stack': {
-                title: 'The Stack',
-                rule: 'The stack is the zone where spells and abilities wait to resolve. The last spell/ability put on the stack resolves first (LIFO).',
-                reference: 'CR 405.1',
-                explanation: 'When you cast a spell, it goes on the stack. Players can respond by adding more spells/abilities. Once everyone passes, the top item resolves, then players can respond again.',
-                action: 'You can respond to almost everything. Wait for your opponent to cast something, then respond with your counterspell or instant. Remember: last in, first out.'
-            },
-            'priority': {
-                title: 'Priority',
-                rule: 'The active player receives priority first. After they pass, the non-active player receives priority.',
-                reference: 'CR 117.1',
-                explanation: 'Priority determines who can cast spells and activate abilities. You can only do things when you have priority, or when casting an instant/activating an ability in response.',
-                action: 'If you want to do something at a specific time, you need priority. The active player controls the pace, but you can respond to their actions.'
-            },
-            'target': {
-                title: 'Targeting',
-                rule: 'When you cast a spell or activate an ability that targets, you must choose legal targets. If all targets become illegal, the spell is countered.',
-                reference: 'CR 115.1',
-                explanation: 'Hexproof and shroud prevent targeting. Once targets are chosen, the spell remembers them. If the target gains hexproof later, the spell is countered on resolution.',
-                action: 'Check if your target is legal before casting. If they have hexproof, you can\'t target them. You can respond to their spell by giving your creature hexproof to counter their spell.'
-            },
-            'trigger': {
-                title: 'Triggered Abilities',
-                rule: 'When a triggered ability\'s condition is met, it goes on the stack the next time a player receives priority.',
-                reference: 'CR 603.2',
-                explanation: 'Triggers use the stack and can be responded to. In multiplayer, triggers go on the stack in APNAP order: Active Player, then Non-Active Players in turn order.',
-                action: 'Don\'t miss your triggers — they\'re mandatory if they don\'t say "may." You can respond to triggers before they resolve, and in multiplayer, the order matters.'
+                ref: 'CR 702.9b',
+                explain: 'Ground creatures without reach cannot block flyers. This makes flyers difficult to stop in combat.',
+                action: 'Attack freely with flyers unless they have flyers/reach. If facing flyers, you need flying creatures, reach, or removal.'
             },
             'default': {
                 title: 'Rules Question',
                 rule: 'The specific rule depends on your exact situation.',
-                reference: 'Comprehensive Rules',
-                explanation: 'I heard your question but need more context to give you the precise rule. Try asking about a specific keyword ability or game concept.',
-                action: 'For the most accurate answer, mention specific cards or abilities. You can also check the official Comprehensive Rules or ask a judge for complex interactions.'
+                ref: 'Comprehensive Rules',
+                explain: 'I heard your question. For a precise answer, try mentioning specific cards or abilities.',
+                action: 'Check the official Comprehensive Rules or ask a judge for complex interactions.'
             }
         };
 
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        // Initialize speech recognition
+        function initSpeech() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('Speech recognition not supported. Use Chrome or Edge.');
+                return;
+            }
+
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
             recognition.continuous = true;
             recognition.interimResults = true;
             recognition.lang = 'en-US';
 
-            recognition.onresult = (event) => {
+            recognition.onresult = function(event) {
                 const results = event.results;
                 const lastResult = results[results.length - 1];
                 const transcript = lastResult[0].transcript;
@@ -663,23 +585,36 @@
                 }
             };
 
-            recognition.onerror = (event) => {
+            recognition.onerror = function(event) {
                 if (event.error === 'no-speech') return;
-                setTimeout(() => { if (isListening) recognition.start(); }, 1000);
+                console.log('Speech error:', event.error);
+                setTimeout(function() {
+                    if (isListening) recognition.start();
+                }, 1000);
             };
 
-            recognition.onend = () => {
+            recognition.onend = function() {
                 if (isListening) recognition.start();
             };
 
             recognition.start();
+            console.log('Speech recognition started');
         }
 
         function processTranscript(text) {
-            const timestamp = new Date().toLocaleTimeString();
-            const entry = { time: timestamp, text: text, isQuestion: false };
+            console.log('Heard:', text);
             
-            const isQuestion = questionPatterns.some(pattern => pattern.test(text));
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = {
+                time: timestamp,
+                text: text,
+                isQuestion: false
+            };
+            
+            // Check if question
+            const isQuestion = questionPatterns.some(function(pattern) {
+                return pattern.test(text);
+            });
             
             if (isQuestion) {
                 entry.isQuestion = true;
@@ -692,7 +627,7 @@
                 sessionData.rulesExplained++;
                 showPlate(answer);
                 
-                setTimeout(() => {
+                setTimeout(function() {
                     document.body.classList.remove('recording');
                     document.getElementById('statusText').textContent = 'Listening...';
                 }, 2000);
@@ -706,43 +641,42 @@
 
         function findAnswer(text) {
             const lower = text.toLowerCase();
-            for (const [keyword, data] of Object.entries(rulesDatabase)) {
-                if (lower.includes(keyword)) {
-                    return data;
+            for (const keyword in rulesDB) {
+                if (lower.indexOf(keyword) !== -1) {
+                    return rulesDB[keyword];
                 }
             }
-            return rulesDatabase['default'];
+            return rulesDB['default'];
         }
 
         function showPlate(answer) {
             document.getElementById('plateTitle').textContent = answer.title;
             document.getElementById('plateRule').textContent = answer.rule;
-            document.getElementById('plateReference').textContent = answer.reference;
-            document.getElementById('plateExplanation').textContent = answer.explanation;
+            document.getElementById('plateRef').textContent = answer.ref;
+            document.getElementById('plateExplain').textContent = answer.explain;
             document.getElementById('plateAction').textContent = answer.action;
             
             document.getElementById('answerPlate').classList.add('active');
             plateVisible = true;
         }
 
-        function dismissPlate() {
+        function closePlate() {
             document.getElementById('answerPlate').classList.remove('active');
             plateVisible = false;
         }
 
         function updateTranscript() {
             const content = document.getElementById('transcriptContent');
-            if (content.innerHTML.includes('Ask a question')) {
+            const entry = sessionData.transcript[sessionData.transcript.length - 1];
+            
+            if (content.innerHTML.indexOf('Ask a question') !== -1) {
                 content.innerHTML = '';
             }
             
-            const entry = sessionData.transcript[sessionData.transcript.length - 1];
             const div = document.createElement('div');
             div.className = 'transcript-item';
-            div.innerHTML = `
-                <div class="transcript-time">${entry.time}</div>
-                <div class="transcript-text ${entry.isQuestion ? 'question' : ''}">${entry.text}</div>
-            `;
+            div.innerHTML = '<div class="transcript-time">' + entry.time + '</div>' +
+                          '<div class="transcript-text ' + (entry.isQuestion ? 'question' : '') + '">' + entry.text + '</div>';
             content.insertBefore(div, content.firstChild);
         }
 
@@ -759,14 +693,18 @@
             const seconds = duration % 60;
             
             document.getElementById('statQuestions').textContent = sessionData.questions.length;
-            document.getElementById('statDuration').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('statDuration').textContent = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
             document.getElementById('statRules').textContent = sessionData.rulesExplained;
             
+            // Save to localStorage
             let sessions = JSON.parse(localStorage.getItem('veritas_sessions') || '[]');
             sessions.push({
-                ...sessionData,
+                transcript: sessionData.transcript,
+                questions: sessionData.questions,
+                startTime: sessionData.startTime,
                 endTime: new Date().toISOString(),
-                duration: duration
+                duration: duration,
+                rulesExplained: sessionData.rulesExplained
             });
             localStorage.setItem('veritas_sessions', JSON.stringify(sessions));
             
@@ -774,11 +712,14 @@
         }
 
         // Close plate on background click
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', function(e) {
             if (plateVisible && !e.target.closest('.answer-plate')) {
-                dismissPlate();
+                closePlate();
             }
         });
+
+        // Start
+        initSpeech();
     </script>
 </body>
 </html>
