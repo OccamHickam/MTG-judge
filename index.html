@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+home_page = '''<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -31,6 +31,73 @@
             color: #94a3b8;
             font-style: italic;
             font-size: 1.2rem;
+        }
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 16px;
+            margin-bottom: 40px;
+            border: 1px solid #334155;
+        }
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #14b8a6;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(90deg, #14b8a6, #2dd4bf);
+            color: #0f172a;
+            padding: 20px 40px;
+            border-radius: 8px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 10px;
+        }
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(20, 184, 166, 0.4);
+        }
+        .cta-button.secondary {
+            background: transparent;
+            border: 2px solid #14b8a6;
+            color: #14b8a6;
+        }
+        .cta-button.secondary:hover {
+            background: #14b8a6;
+            color: #0f172a;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        .feature-card {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            text-align: center;
+        }
+        .feature-card h3 {
+            color: #14b8a6;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        .feature-card p {
+            color: #94a3b8;
+            line-height: 1.6;
         }
         .mode-tabs {
             display: flex;
@@ -187,8 +254,16 @@
             border-radius: 6px;
             margin-top: 20px;
         }
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid #334155;
+            margin-top: 60px;
+            color: #64748b;
+        }
         @media (max-width: 768px) {
             h1 { font-size: 2rem; }
+            .hero h2 { font-size: 1.8rem; }
             .mode-tabs { flex-direction: column; }
             .card-grid { grid-template-columns: 1fr; }
         }
@@ -201,66 +276,108 @@
             <p class="tagline">"Rules at the speed of conversation"</p>
         </header>
 
-        <div class="mode-tabs">
-            <button class="mode-tab active" onclick="switchMode('rules')">📋 Rules Assistant</button>
-            <button class="mode-tab" onclick="switchMode('deck')">🎴 Deck Analyzer</button>
-            <button class="mode-tab" onclick="switchMode('coach')">🧠 Coach Mode</button>
+        <!-- Hero Section -->
+        <div class="hero">
+            <h2>Your AI-Powered MTG Assistant</h2>
+            <p>Get instant rules clarification, deck analysis, and strategic coaching. Xyneth listens to your games and helps you make better decisions.</p>
+            <a href="game-session.html" class="cta-button">🎮 Start Game Session</a>
+            <a href="#tools" class="cta-button secondary">📋 Browse Tools</a>
         </div>
 
-        <!-- Rules Panel -->
-        <div id="rules-panel" class="panel active">
-            <div class="input-group">
-                <label>Ask Xyneth about rules, cards, or interactions:</label>
-                <div style="display: flex;">
-                    <input type="text" id="rules-input" placeholder="e.g., 'How does trample work?'" style="flex: 1;">
-                    <button class="voice-btn" onclick="toggleVoice()" title="Voice input">🎤</button>
+        <!-- Tools Section -->
+        <div id="tools">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #14b8a6;">Quick Tools</h2>
+            
+            <div class="mode-tabs">
+                <button class="mode-tab active" onclick="switchMode('rules')">📋 Rules Assistant</button>
+                <button class="mode-tab" onclick="switchMode('deck')">🎴 Deck Analyzer</button>
+                <button class="mode-tab" onclick="switchMode('coach')">🧠 Coach Mode</button>
+            </div>
+
+            <!-- Rules Panel -->
+            <div id="rules-panel" class="panel active">
+                <div class="input-group">
+                    <label>Ask Xyneth about rules, cards, or interactions:</label>
+                    <div style="display: flex;">
+                        <input type="text" id="rules-input" placeholder="e.g., 'How does trample work?'" style="flex: 1;">
+                        <button class="voice-btn" onclick="toggleVoice()" title="Voice input">🎤</button>
+                    </div>
                 </div>
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="askQuick('trample')">Trample</button>
+                    <button class="quick-btn" onclick="askQuick('hexproof')">Hexproof</button>
+                    <button class="quick-btn" onclick="askQuick('the stack')">The Stack</button>
+                    <button class="quick-btn" onclick="askQuick('commander tax')">Commander Tax</button>
+                    <button class="quick-btn" onclick="askQuick('priority')">Priority</button>
+                    <button class="quick-btn" onclick="askQuick('mana abilities')">Mana Abilities</button>
+                </div>
+                <button onclick="askRules()" style="margin-top: 20px;">Ask Xyneth</button>
+                <div id="rules-results"></div>
             </div>
-            <div class="quick-actions">
-                <button class="quick-btn" onclick="askQuick('trample')">Trample</button>
-                <button class="quick-btn" onclick="askQuick('hexproof')">Hexproof</button>
-                <button class="quick-btn" onclick="askQuick('the stack')">The Stack</button>
-                <button class="quick-btn" onclick="askQuick('commander tax')">Commander Tax</button>
+
+            <!-- Deck Panel -->
+            <div id="deck-panel" class="panel">
+                <div class="input-group">
+                    <label>Deck Name:</label>
+                    <input type="text" id="deck-name" placeholder="My Commander Deck">
+                </div>
+                <div class="input-group">
+                    <label>Format:</label>
+                    <select id="deck-format">
+                        <option value="commander">Commander / EDH</option>
+                        <option value="standard">Standard</option>
+                        <option value="modern">Modern</option>
+                        <option value="legacy">Legacy</option>
+                        <option value="pioneer">Pioneer</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Paste your decklist (MTGO/MTGA format):</label>
+                    <textarea id="deck-input" placeholder="1 Sol Ring&#10;1 Command Tower&#10;1 Arcane Signet&#10;...&#10;Commander:&#10;1 Atraxa, Praetors' Voice"></textarea>
+                </div>
+                <button onclick="analyzeDeck()">Analyze Deck</button>
+                <div id="deck-results"></div>
             </div>
-            <button onclick="askRules()" style="margin-top: 20px;">Ask Xyneth</button>
-            <div id="rules-results"></div>
+
+            <!-- Coach Panel -->
+            <div id="coach-panel" class="panel">
+                <div class="input-group">
+                    <label>Describe your game situation:</label>
+                    <textarea id="coach-input" placeholder="e.g., 'I'm playing aggro vs control. They have 4 cards in hand, I'm at 10 life. Should I attack with everything?'" style="min-height: 100px;"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Your Deck Strategy (optional):</label>
+                    <input type="text" id="coach-deck" placeholder="e.g., 'Mono-red aggro with burn spells'">
+                </div>
+                <button onclick="askCoach()">Get Coaching</button>
+                <div id="coach-results"></div>
+            </div>
         </div>
 
-        <!-- Deck Panel -->
-        <div id="deck-panel" class="panel">
-            <div class="input-group">
-                <label>Deck Name:</label>
-                <input type="text" id="deck-name" placeholder="My Commander Deck">
+        <!-- Features Grid -->
+        <div class="features" style="margin-top: 60px;">
+            <div class="feature-card">
+                <h3>🎙️ Voice Activated</h3>
+                <p>Ask questions naturally while you play. Xyneth listens and responds instantly, keeping your hands free for your cards.</p>
             </div>
-            <div class="input-group">
-                <label>Format:</label>
-                <select id="deck-format">
-                    <option value="commander">Commander / EDH</option>
-                    <option value="standard">Standard</option>
-                    <option value="modern">Modern</option>
-                </select>
+            <div class="feature-card">
+                <h3>📚 28+ Keywords</h3>
+                <p>Comprehensive rules database covering mechanics, zones, and game concepts. From Trample to The Stack.</p>
             </div>
-            <div class="input-group">
-                <label>Paste your decklist:</label>
-                <textarea id="deck-input" placeholder="1 Sol Ring&#10;1 Command Tower&#10;1 Arcane Signet"></textarea>
+            <div class="feature-card">
+                <h3>🎮 Game Sessions</h3>
+                <p>Start a session and let Xyneth listen to your game. Get real-time suggestions and post-game analysis.</p>
             </div>
-            <button onclick="analyzeDeck()">Analyze Deck</button>
-            <div id="deck-results"></div>
         </div>
 
-        <!-- Coach Panel -->
-        <div id="coach-panel" class="panel">
-            <div class="input-group">
-                <label>Describe your game situation:</label>
-                <textarea id="coach-input" placeholder="e.g., 'Should I attack with everything?'" style="min-height: 100px;"></textarea>
-            </div>
-            <button onclick="askCoach()">Get Coaching</button>
-            <div id="coach-results"></div>
-        </div>
+        <footer>
+            <p>Xyneth - MTG Rules Assistant | Built for Commander/EDH players</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">Data collected locally to improve AI recommendations</p>
+        </footer>
     </div>
 
     <script>
-        // Keyword database
+        // Keyword database (same as before)
         const keywords = {
             'trample': { description: 'Excess combat damage is dealt to defending player/planeswalker', example: 'A 5/5 with trample blocked by a 2/2 deals 2 to creature, 3 to player', rule: '702.19b' },
             'flying': { description: 'Can only be blocked by creatures with flying or reach', example: 'A creature with flying can fly over ground creatures', rule: '702.9b' },
@@ -407,4 +524,6 @@
         }
     </script>
 </body>
-</html>
+</html>'''
+
+print(home_page)
