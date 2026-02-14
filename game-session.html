@@ -207,6 +207,13 @@
             winner: 'Unknown'
         };
 
+        // Prevent "leave site" confirmation
+        window.addEventListener('beforeunload', function(e) {
+            // Don't show confirmation - just leave
+            delete e['returnValue'];
+        });
+
+
         // ============================================
         // END SESSION FUNCTION - DEFINED SECOND
         // ============================================
