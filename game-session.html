@@ -582,6 +582,128 @@
 
     <script>
         // ============================================
+        // SESSION TRACKING FOR ANALYSIS (DEFINED EARLY)
+        // ============================================
+
+        let sessionData = {
+            startTime: new Date().toISOString(),
+            endTime: null,
+            players: ['Player 1', 'Player 2', 'Player 3', 'Player 4'],
+            format: 'Commander',
+            events: [],
+            disputes: [],
+            transcripts: [],
+            playerStats: {}
+        };
+
+        // Initialize player stats
+        sessionData.players.forEach(p => {
+            sessionData.playerStats[p] = {
+                goodPlays: 0,
+                mistakes: 0,
+                resourcesUsed: 0,
+                resourcesWasted: 0,
+                spellsCast: 0,
+                lifeTotal: 40
+            };
+        });
+
+        let currentTurn = 1;
+        let currentPhase = 'Main';
+        let eventCounter = 0;
+        let disputeLog = [];
+
+        function formatElapsedTime() {
+            const elapsed = Date.now() - new Date(sessionData.startTime).getTime();
+            const minutes = Math.floor(elapsed / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function calculateComplexity() {
+            const baseScore = 5;
+            const disputeBonus = Math.min(3, disputeLog.length * 0.5);
+            const eventBonus = Math.min(2, sessionData.events.length / 10);
+            return Math.min(10, baseScore + disputeBonus + eventBonus).toFixed(1);
+        }
+
+        function calculateThreatAccuracy() {
+            const accuracy = {};
+            sessionData.players.forEach(p => {
+                const stats = sessionData.playerStats[p];
+                accuracy[p] = stats.goodPlays / (stats.goodPlays + stats.mistakes + 0.1);
+            });
+            return accuracy;
+        }
+
+        // CRITICAL: endSession must be defined BEFORE the button that calls it
+        function endSession() {
+            console.log('Ending session...');
+            sessionData.endTime = new Date().toISOString();
+            sessionData.gameLength = (new Date(sessionData.endTime) - new Date(sessionData.startTime)) / 1000;
+            sessionData.disputes = disputeLog;
+
+            // Calculate winner
+            const playerScores = Object.entries(sessionData.playerStats).map(([name, stats]) => ({
+                name,
+                score: stats.goodPlays * 10 - stats.mistakes * 5 + stats.lifeTotal
+            }));
+            playerScores.sort((a, b) => b.score - a.score);
+            sessionData.winner = playerScores[0]?.name || 'Unknown';
+
+            // Add metrics
+            sessionData.strategicMetrics = {
+                avgTurnTime: sessionData.gameLength / currentTurn,
+                interactionDensity: sessionData.events.length / (sessionData.gameLength / 60),
+                complexityScore: calculateComplexity(),
+                rulesDisputesPerHour: (disputeLog.length / (sessionData.gameLength / 3600)),
+                threatAssessmentAccuracy: calculateThreatAccuracy()
+            };
+
+            // Save to localStorage
+            localStorage.setItem('veritas_session', JSON.stringify(sessionData));
+            console.log('Session saved, navigating to analysis...');
+
+            // Navigate to analysis
+            window.location.href = 'analysis.html';
+        }
+
+        function trackEvent(type, title, description, options = {}) {
+            eventCounter++;
+            const event = {
+                id: eventCounter,
+                time: formatElapsedTime(),
+                turn: currentTurn,
+                phase: currentPhase,
+                type: type,
+                player: options.player || 'Unknown',
+                title: title,
+                description: description,
+                impact: options.impact || 'neutral',
+                strategicValue: options.strategicValue || 0,
+                category: options.category || 'General',
+                improvement: options.improvement || null,
+                betterPlay: options.betterPlay || null,
+                note: options.note || null
+            };
+
+            sessionData.events.push(event);
+
+            if (sessionData.playerStats[event.player]) {
+                if (event.impact === 'positive') sessionData.playerStats[event.player].goodPlays++;
+                if (event.impact === 'negative') sessionData.playerStats[event.player].mistakes++;
+                if (event.strategicValue < 0) sessionData.playerStats[event.player].resourcesWasted++;
+                sessionData.playerStats[event.player].resourcesUsed++;
+            }
+
+            return event;
+        }
+
+        // ============================================
+        // ORIGINAL GAME SESSION CODE BELOW
+        // ============================================
+
+        // ============================================
         // PARTICLE SYSTEM
         // ============================================
         const canvas = document.getElementById('particle-canvas');
@@ -1069,153 +1191,6 @@
         });
 
         // ============================================
-        // SESSION TRACKING FOR ANALYSIS
-        // ============================================
-
-        let sessionData = {
-            startTime: new Date().toISOString(),
-            endTime: null,
-            players: ['Player 1', 'Player 2', 'Player 3', 'Player 4'],
-            format: 'Commander',
-            events: [],
-            disputes: [],
-            transcripts: [],
-            playerStats: {}
-        };
-
-        // Initialize player stats
-        sessionData.players.forEach(p => {
-            sessionData.playerStats[p] = {
-                goodPlays: 0,
-                mistakes: 0,
-                resourcesUsed: 0,
-                resourcesWasted: 0,
-                spellsCast: 0,
-                lifeTotal: 40
-            };
-        });
-
-        let currentTurn = 1;
-        let currentPhase = 'Main';
-        let eventCounter = 0;
-
-        function trackEvent(type, title, description, options = {}) {
-            eventCounter++;
-            const event = {
-                id: eventCounter,
-                time: formatElapsedTime(),
-                turn: currentTurn,
-                phase: currentPhase,
-                type: type,
-                player: options.player || 'Unknown',
-                title: title,
-                description: description,
-                impact: options.impact || 'neutral',
-                strategicValue: options.strategicValue || 0,
-                category: options.category || 'General',
-                improvement: options.improvement || null,
-                betterPlay: options.betterPlay || null,
-                note: options.note || null
-            };
-
-            sessionData.events.push(event);
-
-            if (sessionData.playerStats[event.player]) {
-                if (event.impact === 'positive') sessionData.playerStats[event.player].goodPlays++;
-                if (event.impact === 'negative') sessionData.playerStats[event.player].mistakes++;
-                if (event.strategicValue < 0) sessionData.playerStats[event.player].resourcesWasted++;
-                sessionData.playerStats[event.player].resourcesUsed++;
-            }
-
-            return event;
-        }
-
-        function formatElapsedTime() {
-            const elapsed = Date.now() - new Date(sessionData.startTime).getTime();
-            const minutes = Math.floor(elapsed / 60000);
-            const seconds = Math.floor((elapsed % 60000) / 1000);
-            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        // Track disputes
-        let disputeLog = [];
-
-        // Modify handleDispute to track
-        const originalHandleDispute = handleDispute;
-        handleDispute = async function(result) {
-            const disputeStart = Date.now();
-
-            const disputeEvent = trackEvent('dispute', 'Rules Dispute', result.text, {
-                player: 'Multiple',
-                impact: 'neutral',
-                category: 'Rules',
-                strategicValue: 0
-            });
-
-            // Call original
-            await originalHandleDispute(result);
-
-            // Track resolution
-            disputeEvent.resolution = 'Resolved';
-            disputeEvent.resolutionTime = Date.now() - disputeStart;
-
-            disputeLog.push({
-                time: disputeEvent.time,
-                topic: result.text.substring(0, 50),
-                players: ['Multiple'],
-                complexity: result.confidence > 8 ? 'high' : result.confidence > 5 ? 'medium' : 'low',
-                resolved: true
-            });
-        };
-
-        // End session and save
-        function endSession() {
-            console.log('Ending session...');
-            sessionData.endTime = new Date().toISOString();
-            sessionData.gameLength = (new Date(sessionData.endTime) - new Date(sessionData.startTime)) / 1000;
-            sessionData.disputes = disputeLog;
-
-            // Calculate winner
-            const playerScores = Object.entries(sessionData.playerStats).map(([name, stats]) => ({
-                name,
-                score: stats.goodPlays * 10 - stats.mistakes * 5 + stats.lifeTotal
-            }));
-            playerScores.sort((a, b) => b.score - a.score);
-            sessionData.winner = playerScores[0]?.name || 'Unknown';
-
-            // Add metrics
-            sessionData.strategicMetrics = {
-                avgTurnTime: sessionData.gameLength / currentTurn,
-                interactionDensity: sessionData.events.length / (sessionData.gameLength / 60),
-                complexityScore: calculateComplexity(),
-                rulesDisputesPerHour: (disputeLog.length / (sessionData.gameLength / 3600)),
-                threatAssessmentAccuracy: calculateThreatAccuracy()
-            };
-
-            // Save to localStorage
-            localStorage.setItem('veritas_session', JSON.stringify(sessionData));
-            console.log('Session saved:', sessionData);
-
-            // Navigate to analysis
-            window.location.href = 'analysis.html';
-        }
-
-        function calculateComplexity() {
-            const baseScore = 5;
-            const disputeBonus = Math.min(3, disputeLog.length * 0.5);
-            const eventBonus = Math.min(2, sessionData.events.length / 10);
-            return Math.min(10, baseScore + disputeBonus + eventBonus).toFixed(1);
-        }
-
-        function calculateThreatAccuracy() {
-            const accuracy = {};
-            sessionData.players.forEach(p => {
-                const stats = sessionData.playerStats[p];
-                accuracy[p] = stats.goodPlays / (stats.goodPlays + stats.mistakes + 0.1);
-            });
-            return accuracy;
-        }
-
-    </script>
+            </script>
 </body>
 </html>
