@@ -6,99 +6,140 @@
     <title>Veritas - MTG Rules Assistant</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --deep-navy: #0A1A2F;
+            --slate-gray: #4A5568;
+            --teal: #00A7B5;
+            --gold: #C9A86A;
+            --light: #e0e0ff;
+        }
+
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #e2e8f0;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--deep-navy) 0%, #0f172a 100%);
+            color: var(--light);
             min-height: 100vh;
             padding: 20px;
         }
+
         .container { max-width: 1200px; margin: 0 auto; }
+
         header {
             text-align: center;
             padding: 40px 0;
-            border-bottom: 2px solid #334155;
+            border-bottom: 1px solid rgba(0, 167, 181, 0.2);
             margin-bottom: 30px;
         }
+
         h1 {
-            font-size: 3rem;
-            background: linear-gradient(90deg, #14b8a6, #2dd4bf);
+            font-size: 3.5rem;
+            background: linear-gradient(90deg, var(--teal), var(--gold));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 2px;
         }
+
         .tagline {
-            color: #94a3b8;
+            color: var(--slate-gray);
             font-style: italic;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
         }
+
         .hero {
             text-align: center;
             padding: 60px 20px;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            background: rgba(10, 26, 47, 0.6);
             border-radius: 16px;
             margin-bottom: 40px;
-            border: 1px solid #334155;
+            border: 1px solid rgba(0, 167, 181, 0.2);
+            backdrop-filter: blur(10px);
         }
+
         .hero h2 {
             font-size: 2.5rem;
             margin-bottom: 20px;
-            color: #14b8a6;
+            color: var(--teal);
+            font-weight: 300;
         }
+
         .hero p {
             font-size: 1.2rem;
-            color: #94a3b8;
+            color: var(--slate-gray);
             max-width: 600px;
-            margin: 0 auto 30px;
+            margin: 0 auto 40px;
             line-height: 1.6;
         }
+
         .cta-button {
             display: inline-block;
-            background: linear-gradient(90deg, #14b8a6, #2dd4bf);
-            color: #0f172a;
-            padding: 20px 40px;
-            border-radius: 8px;
-            font-size: 1.3rem;
-            font-weight: bold;
+            background: linear-gradient(135deg, var(--teal) 0%, #008a96 100%);
+            color: white;
+            padding: 22px 50px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
             text-decoration: none;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0, 167, 181, 0.3);
+            border: none;
+            cursor: pointer;
         }
+
         .cta-button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(20, 184, 166, 0.4);
+            box-shadow: 0 15px 50px rgba(0, 167, 181, 0.5);
         }
+
         .cta-button.secondary {
             background: transparent;
-            border: 2px solid #14b8a6;
-            color: #14b8a6;
+            border: 2px solid var(--teal);
+            color: var(--teal);
+            box-shadow: none;
         }
+
         .cta-button.secondary:hover {
-            background: #14b8a6;
-            color: #0f172a;
+            background: var(--teal);
+            color: white;
         }
+
         .features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
             margin: 40px 0;
         }
+
         .feature-card {
-            background: #1e293b;
+            background: rgba(10, 26, 47, 0.5);
             padding: 30px;
             border-radius: 12px;
-            border: 1px solid #334155;
+            border: 1px solid rgba(0, 167, 181, 0.2);
             text-align: center;
+            transition: transform 0.3s ease, border-color 0.3s ease;
         }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--teal);
+        }
+
         .feature-card h3 {
-            color: #14b8a6;
+            color: var(--teal);
             margin-bottom: 15px;
             font-size: 1.5rem;
         }
+
         .feature-card p {
-            color: #94a3b8;
+            color: var(--slate-gray);
             line-height: 1.6;
         }
+
         .mode-tabs {
             display: flex;
             gap: 10px;
@@ -106,168 +147,232 @@
             justify-content: center;
             flex-wrap: wrap;
         }
+
         .mode-tab {
             padding: 12px 24px;
-            background: #1e293b;
-            border: 2px solid #334155;
+            background: rgba(10, 26, 47, 0.5);
+            border: 1px solid rgba(74, 85, 104, 0.3);
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
             font-size: 1rem;
-            color: #94a3b8;
+            color: var(--slate-gray);
         }
+
         .mode-tab:hover {
-            border-color: #14b8a6;
-            color: #14b8a6;
+            border-color: var(--teal);
+            color: var(--teal);
         }
+
         .mode-tab.active {
-            background: #14b8a6;
-            border-color: #14b8a6;
-            color: #0f172a;
-            font-weight: bold;
+            background: var(--teal);
+            border-color: var(--teal);
+            color: white;
+            font-weight: 600;
         }
+
         .panel {
             display: none;
-            background: #1e293b;
+            background: rgba(10, 26, 47, 0.5);
             border-radius: 12px;
             padding: 30px;
-            border: 1px solid #334155;
+            border: 1px solid rgba(0, 167, 181, 0.2);
         }
+
         .panel.active { display: block; }
+
         .input-group { margin-bottom: 20px; }
+
         label {
             display: block;
             margin-bottom: 8px;
-            color: #14b8a6;
+            color: var(--teal);
             font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
         }
+
         input, textarea, select {
             width: 100%;
-            padding: 12px;
-            background: #0f172a;
-            border: 2px solid #334155;
-            border-radius: 6px;
-            color: #e2e8f0;
+            padding: 14px;
+            background: rgba(5, 10, 20, 0.8);
+            border: 1px solid rgba(74, 85, 104, 0.3);
+            border-radius: 8px;
+            color: var(--light);
             font-size: 1rem;
             font-family: inherit;
+            transition: border-color 0.3s ease;
         }
+
         input:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: #14b8a6;
+            border-color: var(--teal);
         }
+
         textarea { min-height: 200px; resize: vertical; }
+
         button {
-            background: linear-gradient(90deg, #14b8a6, #2dd4bf);
-            color: #0f172a;
+            background: linear-gradient(135deg, var(--teal) 0%, #008a96 100%);
+            color: white;
             border: none;
             padding: 14px 28px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 1rem;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
+
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 167, 181, 0.3);
         }
+
         .voice-btn {
-            background: #7c3aed;
+            background: var(--gold);
             margin-left: 10px;
+            padding: 14px 20px;
         }
+
         .voice-btn:hover {
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+            box-shadow: 0 8px 25px rgba(201, 168, 106, 0.3);
         }
+
         .voice-btn.listening {
             background: #ef4444;
             animation: pulse 1.5s infinite;
         }
+
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.7; }
         }
+
         .results {
             margin-top: 30px;
-            padding: 20px;
-            background: #0f172a;
-            border-radius: 8px;
-            border-left: 4px solid #14b8a6;
+            padding: 25px;
+            background: rgba(5, 10, 20, 0.6);
+            border-radius: 12px;
+            border-left: 4px solid var(--teal);
         }
-        .results h3 { color: #14b8a6; margin-bottom: 15px; }
+
+        .results h3 { color: var(--teal); margin-bottom: 15px; font-size: 1.3rem; }
+
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 15px;
             margin-top: 20px;
         }
+
         .card {
-            background: #1e293b;
-            padding: 15px;
+            background: rgba(10, 26, 47, 0.5);
+            padding: 20px;
             border-radius: 8px;
-            border: 1px solid #334155;
+            border: 1px solid rgba(74, 85, 104, 0.2);
         }
-        .card h4 { color: #14b8a6; margin-bottom: 8px; }
+
+        .card h4 { color: var(--gold); margin-bottom: 8px; }
+
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
             margin: 20px 0;
         }
+
         .stat-box {
-            background: #0f172a;
-            padding: 15px;
+            background: rgba(5, 10, 20, 0.6);
+            padding: 20px;
             border-radius: 8px;
             text-align: center;
-            border: 1px solid #334155;
+            border: 1px solid rgba(74, 85, 104, 0.2);
         }
+
         .stat-value {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: bold;
-            color: #14b8a6;
+            color: var(--teal);
         }
-        .stat-label { color: #64748b; font-size: 0.9rem; }
+
+        .stat-label { color: var(--slate-gray); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+
         .quick-actions {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-top: 15px;
         }
+
         .quick-btn {
-            background: #334155;
-            color: #e2e8f0;
-            padding: 8px 16px;
+            background: rgba(74, 85, 104, 0.2);
+            color: var(--light);
+            padding: 10px 20px;
             border-radius: 20px;
             font-size: 0.9rem;
-            border: none;
+            border: 1px solid rgba(74, 85, 104, 0.3);
             cursor: pointer;
             transition: all 0.2s;
         }
+
         .quick-btn:hover {
-            background: #14b8a6;
-            color: #0f172a;
+            background: var(--teal);
+            border-color: var(--teal);
+            color: white;
         }
+
         .error {
-            background: #450a0a;
-            border: 1px solid #dc2626;
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.3);
             color: #fca5a5;
             padding: 15px;
-            border-radius: 6px;
+            border-radius: 8px;
             margin-top: 20px;
         }
+
         footer {
             text-align: center;
             padding: 40px 0;
-            border-top: 1px solid #334155;
+            border-top: 1px solid rgba(74, 85, 104, 0.2);
             margin-top: 60px;
-            color: #64748b;
+            color: var(--slate-gray);
         }
+
+        .game-session-info {
+            background: rgba(0, 167, 181, 0.1);
+            border: 1px solid rgba(0, 167, 181, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: left;
+        }
+
+        .game-session-info h4 {
+            color: var(--teal);
+            margin-bottom: 10px;
+        }
+
+        .game-session-info ul {
+            margin-left: 20px;
+            color: var(--slate-gray);
+        }
+
+        .game-session-info li {
+            margin-bottom: 5px;
+        }
+
         @media (max-width: 768px) {
-            h1 { font-size: 2rem; }
+            h1 { font-size: 2.5rem; }
             .hero h2 { font-size: 1.8rem; }
             .mode-tabs { flex-direction: column; }
             .card-grid { grid-template-columns: 1fr; }
         }
     </style>
+<base target="_blank">
 </head>
 <body>
     <div class="container">
@@ -280,14 +385,25 @@
         <div class="hero">
             <h2>Your AI-Powered MTG Assistant</h2>
             <p>Get instant rules clarification, deck analysis, and strategic coaching. Veritas listens to your games and helps you make better decisions.</p>
+
             <a href="game-session.html" class="cta-button">🎮 Start Game Session</a>
             <a href="coach-session.html" class="cta-button secondary">🧠 Coach Mode</a>
+
+            <div class="game-session-info">
+                <h4>🎙️ Game Session Mode:</h4>
+                <ul>
+                    <li>Continuous voice listening during your game</li>
+                    <li>Automatic dispute detection when rules questions arise</li>
+                    <li>Fullscreen ruling display with spoken answers</li>
+                    <li>Perfect for Commander/EDH playgroups</li>
+                </ul>
+            </div>
         </div>
 
         <!-- Tools Section -->
         <div id="tools">
-            <h2 style="text-align: center; margin-bottom: 30px; color: #14b8a6;">Quick Tools</h2>
-            
+            <h2 style="text-align: center; margin-bottom: 30px; color: var(--teal);">Quick Tools</h2>
+
             <div class="mode-tabs">
                 <button class="mode-tab active" onclick="switchMode('rules')">📋 Rules Assistant</button>
                 <button class="mode-tab" onclick="switchMode('deck')">🎴 Deck Analyzer</button>
@@ -351,7 +467,7 @@
             </div>
             <div class="feature-card">
                 <h3>🎮 Game Sessions</h3>
-                <p>Start a session and let Veritas listen to your game. Get real-time suggestions and post-game analysis.</p>
+                <p>Start a session and let Veritas listen to your game. Get real-time rulings when disputes arise.</p>
             </div>
         </div>
 
@@ -362,7 +478,7 @@
     </div>
 
     <script>
-        // Keyword database (same as before)
+        // Keyword database
         const keywords = {
             'trample': { description: 'Excess combat damage is dealt to defending player/planeswalker', example: 'A 5/5 with trample blocked by a 2/2 deals 2 to creature, 3 to player', rule: '702.19b' },
             'flying': { description: 'Can only be blocked by creatures with flying or reach', example: 'A creature with flying can fly over ground creatures', rule: '702.9b' },
@@ -371,12 +487,12 @@
             'lifelink': { description: 'Damage dealt also gains you that much life', example: '5/5 with lifelink deals 5 damage, you gain 5 life', rule: '702.15b' },
             'deathtouch': { description: 'Any amount of damage is lethal to creatures', example: '1/1 with deathtouch can kill a 10/10 in combat', rule: '702.2b' },
             'haste': { description: 'Can attack and tap immediately when it comes under your control', example: 'Creature with haste can attack the turn you play it', rule: '702.10b' },
-            'vigilance': { description: 'Attacking does not cause this creature to tap', example: 'Can attack and still block on opponent\'s turn', rule: '702.20b' },
+            'vigilance': { description: 'Attacking does not cause this creature to tap', example: 'Can attack and still block on opponent's turn', rule: '702.20b' },
             'first strike': { description: 'Deals combat damage before creatures without first strike', example: '3/1 first strike vs 2/2 - first strike kills 2/2 before it deals damage', rule: '702.7b' },
             'double strike': { description: 'Deals combat damage twice - once in first strike, once in normal', example: '3/3 double strike deals 3 damage, then 3 more damage', rule: '702.8b' },
             'menace': { description: 'Can only be blocked by two or more creatures', example: 'Opponent needs 2+ creatures to block your menace creature', rule: '702.110b' },
             'reach': { description: 'Can block creatures with flying', example: 'Spider with reach can block a bird with flying', rule: '702.17b' },
-            'flash': { description: 'Can be cast any time you could cast an instant', example: 'Cast creature with flash during opponent\'s combat step', rule: '702.8a' },
+            'flash': { description: 'Can be cast any time you could cast an instant', example: 'Cast creature with flash during opponent's combat step', rule: '702.8a' },
             'ward': { description: 'Opponent pays cost or spell/ability is countered', example: 'Ward 2 - opponent pays 2 or their spell fizzles', rule: '702.21b' },
             'prowess': { description: 'Gets +1/+1 until end of turn when you cast noncreature spell', example: 'Cast Lightning Bolt, prowess creature gets +1/+1', rule: '702.107a' },
             'commander': { description: 'Special card in Command Zone, can be cast from there', example: 'Commander dies - goes to Command Zone, costs 2 more next time', rule: '903.3' },
@@ -386,7 +502,7 @@
             'color identity': { description: 'All mana symbols on card determine what colors can be in deck', example: 'Atraxa (WUBG) - deck can only have white, blue, black, green, colorless cards', rule: '903.4' },
             'the stack': { description: 'Zone where spells and abilities wait to resolve (last in, first out)', example: 'You cast spell, opponent counters it - counter is on top, resolves first', rule: '405.1' },
             'priority': { description: 'Right to cast spells and activate abilities', example: 'Active player gets priority first, then passes to opponent', rule: '117.1' },
-            'mana abilities': { description: 'Abilities that add mana and don\'t use the stack', example: 'Tap Forest for green mana - happens immediately, can\'t be responded to', rule: '605.1' },
+            'mana abilities': { description: 'Abilities that add mana and don't use the stack', example: 'Tap Forest for green mana - happens immediately, can't be responded to', rule: '605.1' },
             'combat damage': { description: 'Damage dealt during combat phase by attacking/blocking creatures', example: 'Attacker deals damage equal to power to blocker or player', rule: '510.1' },
             'state-based actions': { description: 'Game checks for things like 0 toughness, lethal damage, immediately', example: 'Creature with 0 toughness dies before you can respond', rule: '704.1' },
             'target': { description: 'Choosing what a spell or ability affects when cast', example: 'Lightning Bolt targets a creature or player - hexproof prevents targeting', rule: '115.1' },
@@ -440,13 +556,16 @@
             const input = document.getElementById('rules-input').value.toLowerCase().trim();
             const resultsDiv = document.getElementById('rules-results');
             if (!input) return;
+
             let history = JSON.parse(localStorage.getItem('veritas_searches') || '[]');
             history.push({ query: input, time: new Date().toISOString() });
             localStorage.setItem('veritas_searches', JSON.stringify(history));
+
             let found = null;
             for (const [key, data] of Object.entries(keywords)) {
                 if (input.includes(key)) { found = { keyword: key, ...data }; break; }
             }
+
             if (found) {
                 resultsDiv.innerHTML = `<div class="results"><h3>📚 ${found.keyword.toUpperCase()}</h3><p><strong>Rule ${found.rule}:</strong> ${found.description}</p><div class="card"><h4>💡 Example</h4><p>${found.example}</p></div></div>`;
             } else {
@@ -459,23 +578,28 @@
             const format = document.getElementById('deck-format').value;
             const input = document.getElementById('deck-input').value;
             const resultsDiv = document.getElementById('deck-results');
+
             if (!input.trim()) { resultsDiv.innerHTML = '<div class="error">Please enter a decklist</div>'; return; }
+
             const lines = input.split('\n');
             let cards = [];
             for (const line of lines) {
                 const match = line.match(/^(\d+)x?\s+(.+?)(?:\s*\(|\s*#|$)/i);
                 if (match) cards.push({ quantity: parseInt(match[1]), name: match[2].trim() });
             }
+
             const totalCards = cards.reduce((sum, c) => sum + c.quantity, 0);
             const landCount = cards.filter(c => 
                 ['forest','island','mountain','plains','swamp'].some(land => c.name.toLowerCase().includes(land))
                 || c.name.toLowerCase().includes('land')
             ).reduce((sum, c) => sum + c.quantity, 0);
+
             let recs = [];
             if (format === 'commander') {
                 if (totalCards < 99) recs.push('Add more cards - Commander needs 99 + commander');
                 if (landCount < 35) recs.push('Consider more lands or ramp (you have ' + landCount + ')');
             }
+
             resultsDiv.innerHTML = `
                 <div class="results">
                     <h3>📊 ${name} Analysis</h3>
@@ -487,6 +611,7 @@
                     ${recs.length > 0 ? `<div style="margin-top: 20px;"><h4>💡 Suggestions:</h4><ul style="margin-top: 10px; padding-left: 20px;">${recs.map(r => `<li>${r}</li>`).join('')}</ul></div>` : '<p>✅ Basic structure looks good!</p>'}
                 </div>
             `;
+
             let decks = JSON.parse(localStorage.getItem('veritas_decks') || '[]');
             decks.push({ name, format, cards, date: new Date().toISOString() });
             localStorage.setItem('veritas_decks', JSON.stringify(decks));
