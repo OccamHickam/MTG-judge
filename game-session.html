@@ -123,40 +123,58 @@
         .end-session-btn:hover {
             background: #00a7b5;
             color: white;
-            transform: translateX(-50%) translateY(-2px);
         }
 
-        .status-bar {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 30px;
+        /* Ruling Overlay */
+        #ruling-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 10, 0.95);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
         }
 
-        .status-item {
+        #ruling-overlay.active {
             display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            color: #4a5568;
+        }
+
+        .ruling-title {
+            font-size: 2rem;
+            color: #00a7b5;
+            margin-bottom: 20px;
+        }
+
+        .ruling-text {
+            font-size: 1.2rem;
+            color: #e0e0ff;
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .ruling-close {
+            background: transparent;
+            border: 2px solid #00a7b5;
+            color: #00a7b5;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
         }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #4a5568;
-            transition: background 0.3s ease;
-        }
-
-        .status-dot.active {
+        .ruling-close:hover {
             background: #00a7b5;
-            box-shadow: 0 0 10px rgba(0, 167, 181, 0.8);
+            color: white;
         }
 
         .debug-info {
@@ -167,7 +185,6 @@
             color: #4a5568;
             font-size: 12px;
             text-align: center;
-            opacity: 0.7;
         }
     </style>
 <base target="_blank">
@@ -183,20 +200,19 @@
             <div class="listening-text">Listening</div>
             <div class="listening-subtext">The Arbiter hears all</div>
         </div>
+        <div class="debug-info" id="debug-info">Session time: 0:00 | Disputes: 0</div>
+    </div>
 
-        <div class="status-bar">
-            <div class="status-item">
-                <div class="status-dot active" id="mic-status"></div>
-                <span>Microphone Active</span>
-            </div>
-        </div>
-
-        <div class="debug-info" id="debug-info">Session time: 0:00</div>
+    <!-- Ruling Overlay -->
+    <div id="ruling-overlay">
+        <div class="ruling-title">⚖️ Dispute Detected</div>
+        <div class="ruling-text" id="ruling-text">Analyzing...</div>
+        <button class="ruling-close" onclick="closeRuling()">Continue</button>
     </div>
 
     <script>
         // ============================================
-        // SESSION DATA - DEFINED FIRST
+        // SESSION DATA & TRACKING
         // ============================================
         const sessionData = {
             startTime: new Date().toISOString(),
@@ -207,46 +223,189 @@
             winner: 'Unknown'
         };
 
-        // Prevent "leave site" confirmation
-        window.addEventListener('beforeunload', function(e) {
-            // Don't show confirmation - just leave
-            delete e['returnValue'];
-        });
+        let disputeCount = 0;
 
+        function trackEvent(type, title, description) {
+            const now = new Date();
+            const elapsed = Math.floor((now - new Date(sessionData.startTime)) / 1000);
+            const mins = Math.floor(elapsed / 60);
+            const secs = elapsed % 60;
+
+            const event = {
+                time: `${mins}:${secs.toString().padStart(2, '0')}`,
+                type: type,
+                title: title,
+                description: description
+            };
+
+            sessionData.events.push(event);
+            console.log('Event tracked:', event);
+            updateDebugInfo();
+        }
+
+        function updateDebugInfo() {
+            const elapsed = Math.floor((new Date() - new Date(sessionData.startTime)) / 1000);
+            const mins = Math.floor(elapsed / 60);
+            const secs = elapsed % 60;
+            document.getElementById('debug-info').textContent = 
+                `Session time: ${mins}:${secs.toString().padStart(2, '0')} | Disputes: ${disputeCount}`;
+        }
+
+        setInterval(updateDebugInfo, 1000);
 
         // ============================================
-        // END SESSION FUNCTION - DEFINED SECOND
+        // END SESSION
         // ============================================
         function endSession() {
-            console.log('END SESSION CLICKED');
-
-            // Track session end event
-            trackEvent('session', 'Session Ended', `Total disputes: ${disputeCount}, Total events: ${sessionData.events.length}`);
-
-            alert(`Ending session...\nRecorded ${sessionData.events.length} events and ${sessionData.disputes.length} disputes.`);
-
+            console.log('Ending session...');
             sessionData.endTime = new Date().toISOString();
             sessionData.gameLength = Math.floor((new Date() - new Date(sessionData.startTime)) / 1000);
 
-            console.log('Saving data:', sessionData);
             localStorage.setItem('veritas_session', JSON.stringify(sessionData));
+            console.log('Saved:', sessionData);
 
-            console.log('Navigating to analysis...');
+            alert(`Session saved!\nEvents: ${sessionData.events.length}\nDisputes: ${disputeCount}`);
             window.location.href = 'analysis.html';
         }
 
-        // ============================================
-        // BUTTON EVENT LISTENER - DEFINED THIRD
-        // ============================================
-        document.getElementById('endBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Button clicked!');
-            endSession();
-        });
+        document.getElementById('endBtn').addEventListener('click', endSession);
 
         // ============================================
-        // PARTICLE SYSTEM
+        // DISPUTE DETECTION
+        // ============================================
+        class DisputeDetector {
+            constructor() {
+                this.confidence = 0;
+                this.threshold = 3; // Lower = more sensitive
+                this.decayRate = 1;
+                this.lastTriggerTime = 0;
+                this.cooldown = 5000;
+
+                this.triggers = {
+                    uncertainty: ['wait', 'hold on', 'does that', 'can you', 'not sure', 'confused', 'what happens', 'how does', 'question'],
+                    challenge: ["you can't", 'you can not', 'illegal', 'wrong', 'doesn't work', 'not legal', 'cheat', 'invalid', 'not allowed'],
+                    mtg_terms: ['stack', 'priority', 'trigger', 'target', 'mana', 'token', 'combat', 'phase', 'ability', 'resolve', 'counter']
+                };
+
+                this.triggerWeights = { uncertainty: 2, challenge: 3, mtg_terms: 1 };
+            }
+
+            analyze(text) {
+                const lowerText = text.toLowerCase();
+                console.log('Analyzing:', text);
+
+                let detected = [];
+                let newTriggers = false;
+
+                for (const [category, words] of Object.entries(this.triggers)) {
+                    for (const word of words) {
+                        if (lowerText.includes(word)) {
+                            if (!detected.find(d => d.word === word)) {
+                                this.confidence += this.triggerWeights[category];
+                                detected.push({ category, word, weight: this.triggerWeights[category] });
+                                newTriggers = true;
+                                console.log(`Trigger: ${word} (+${this.triggerWeights[category]})`);
+                            }
+                        }
+                    }
+                }
+
+                if (!newTriggers) {
+                    this.confidence = Math.max(0, this.confidence - this.decayRate);
+                }
+
+                this.confidence = Math.min(this.confidence, 15);
+                console.log('Confidence:', this.confidence, 'Threshold:', this.threshold);
+
+                const now = Date.now();
+                if (this.confidence >= this.threshold && (now - this.lastTriggerTime) > this.cooldown) {
+                    this.lastTriggerTime = now;
+                    return { detected: true, text: text, triggers: detected, confidence: this.confidence };
+                }
+
+                return { detected: false };
+            }
+        }
+
+        const disputeDetector = new DisputeDetector();
+
+        // ============================================
+        // SPEECH RECOGNITION
+        // ============================================
+        let recognition;
+
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                document.getElementById('listening-container').classList.add('active');
+                console.log('Listening started');
+            };
+
+            recognition.onend = () => {
+                document.getElementById('listening-container').classList.remove('active');
+                setTimeout(() => recognition.start(), 100);
+            };
+
+            recognition.onresult = (event) => {
+                let interim = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        console.log('Heard:', transcript);
+                        const result = disputeDetector.analyze(transcript);
+                        if (result.detected) {
+                            handleDispute(result);
+                        }
+                    } else {
+                        interim += transcript;
+                    }
+                }
+            };
+
+            recognition.start();
+        } else {
+            alert('Speech recognition not supported. Use Chrome.');
+        }
+
+        // ============================================
+        // DISPUTE HANDLING
+        // ============================================
+        function handleDispute(result) {
+            console.log('DISPUTE DETECTED:', result);
+
+            // Track it
+            disputeCount++;
+            sessionData.disputes.push({
+                time: new Date().toISOString(),
+                text: result.text,
+                confidence: result.confidence
+            });
+            trackEvent('dispute', 'Rules Dispute', result.text);
+
+            // Show ruling overlay
+            document.getElementById('ruling-text').textContent = `Heard: "${result.text}"`;
+            document.getElementById('ruling-overlay').classList.add('active');
+
+            // Speak
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance('Dispute detected. Please clarify the question.');
+                utterance.rate = 0.9;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function closeRuling() {
+            document.getElementById('ruling-overlay').classList.remove('active');
+            disputeDetector.confidence = 0;
+        }
+
+        // ============================================
+        // PARTICLES
         // ============================================
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
@@ -267,7 +426,6 @@
                 this.opacity = Math.random() * 0.5 + 0.1;
                 this.color = Math.random() > 0.5 ? '#00a7b5' : '#c9a86a';
             }
-
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
@@ -276,7 +434,6 @@
                     this.y = Math.random() * canvas.height;
                 }
             }
-
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
@@ -289,9 +446,7 @@
 
         function initParticles() {
             particles = [];
-            for (let i = 0; i < 50; i++) {
-                particles.push(new Particle());
-            }
+            for (let i = 0; i < 50; i++) particles.push(new Particle());
         }
 
         function animateParticles() {
@@ -304,16 +459,6 @@
         resizeCanvas();
         initParticles();
         animateParticles();
-
-        // Update debug timer
-        setInterval(() => {
-            const elapsed = Math.floor((new Date() - new Date(sessionData.startTime)) / 1000);
-            const mins = Math.floor(elapsed / 60);
-            const secs = elapsed % 60;
-            document.getElementById('debug-info').textContent = `Session time: ${mins}:${secs.toString().padStart(2, '0')}`;
-        }, 1000);
-
-        console.log('Game session loaded, endSession function:', typeof endSession);
     </script>
 </body>
 </html>
