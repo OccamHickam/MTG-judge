@@ -237,8 +237,7 @@
 </head>
 <body>
     <!-- Loading Overlay -->
-    <div id="loading-overlay">
-        <div class="loading-spinner"></div>
+    
         <div class="loading-text">The Arbiter analyzes the battle...</div>
         <button class="show-analysis-btn" onclick="hideLoader()">Show Analysis</button>
         <div class="loading-hint">Auto-closing in 1 second...</div>
@@ -287,16 +286,7 @@
     </div>
 
     <script>
-        // CRITICAL: Hide loader function - defined FIRST
-        function hideLoader() {
-            console.log('Hiding loader');
-            document.getElementById('loading-overlay').style.display = 'none';
-        }
-
-        // Auto-hide after 1 second
-        setTimeout(hideLoader, 1000);
-
-        // Load and display session data
+        // Load and display session data immediately
         function loadSession() {
             console.log('Loading session...');
 
@@ -353,7 +343,7 @@
             console.log('Display updated');
         }
 
-        // Load data when page loads
+        // Load immediately
         window.addEventListener('load', loadSession);
     </script>
 </body>
