@@ -686,11 +686,11 @@
 <base target="_blank">
 </head>
 <body>
-        <div id="loading-overlay" class="loading-overlay">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">The Arbiter analyzes the battle...</div>
-        <button onclick="forceCloseLoader()" style="margin-top: 30px; padding: 15px 30px; background: #00A7B5; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; text-transform: uppercase; letter-spacing: 1px;">Show Analysis</button>
-        <p style="margin-top: 20px; color: #4A5568; font-size: 12px;">Click button if stuck loading</p>
+        <div id="loading-overlay" class="loading-overlay" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 5, 10, 0.98); z-index: 9999;">
+        <div class="loading-spinner" style="width: 60px; height: 60px; border: 3px solid rgba(0, 167, 181, 0.2); border-top-color: #00A7B5; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <div class="loading-text" style="margin-top: 20px; color: #00A7B5; font-size: 1.2rem; letter-spacing: 2px;">The Arbiter analyzes the battle...</div>
+        <button onclick="document.getElementById('loading-overlay').style.display='none';" style="margin-top: 30px; padding: 15px 30px; background: #00A7B5; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Show Analysis</button>
+        <p style="margin-top: 15px; color: #4A5568; font-size: 12px;">Click if stuck loading</p>
     </div>
         <div class="loading-text">The Arbiter analyzes the battle...</div>
         <button onclick="skipLoading()" style="margin-top: 30px; padding: 12px 24px; background: transparent; border: 2px solid var(--teal); color: var(--teal); border-radius: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-family: inherit;">Skip to Preview</button>
@@ -1602,6 +1602,15 @@
                 }
             };
         }
-    </script>
+    
+
+        // Simple force close - works immediately
+        function closeLoader() {
+            var el = document.getElementById('loading-overlay');
+            if (el) el.style.display = 'none';
+        }
+        // Auto close after 1 second
+        setTimeout(closeLoader, 1000);
+</script>
 </body>
 </html>
