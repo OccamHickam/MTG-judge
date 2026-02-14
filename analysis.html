@@ -686,8 +686,12 @@
 <base target="_blank">
 </head>
 <body>
-    <div id="loading-overlay" class="loading-overlay">
+        <div id="loading-overlay" class="loading-overlay">
         <div class="loading-spinner"></div>
+        <div class="loading-text">The Arbiter analyzes the battle...</div>
+        <button onclick="forceCloseLoader()" style="margin-top: 30px; padding: 15px 30px; background: #00A7B5; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; text-transform: uppercase; letter-spacing: 1px;">Show Analysis</button>
+        <p style="margin-top: 20px; color: #4A5568; font-size: 12px;">Click button if stuck loading</p>
+    </div>
         <div class="loading-text">The Arbiter analyzes the battle...</div>
         <button onclick="skipLoading()" style="margin-top: 30px; padding: 12px 24px; background: transparent; border: 2px solid var(--teal); color: var(--teal); border-radius: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-family: inherit;">Skip to Preview</button>
     </div>
@@ -788,6 +792,37 @@
     </div>
 
     <script>
+        // Emergency loader close
+        function forceCloseLoader() {
+            console.log('Force closing loader');
+            document.getElementById('loading-overlay').style.display = 'none';
+            // Try to render anyway
+            try {
+                if (!sessionData) {
+                    sessionData = createEmptySession();
+                }
+                if (!analysisResults) {
+                    analysisResults = performDeepAnalysis(sessionData);
+                }
+                renderExecutiveSummary(sessionData, analysisResults);
+                renderInsights(analysisResults);
+                renderPlayerAnalysis(analysisResults);
+                renderTimeline(sessionData);
+                renderMetaStats(analysisResults);
+            } catch(e) {
+                console.error('Render error:', e);
+            }
+        }
+
+        // Auto-hide after 2 seconds
+        setTimeout(function() {
+            console.log('Auto-hiding loader');
+            var loader = document.getElementById('loading-overlay');
+            if (loader) {
+                loader.style.display = 'none';
+            }
+        }, 2000);
+
         // ============================================
         // ADVANCED ANALYSIS ENGINE
         // ============================================
@@ -1497,6 +1532,11 @@
         }
 
         window.addEventListener('load', () => {
+            // Safety timeout - hide loader after 3 seconds no matter what
+            setTimeout(() => {
+                document.getElementById('loading-overlay').classList.add('hidden');
+            }, 3000);
+
             console.log('Analysis page loaded');
 
             // Try to load real session data
