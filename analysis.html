@@ -954,6 +954,35 @@
                 actionItems: []
             };
 
+            // Handle empty session
+            if (!data.events || data.events.length === 0) {
+                analysis.metaStats = {
+                    gamePace: { label: 'Game Pace', value: '0m', context: 'No data recorded' },
+                    interactionRate: { label: 'Interaction Rate', value: '0/min', context: 'No events' },
+                    complexity: { label: 'Complexity', value: '0/10', context: 'No data' },
+                    rulesClarity: { label: 'Disputes', value: '0', context: 'No disputes' },
+                    avgLifeLoss: { label: 'Life Loss', value: '0', context: 'per player' },
+                    totalSpells: { label: 'Spells Cast', value: '0', context: 'no activity' }
+                };
+
+                // Empty player analysis
+                data.players.forEach(player => {
+                    analysis.playerAnalysis[player] = {
+                        stats: { goodPlays: 0, mistakes: 0, lifeTotal: 40, spellsCast: 0 },
+                        resourceEfficiency: 0,
+                        playQuality: 0,
+                        playstyle: 'Unknown',
+                        grade: 'N/A',
+                        strengths: ['No data'],
+                        weaknesses: ['No data'],
+                        keyMoments: [],
+                        improvementAreas: ['Start a game session to record data']
+                    };
+                });
+
+                return analysis;
+            }
+
             // 1. Identify Critical Moments (high strategic value)
             data.events.forEach(event => {
                 if (event.strategicValue >= 8) {
@@ -1179,7 +1208,18 @@
         // ============================================
 
         function renderExecutiveSummary(data, analysis) {
-            const duration = formatTime(data.gameLength);
+            // Show message if no data
+            if (!data.events || data.events.length === 0) {
+                document.getElementById('session-overview').innerHTML = 
+                    '<strong style="color: #00A7B5;">No game data recorded.</strong> ' +
+                    'Start a game session and play to see analysis here. Showing empty template.';
+            } else {
+                document.getElementById('session-overview').textContent = 
+                    `A ${formatTime(data.gameLength)} game with ${data.players.length} players. ` +
+                    `${data.winner} won. ${data.events.length} events recorded.`;
+            }
+
+            const duration = data.gameLength > 0 ? formatTime(data.gameLength) : '0m';
             document.getElementById('session-overview').textContent = 
                 `A ${duration} Commander game with ${data.players.length} players. ` +
                 `${data.winner} emerged victorious through superior threat assessment and combo execution. ` +
@@ -1459,63 +1499,69 @@
         window.addEventListener('load', () => {
             console.log('Analysis page loaded');
 
-            try {
-                // Load real data or use demo
-                const saved = localStorage.getItem('veritas_session');
-                console.log('Checking localStorage...');
+            // Try to load real session data
+            const saved = localStorage.getItem('veritas_session');
 
-                if (saved && saved.length > 0) {
-                    console.log('Found saved data, length:', saved.length);
-                    try {
-                        sessionData = JSON.parse(saved);
-                        console.log('✓ Parsed session data');
-                        console.log('  - Duration:', sessionData.gameLength, 'seconds');
-                        console.log('  - Events:', sessionData.events?.length || 0);
-                        console.log('  - Disputes:', sessionData.disputes?.length || 0);
-                        console.log('  - Winner:', sessionData.winner);
-                    } catch (e) {
-                        console.error('✗ Failed to parse saved data:', e);
-                        sessionData = generateRichDemoData();
+            if (saved) {
+                try {
+                    sessionData = JSON.parse(saved);
+                    console.log('Loaded real session:', sessionData);
+
+                    // If no events, create empty structure
+                    if (!sessionData.events) sessionData.events = [];
+                    if (!sessionData.disputes) sessionData.disputes = [];
+                    if (!sessionData.playerStats) {
+                        sessionData.playerStats = {};
+                        sessionData.players.forEach(p => {
+                            sessionData.playerStats[p] = {
+                                goodPlays: 0, mistakes: 0, resourcesUsed: 0,
+                                resourcesWasted: 0, spellsCast: 0, lifeTotal: 40
+                            };
+                        });
                     }
-                } else {
-                    console.log('No saved data found, using demo');
-                    sessionData = generateRichDemoData();
+
+                } catch (e) {
+                    console.error('Error parsing session:', e);
+                    sessionData = createEmptySession();
                 }
-
-                // Validate data structure
-                if (!sessionData || !sessionData.events || sessionData.events.length === 0) {
-                    console.warn('Invalid or empty data, using demo');
-                    sessionData = generateRichDemoData();
-                }
-
-                // Perform analysis
-                console.log('Performing analysis...');
-                analysisResults = performDeepAnalysis(sessionData);
-                console.log('✓ Analysis complete');
-
-                // Render all sections
-                console.log('Rendering...');
-                renderExecutiveSummary(sessionData, analysisResults);
-                renderInsights(analysisResults);
-                renderPlayerAnalysis(analysisResults);
-                renderTimeline(sessionData);
-                renderMetaStats(analysisResults);
-                console.log('✓ Render complete');
-
-                // Hide loading
-                setTimeout(() => {
-                    document.getElementById('loading-overlay').classList.add('hidden');
-                    console.log('✓ Loader hidden');
-                }, 500);
-
-            } catch (error) {
-                console.error('✗ Fatal error:', error);
-                document.querySelector('.loading-text').textContent = 'Error: ' + error.message;
-                document.querySelector('.loading-text').style.color = '#ef4444';
-                document.querySelector('.loading-text').style.cursor = 'pointer';
-                document.querySelector('.loading-text').onclick = skipLoading;
+            } else {
+                console.log('No session data found');
+                sessionData = createEmptySession();
             }
+
+            // Perform analysis (will handle empty data)
+            analysisResults = performDeepAnalysis(sessionData);
+
+            // Render
+            renderExecutiveSummary(sessionData, analysisResults);
+            renderInsights(analysisResults);
+            renderPlayerAnalysis(analysisResults);
+            renderTimeline(sessionData);
+            renderMetaStats(analysisResults);
+
+            // Hide loader
+            document.getElementById('loading-overlay').classList.add('hidden');
         });
+
+        function createEmptySession() {
+            return {
+                startTime: new Date().toISOString(),
+                endTime: new Date().toISOString(),
+                gameLength: 0,
+                players: ['Player 1', 'Player 2', 'Player 3', 'Player 4'],
+                winner: 'None',
+                events: [],
+                disputes: [],
+                playerStats: {},
+                strategicMetrics: {
+                    avgTurnTime: 0,
+                    interactionDensity: 0,
+                    complexityScore: 0,
+                    rulesDisputesPerHour: 0,
+                    threatAssessmentAccuracy: {}
+                }
+            };
+        }
     </script>
 </body>
 </html>
