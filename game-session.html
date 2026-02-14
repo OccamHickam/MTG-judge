@@ -219,7 +219,11 @@
         // ============================================
         function endSession() {
             console.log('END SESSION CLICKED');
-            alert('Ending session...');
+
+            // Track session end event
+            trackEvent('session', 'Session Ended', `Total disputes: ${disputeCount}, Total events: ${sessionData.events.length}`);
+
+            alert(`Ending session...\nRecorded ${sessionData.events.length} events and ${sessionData.disputes.length} disputes.`);
 
             sessionData.endTime = new Date().toISOString();
             sessionData.gameLength = Math.floor((new Date() - new Date(sessionData.startTime)) / 1000);
