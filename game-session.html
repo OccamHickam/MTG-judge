@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Veritas - Game Session</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -20,7 +16,6 @@
             width: 100vw;
         }
 
-        /* Ambient Particle Canvas */
         #particle-canvas {
             position: fixed;
             top: 0;
@@ -31,7 +26,6 @@
             pointer-events: none;
         }
 
-        /* Main Game Session Container */
         #game-session {
             position: fixed;
             top: 0;
@@ -46,16 +40,13 @@
             background: radial-gradient(ellipse at center, rgba(20, 20, 40, 0.3) 0%, rgba(5, 5, 10, 0.9) 100%);
         }
 
-        /* Listening Indicator */
         .listening-container {
             text-align: center;
             opacity: 0.6;
             transition: opacity 0.3s ease;
         }
 
-        .listening-container.active {
-            opacity: 1;
-        }
+        .listening-container.active { opacity: 1; }
 
         .listening-pulse {
             width: 120px;
@@ -110,332 +101,31 @@
             font-style: italic;
         }
 
-        /* Audio Waveform */
-        .waveform {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            height: 40px;
-            margin-top: 30px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .waveform.active {
-            opacity: 1;
-        }
-
-        .wave-bar {
-            width: 4px;
-            background: linear-gradient(to top, #00a7b5, #c9a86a);
-            border-radius: 2px;
-            animation: wave 1s ease-in-out infinite;
-        }
-
-        .wave-bar:nth-child(1) { height: 20%; animation-delay: 0s; }
-        .wave-bar:nth-child(2) { height: 40%; animation-delay: 0.1s; }
-        .wave-bar:nth-child(3) { height: 60%; animation-delay: 0.2s; }
-        .wave-bar:nth-child(4) { height: 80%; animation-delay: 0.3s; }
-        .wave-bar:nth-child(5) { height: 100%; animation-delay: 0.4s; }
-        .wave-bar:nth-child(6) { height: 80%; animation-delay: 0.5s; }
-        .wave-bar:nth-child(7) { height: 60%; animation-delay: 0.6s; }
-        .wave-bar:nth-child(8) { height: 40%; animation-delay: 0.7s; }
-        .wave-bar:nth-child(9) { height: 20%; animation-delay: 0.8s; }
-
-        @keyframes wave {
-            0%, 100% { transform: scaleY(0.5); opacity: 0.5; }
-            50% { transform: scaleY(1); opacity: 1; }
-        }
-
-        /* Transcript Display */
-        .transcript-container {
-            position: absolute;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            max-width: 600px;
-            text-align: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .transcript-container.visible {
-            opacity: 0.7;
-        }
-
-        .transcript-text {
-            font-size: 16px;
-            color: #8892b0;
-            font-style: italic;
-            line-height: 1.5;
-        }
-
-        /* Confidence Meter */
-        .confidence-container {
-            position: absolute;
-            top: 40px;
-            right: 40px;
-            background: rgba(10, 10, 15, 0.8);
-            border: 1px solid rgba(0, 167, 181, 0.3);
-            border-radius: 12px;
-            padding: 20px;
-            min-width: 200px;
-            backdrop-filter: blur(10px);
-        }
-
-        .confidence-title {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #4a5568;
-            margin-bottom: 10px;
-        }
-
-        .confidence-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(74, 85, 104, 0.3);
-            border-radius: 3px;
-            overflow: hidden;
-            margin-bottom: 8px;
-        }
-
-        .confidence-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00a7b5, #c9a86a);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .confidence-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #00a7b5;
-        }
-
-        .confidence-label {
-            font-size: 11px;
-            color: #4a5568;
-            margin-top: 5px;
-        }
-
-        /* Dispute Detection Log */
-        .detection-log {
-            position: absolute;
-            top: 40px;
-            left: 40px;
-            background: rgba(10, 10, 15, 0.8);
-            border: 1px solid rgba(201, 168, 106, 0.2);
-            border-radius: 12px;
-            padding: 20px;
-            min-width: 250px;
-            max-height: 300px;
-            overflow-y: auto;
-            backdrop-filter: blur(10px);
-        }
-
-        .detection-title {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #c9a86a;
-            margin-bottom: 15px;
-        }
-
-        .detection-item {
-            font-size: 13px;
-            color: #8892b0;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(74, 85, 104, 0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .detection-item:last-child {
-            border-bottom: none;
-        }
-
-        .detection-trigger {
-            color: #00a7b5;
-            font-size: 11px;
-        }
-
-        /* Fullscreen Ruling Overlay */
-        #ruling-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(5, 5, 10, 0.95);
-            z-index: 100;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 60px;
-            backdrop-filter: blur(20px);
-        }
-
-        #ruling-overlay.active {
-            display: flex;
-            animation: rulingAppear 0.5s ease-out;
-        }
-
-        @keyframes rulingAppear {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .ruling-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .ruling-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            animation: iconPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes iconPulse {
-            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(0, 167, 181, 0.5)); }
-            50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(0, 167, 181, 0.8)); }
-        }
-
-        .ruling-announcement {
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            color: #c9a86a;
-            margin-bottom: 10px;
-        }
-
-        .ruling-title {
-            font-size: 42px;
-            font-weight: 300;
-            color: #e0e0ff;
-            text-shadow: 0 0 30px rgba(0, 167, 181, 0.3);
-        }
-
-        .ruling-content {
-            max-width: 800px;
-            text-align: center;
-        }
-
-        .ruling-rule {
-            font-size: 28px;
-            color: #00a7b5;
-            margin-bottom: 30px;
-            line-height: 1.4;
-            font-weight: 500;
-        }
-
-        .ruling-explanation {
-            font-size: 20px;
-            color: #8892b0;
-            line-height: 1.6;
-            margin-bottom: 30px;
-        }
-
-        .ruling-action {
-            background: rgba(0, 167, 181, 0.1);
-            border: 1px solid rgba(0, 167, 181, 0.3);
-            border-radius: 12px;
-            padding: 25px 40px;
-            font-size: 22px;
-            color: #e0e0ff;
-            font-weight: 500;
-        }
-
-        .ruling-close {
-            position: absolute;
-            bottom: 60px;
-            font-size: 14px;
-            color: #4a5568;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .ruling-close:hover {
-            color: #00a7b5;
-        }
-
-        /* Back Button */
-        .back-button {
+        .end-session-btn {
             position: absolute;
             top: 40px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(10, 10, 15, 0.8);
-            border: 1px solid rgba(74, 85, 104, 0.3);
-            border-radius: 25px;
+            border: 2px solid #00a7b5;
+            color: #00a7b5;
             padding: 12px 30px;
-            color: #4a5568;
-            text-decoration: none;
-            font-size: 12px;
+            border-radius: 25px;
+            font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .back-button:hover {
-            border-color: #00a7b5;
-            color: #00a7b5;
-        }
-
-        /* Permission Screen (shown briefly if needed) */
-        #permission-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(5, 5, 10, 0.95);
-            z-index: 50;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(10px);
-        }
-
-        #permission-screen.visible {
-            display: flex;
-        }
-
-        .permission-text {
-            font-size: 24px;
-            color: #e0e0ff;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .permission-button {
-            background: linear-gradient(135deg, #00a7b5 0%, #008a96 100%);
-            border: none;
-            border-radius: 50px;
-            padding: 18px 50px;
-            font-size: 16px;
-            color: white;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
             cursor: pointer;
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 10;
         }
 
-        .permission-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(0, 167, 181, 0.3);
+        .end-session-btn:hover {
+            background: #00a7b5;
+            color: white;
+            transform: translateX(-50%) translateY(-2px);
         }
 
-        /* Status Indicators */
         .status-bar {
             position: absolute;
             bottom: 40px;
@@ -469,270 +159,80 @@
             box-shadow: 0 0 10px rgba(0, 167, 181, 0.8);
         }
 
-        .status-dot.detecting {
-            background: #c9a86a;
-            box-shadow: 0 0 10px rgba(201, 168, 106, 0.8);
-            animation: blink 1s ease-in-out infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .ruling-title { font-size: 32px; }
-            .ruling-rule { font-size: 22px; }
-            .ruling-explanation { font-size: 16px; }
-            .confidence-container, .detection-log {
-                display: none;
-            }
+        .debug-info {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #4a5568;
+            font-size: 12px;
+            text-align: center;
+            opacity: 0.7;
         }
     </style>
 <base target="_blank">
 </head>
 <body>
-    <!-- Particle Canvas -->
     <canvas id="particle-canvas"></canvas>
 
-    <!-- Permission Screen (only if mic not allowed) -->
-    <div id="permission-screen">
-        <div class="permission-text">The Arbiter requires permission to hear</div>
-        <button class="permission-button" onclick="requestPermission()">Allow Microphone</button>
-    </div>
+    <button id="endBtn" class="end-session-btn">End Session & Analyze</button>
 
-    <!-- Main Game Session -->
     <div id="game-session">
-        <!-- Back Button -->
-        <button class="back-button" id="end-session-btn">← End Session & Analyze</button>
-
-        <!-- Detection Log -->
-        <div class="detection-log">
-            <div class="detection-title">Detection Log</div>
-            <div id="detection-list"></div>
-        </div>
-
-        <!-- Confidence Meter -->
-        <div class="confidence-container">
-            <div class="confidence-title">Dispute Confidence</div>
-            <div class="confidence-bar">
-                <div class="confidence-fill" id="confidence-fill"></div>
-            </div>
-            <div class="confidence-value" id="confidence-value">0</div>
-            <div class="confidence-label">triggers detected</div>
-        </div>
-
-        <!-- Listening Indicator -->
         <div class="listening-container" id="listening-container">
             <div class="listening-pulse"></div>
             <div class="listening-text">Listening</div>
             <div class="listening-subtext">The Arbiter hears all</div>
         </div>
 
-        <!-- Audio Waveform -->
-        <div class="waveform" id="waveform">
-            <div class="wave-bar"></div>
-            <div class="wave-bar"></div>
-            <div class="wave-bar"></div>
-            <div class="wave-bar"></div>
-            <div class="wave-bar"></div>
-            <div class="wave-bar"></div>
-            <div class="wave-bar"></div>
-            <div class="wave-bar"></div>
-            <div class="wave-bar"></div>
-        </div>
-
-        <!-- Transcript -->
-        <div class="transcript-container" id="transcript-container">
-            <div class="transcript-text" id="transcript-text"></div>
-        </div>
-
-        <!-- Status Bar -->
         <div class="status-bar">
             <div class="status-item">
                 <div class="status-dot active" id="mic-status"></div>
-                <span>Microphone</span>
-            </div>
-            <div class="status-item">
-                <div class="status-dot" id="detect-status"></div>
-                <span>Detecting</span>
-            </div>
-            <div class="status-item">
-                <div class="status-dot" id="api-status"></div>
-                <span>API</span>
+                <span>Microphone Active</span>
             </div>
         </div>
-    </div>
 
-    <!-- Fullscreen Ruling Overlay -->
-    <div id="ruling-overlay">
-        <div class="ruling-header">
-            <div class="ruling-icon">⚖️</div>
-            <div class="ruling-announcement">A disturbance ripples through the aether</div>
-            <div class="ruling-title" id="ruling-title">Dispute Detected</div>
-        </div>
-        <div class="ruling-content">
-            <div class="ruling-rule" id="ruling-rule">Hear now the judgment...</div>
-            <div class="ruling-explanation" id="ruling-explanation"></div>
-            <div class="ruling-action" id="ruling-action"></div>
-        </div>
-        <div class="ruling-close" onclick="closeRuling()">Click anywhere or speak "Continue" to dismiss</div>
+        <div class="debug-info" id="debug-info">Session time: 0:00</div>
     </div>
 
     <script>
-        // DEBUG: Log when script loads
-        console.log('Game session script loaded');
-        console.log('endSession function exists:', typeof endSession !== 'undefined');
-        console.log('sessionData initialized:', sessionData);
-
         // ============================================
-        // SESSION TRACKING FOR ANALYSIS (DEFINED EARLY)
+        // SESSION DATA - DEFINED FIRST
         // ============================================
-
-        let sessionData = {
+        const sessionData = {
             startTime: new Date().toISOString(),
             endTime: null,
             players: ['Player 1', 'Player 2', 'Player 3', 'Player 4'],
-            format: 'Commander',
             events: [],
             disputes: [],
-            transcripts: [],
-            playerStats: {}
+            winner: 'Unknown'
         };
 
-        // Initialize player stats
-        sessionData.players.forEach(p => {
-            sessionData.playerStats[p] = {
-                goodPlays: 0,
-                mistakes: 0,
-                resourcesUsed: 0,
-                resourcesWasted: 0,
-                spellsCast: 0,
-                lifeTotal: 40
-            };
-        });
-
-        let currentTurn = 1;
-        let currentPhase = 'Main';
-        let eventCounter = 0;
-        let disputeLog = [];
-
-        function formatElapsedTime() {
-            const elapsed = Date.now() - new Date(sessionData.startTime).getTime();
-            const minutes = Math.floor(elapsed / 60000);
-            const seconds = Math.floor((elapsed % 60000) / 1000);
-            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        function calculateComplexity() {
-            const baseScore = 5;
-            const disputeBonus = Math.min(3, disputeLog.length * 0.5);
-            const eventBonus = Math.min(2, sessionData.events.length / 10);
-            return Math.min(10, baseScore + disputeBonus + eventBonus).toFixed(1);
-        }
-
-        function calculateThreatAccuracy() {
-            const accuracy = {};
-            sessionData.players.forEach(p => {
-                const stats = sessionData.playerStats[p];
-                accuracy[p] = stats.goodPlays / (stats.goodPlays + stats.mistakes + 0.1);
-            });
-            return accuracy;
-        }
-
-        // CRITICAL: endSession must be defined BEFORE the button that calls it
+        // ============================================
+        // END SESSION FUNCTION - DEFINED SECOND
+        // ============================================
         function endSession() {
-            console.log('=== END SESSION STARTED ===');
+            console.log('END SESSION CLICKED');
+            alert('Ending session...');
 
-            try {
-                // Update end time
-                sessionData.endTime = new Date().toISOString();
-                sessionData.gameLength = Math.floor((new Date(sessionData.endTime) - new Date(sessionData.startTime)) / 1000);
-                sessionData.disputes = disputeLog || [];
+            sessionData.endTime = new Date().toISOString();
+            sessionData.gameLength = Math.floor((new Date() - new Date(sessionData.startTime)) / 1000);
 
-                console.log('Session duration:', sessionData.gameLength, 'seconds');
-                console.log('Events recorded:', sessionData.events.length);
-                console.log('Disputes recorded:', sessionData.disputes.length);
+            console.log('Saving data:', sessionData);
+            localStorage.setItem('veritas_session', JSON.stringify(sessionData));
 
-                // Calculate winner
-                const playerScores = Object.entries(sessionData.playerStats).map(([name, stats]) => ({
-                    name,
-                    score: (stats.goodPlays * 10) - (stats.mistakes * 5) + stats.lifeTotal
-                }));
-                playerScores.sort((a, b) => b.score - a.score);
-                sessionData.winner = playerScores.length > 0 ? playerScores[0].name : 'Unknown';
-
-                console.log('Winner calculated:', sessionData.winner);
-
-                // Add metrics
-                sessionData.strategicMetrics = {
-                    avgTurnTime: currentTurn > 0 ? Math.floor(sessionData.gameLength / currentTurn) : 0,
-                    interactionDensity: sessionData.gameLength > 0 ? (sessionData.events.length / (sessionData.gameLength / 60)).toFixed(2) : 0,
-                    complexityScore: calculateComplexity(),
-                    rulesDisputesPerHour: sessionData.gameLength > 0 ? ((disputeLog.length / (sessionData.gameLength / 3600))).toFixed(1) : 0,
-                    threatAssessmentAccuracy: calculateThreatAccuracy()
-                };
-
-                // Save to localStorage
-                const dataString = JSON.stringify(sessionData);
-                console.log('Data size:', dataString.length, 'characters');
-
-                localStorage.setItem('veritas_session', dataString);
-                console.log('✓ Data saved to localStorage');
-
-                // Verify save worked
-                const verify = localStorage.getItem('veritas_session');
-                if (verify) {
-                    console.log('✓ Verified data in localStorage');
-                } else {
-                    console.error('✗ Failed to verify data in localStorage');
-                }
-
-                // Navigate to analysis
-                console.log('Navigating to analysis.html...');
-                window.location.replace('analysis.html');
-
-            } catch (err) {
-                console.error('ERROR in endSession:', err);
-                alert('Error ending session: ' + err.message);
-            }
-        }
-
-        function trackEvent(type, title, description, options = {}) {
-            eventCounter++;
-            const event = {
-                id: eventCounter,
-                time: formatElapsedTime(),
-                turn: currentTurn,
-                phase: currentPhase,
-                type: type,
-                player: options.player || 'Unknown',
-                title: title,
-                description: description,
-                impact: options.impact || 'neutral',
-                strategicValue: options.strategicValue || 0,
-                category: options.category || 'General',
-                improvement: options.improvement || null,
-                betterPlay: options.betterPlay || null,
-                note: options.note || null
-            };
-
-            sessionData.events.push(event);
-
-            if (sessionData.playerStats[event.player]) {
-                if (event.impact === 'positive') sessionData.playerStats[event.player].goodPlays++;
-                if (event.impact === 'negative') sessionData.playerStats[event.player].mistakes++;
-                if (event.strategicValue < 0) sessionData.playerStats[event.player].resourcesWasted++;
-                sessionData.playerStats[event.player].resourcesUsed++;
-            }
-
-            return event;
+            console.log('Navigating to analysis...');
+            window.location.href = 'analysis.html';
         }
 
         // ============================================
-        // ORIGINAL GAME SESSION CODE BELOW
+        // BUTTON EVENT LISTENER - DEFINED THIRD
         // ============================================
+        document.getElementById('endBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Button clicked!');
+            endSession();
+        });
 
         // ============================================
         // PARTICLE SYSTEM
@@ -740,7 +240,6 @@
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
-        let animationId;
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -749,10 +248,6 @@
 
         class Particle {
             constructor() {
-                this.reset();
-            }
-
-            reset() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
                 this.size = Math.random() * 2 + 0.5;
@@ -765,10 +260,9 @@
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
-
-                if (this.x < 0 || this.x > canvas.width || 
-                    this.y < 0 || this.y > canvas.height) {
-                    this.reset();
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
                 }
             }
 
@@ -784,464 +278,31 @@
 
         function initParticles() {
             particles = [];
-            const particleCount = Math.min(100, Math.floor((canvas.width * canvas.height) / 15000));
-            for (let i = 0; i < particleCount; i++) {
+            for (let i = 0; i < 50; i++) {
                 particles.push(new Particle());
             }
         }
 
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            particles.forEach(particle => {
-                particle.update();
-                particle.draw();
-            });
-
-            // Draw connections
-            particles.forEach((p1, i) => {
-                particles.slice(i + 1).forEach(p2 => {
-                    const dx = p1.x - p2.x;
-                    const dy = p1.y - p2.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-
-                    if (distance < 100) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = '#00a7b5';
-                        ctx.globalAlpha = 0.1 * (1 - distance / 100);
-                        ctx.lineWidth = 0.5;
-                        ctx.moveTo(p1.x, p1.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.stroke();
-                        ctx.globalAlpha = 1;
-                    }
-                });
-            });
-
-            animationId = requestAnimationFrame(animateParticles);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
         }
 
-        window.addEventListener('resize', () => {
-            resizeCanvas();
-            initParticles();
-        });
-
+        window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
         resizeCanvas();
         initParticles();
         animateParticles();
 
-        // ============================================
-        // DISPUTE DETECTOR
-        // ============================================
-        class DisputeDetector {
-            constructor() {
-                this.confidence = 0;
-                this.threshold = 6;
-                this.decayRate = 1; // Slower decay for game session
-                this.lastTriggerTime = 0;
-                this.cooldown = 8000; // 8 seconds between rulings
+        // Update debug timer
+        setInterval(() => {
+            const elapsed = Math.floor((new Date() - new Date(sessionData.startTime)) / 1000);
+            const mins = Math.floor(elapsed / 60);
+            const secs = elapsed % 60;
+            document.getElementById('debug-info').textContent = `Session time: ${mins}:${secs.toString().padStart(2, '0')}`;
+        }, 1000);
 
-                this.triggers = {
-                    uncertainty: ['wait', 'hold on', 'does that', 'can you', 'not sure', 'confused', 'what happens', 'how does', 'question', 'um', 'uh'],
-                    challenge: ["you can't", 'you can not', 'illegal', 'wrong', 'doesn't work', 'not legal', 'cheat', 'invalid', 'not allowed', 'no way'],
-                    mtg_terms: ['stack', 'priority', 'trigger', 'mana', 'token', 'combat', 'phase', 'ability', 'target', 'resolve', 'counter', 'exile', 'graveyard', 'battlefield', 'commander', 'cast', 'etb', 'dies', 'attack', 'block', 'life', 'damage', 'toughness', 'power', 'flying', 'trample', 'haste', 'vigilance']
-                };
-
-                this.triggerWeights = {
-                    uncertainty: 2,
-                    challenge: 3,
-                    mtg_terms: 1
-                };
-            }
-
-            analyze(text) {
-                const lowerText = text.toLowerCase();
-                let detected = [];
-                let newTriggers = false;
-
-                // Check each trigger category
-                for (const [category, words] of Object.entries(this.triggers)) {
-                    for (const word of words) {
-                        if (lowerText.includes(word)) {
-                            // Avoid double-counting same word in same text
-                            if (!detected.find(d => d.word === word)) {
-                                this.confidence += this.triggerWeights[category];
-                                detected.push({ category, word, weight: this.triggerWeights[category] });
-                                newTriggers = true;
-                            }
-                        }
-                    }
-                }
-
-                // Natural decay (only if no new triggers)
-                if (!newTriggers) {
-                    this.confidence = Math.max(0, this.confidence - this.decayRate);
-                }
-
-                // Cap confidence
-                this.confidence = Math.min(this.confidence, 15);
-
-                // Update UI
-                this.updateUI();
-
-                // Log detections
-                if (detected.length > 0) {
-                    this.logDetection(detected);
-                }
-
-                // Check if dispute detected
-                const now = Date.now();
-                if (this.confidence >= this.threshold && 
-                    (now - this.lastTriggerTime) > this.cooldown) {
-                    this.lastTriggerTime = now;
-                    return { detected: true, text: text, triggers: detected, confidence: this.confidence };
-                }
-
-                return { detected: false };
-            }
-
-            updateUI() {
-                const fill = document.getElementById('confidence-fill');
-                const value = document.getElementById('confidence-value');
-                const detectStatus = document.getElementById('detect-status');
-
-                const percentage = Math.min(100, (this.confidence / this.threshold) * 100);
-                fill.style.width = percentage + '%';
-                value.textContent = Math.floor(this.confidence);
-
-                if (this.confidence > 0) {
-                    detectStatus.classList.add('detecting');
-                } else {
-                    detectStatus.classList.remove('detecting');
-                }
-            }
-
-            logDetection(detected) {
-                const list = document.getElementById('detection-list');
-                detected.forEach(d => {
-                    const item = document.createElement('div');
-                    item.className = 'detection-item';
-                    item.innerHTML = `
-                        <span>${d.word}</span>
-                        <span class="detection-trigger">+${d.weight} ${d.category}</span>
-                    `;
-                    list.insertBefore(item, list.firstChild);
-
-                    // Keep only last 6
-                    while (list.children.length > 6) {
-                        list.removeChild(list.lastChild);
-                    }
-                });
-            }
-
-            reset() {
-                this.confidence = 0;
-                this.updateUI();
-            }
-        }
-
-        const disputeDetector = new DisputeDetector();
-
-        // ============================================
-        // SPEECH RECOGNITION
-        // ============================================
-        let recognition;
-        let isListening = false;
-
-        function initSpeechRecognition() {
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                alert('Speech recognition not supported. Please use Chrome.');
-                return null;
-            }
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const rec = new SpeechRecognition();
-            rec.continuous = true;
-            rec.interimResults = true;
-            rec.lang = 'en-US';
-
-            rec.onstart = () => {
-                isListening = true;
-                document.getElementById('listening-container').classList.add('active');
-                document.getElementById('waveform').classList.add('active');
-                document.getElementById('mic-status').classList.add('active');
-            };
-
-            rec.onend = () => {
-                isListening = false;
-                document.getElementById('listening-container').classList.remove('active');
-                document.getElementById('waveform').classList.remove('active');
-                document.getElementById('mic-status').classList.remove('active');
-
-                // Auto-restart unless ruling is showing
-                const overlay = document.getElementById('ruling-overlay');
-                if (!overlay.classList.contains('active')) {
-                    setTimeout(() => {
-                        if (!isListening) rec.start();
-                    }, 200);
-                }
-            };
-
-            rec.onresult = (event) => {
-                let interim = '';
-                let final = '';
-
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0].transcript;
-                    if (event.results[i].isFinal) {
-                        final += transcript + ' ';
-                    } else {
-                        interim += transcript;
-                    }
-                }
-
-                // Update display with interim
-                const displayText = interim || final;
-                if (displayText) {
-                    document.getElementById('transcript-text').textContent = displayText;
-                    document.getElementById('transcript-container').classList.add('visible');
-
-                    // Real-time analysis
-                    const result = disputeDetector.analyze(displayText);
-                    if (result.detected) {
-                        handleDispute(result);
-                    }
-                }
-
-                // Clear transcript after delay if final
-                if (final) {
-                    setTimeout(() => {
-                        document.getElementById('transcript-container').classList.remove('visible');
-                    }, 4000);
-                }
-            };
-
-            rec.onerror = (event) => {
-                console.error('Speech recognition error:', event.error);
-                if (event.error === 'not-allowed') {
-                    showPermissionScreen();
-                } else if (event.error === 'no-speech') {
-                    // Auto-restart on no speech
-                    setTimeout(() => {
-                        if (!isListening) rec.start();
-                    }, 500);
-                }
-            };
-
-            return rec;
-        }
-
-        function showPermissionScreen() {
-            document.getElementById('permission-screen').classList.add('visible');
-        }
-
-        function requestPermission() {
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(() => {
-                    document.getElementById('permission-screen').classList.remove('visible');
-                    startListening();
-                })
-                .catch(err => {
-                    alert('Microphone access is required for the Arbiter to hear.');
-                });
-        }
-
-        function startListening() {
-            if (!recognition) {
-                recognition = initSpeechRecognition();
-            }
-            if (recognition && !isListening) {
-                try {
-                    recognition.start();
-                } catch (e) {
-                    console.error('Start error:', e);
-                }
-            }
-        }
-
-        // ============================================
-        // DISPUTE HANDLING
-        // ============================================
-        async function handleDispute(result) {
-            // Pause recognition
-            if (recognition) {
-                try {
-                    recognition.stop();
-                } catch (e) {}
-            }
-
-            // Show ruling overlay
-            const overlay = document.getElementById('ruling-overlay');
-            overlay.classList.add('active');
-
-            // Set loading state
-            document.getElementById('ruling-rule').textContent = 'Consulting the Law...';
-            document.getElementById('ruling-explanation').textContent = 'The Arbiter considers the matter...';
-            document.getElementById('ruling-action').textContent = '';
-
-            // Query API
-            try {
-                const response = await fetch('/api/rules', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        query: result.text,
-                        confidence: result.confidence,
-                        triggers: result.triggers
-                    })
-                });
-
-                if (!response.ok) throw new Error('API error');
-
-                const data = await response.json();
-                displayRuling(data);
-                speakRuling(data);
-
-            } catch (error) {
-                console.error('API error:', error);
-                // Fallback
-                displayRuling({
-                    rule: 'The Law is unclear',
-                    explanation: 'The Arbiter cannot reach the archives. State your question clearly.',
-                    action: 'Check your connection or try rephrasing the dispute.'
-                });
-            }
-        }
-
-        function displayRuling(data) {
-            document.getElementById('ruling-rule').textContent = data.rule || 'Hear now the judgment...';
-            document.getElementById('ruling-explanation').textContent = data.explanation || '';
-            document.getElementById('ruling-action').textContent = data.action || 'The stack resolves. Continue.';
-        }
-
-        function speakRuling(data) {
-            if ('speechSynthesis' in window) {
-                // Cancel any ongoing speech
-                speechSynthesis.cancel();
-
-                const text = `${data.rule}. ${data.explanation}. ${data.action}`;
-                const utterance = new SpeechSynthesisUtterance(text);
-
-                // Veritas voice settings
-                utterance.rate = 0.85;
-                utterance.pitch = 0.9;
-                utterance.volume = 1;
-
-                // Try to find a good voice
-                const voices = speechSynthesis.getVoices();
-                const preferredVoice = voices.find(v => v.name.includes('Google US English')) ||
-                                     voices.find(v => v.name.includes('Samantha')) ||
-                                     voices.find(v => v.name.includes('Daniel')) ||
-                                     voices[0];
-                if (preferredVoice) utterance.voice = preferredVoice;
-
-                speechSynthesis.speak(utterance);
-            }
-        }
-
-        function closeRuling() {
-            speechSynthesis.cancel();
-            document.getElementById('ruling-overlay').classList.remove('active');
-            disputeDetector.reset();
-
-            // Resume listening
-            setTimeout(() => {
-                startListening();
-            }, 500);
-        }
-
-        // Close on click anywhere in overlay
-        document.getElementById('ruling-overlay').addEventListener('click', (e) => {
-            if (e.target.id === 'ruling-overlay' || e.target.classList.contains('ruling-close')) {
-                closeRuling();
-            }
-        });
-
-        // Listen for "continue" to close
-        function checkForContinue(text) {
-            if (text.toLowerCase().includes('continue') || 
-                text.toLowerCase().includes('dismiss') ||
-                text.toLowerCase().includes('thanks')) {
-                closeRuling();
-                return true;
-            }
-            return false;
-        }
-
-        // ============================================
-        // INITIALIZATION
-        // ============================================
-
-        // Load voices for TTS
-        if ('speechSynthesis' in window) {
-            speechSynthesis.getVoices();
-            speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
-        }
-
-        // Check API status
-        function checkAPI() {
-            fetch('/api/health')
-                .then(() => document.getElementById('api-status').classList.add('active'))
-                .catch(() => {
-                    console.log('API not connected');
-                    document.getElementById('api-status').classList.remove('active');
-                });
-        }
-
-        // Start on load
-        window.addEventListener('load', () => {
-            checkAPI();
-
-            // Try to start immediately
-            recognition = initSpeechRecognition();
-            if (recognition) {
-                // Small delay to ensure DOM ready
-                setTimeout(startListening, 500);
-            }
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeRuling();
-            }
-        });
-
-        // Handle page visibility (pause/resume)
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                if (recognition && isListening) {
-                    recognition.stop();
-                }
-            } else {
-                const overlay = document.getElementById('ruling-overlay');
-                if (!overlay.classList.contains('active')) {
-                    setTimeout(startListening, 500);
-                }
-            }
-        });
-
-        // ============================================
-            
-        // Attach event listener to end session button
-        document.addEventListener('DOMContentLoaded', function() {
-            const endBtn = document.getElementById('end-session-btn');
-            if (endBtn) {
-                endBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('End session button clicked');
-                    console.log('endSession type:', typeof endSession);
-                    try {
-                        endSession();
-                    } catch(err) {
-                        console.error('Error calling endSession:', err);
-                        alert('Error: ' + err.message);
-                    }
-                });
-            }
-        });
-
-</script>
+        console.log('Game session loaded, endSession function:', typeof endSession);
+    </script>
 </body>
 </html>
