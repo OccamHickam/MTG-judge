@@ -581,6 +581,11 @@
     </div>
 
     <script>
+        // DEBUG: Log when script loads
+        console.log('Game session script loaded');
+        console.log('endSession function exists:', typeof endSession !== 'undefined');
+        console.log('sessionData initialized:', sessionData);
+
         // ============================================
         // SESSION TRACKING FOR ANALYSIS (DEFINED EARLY)
         // ============================================
@@ -1198,8 +1203,15 @@
             if (endBtn) {
                 endBtn.addEventListener('click', function(e) {
                     e.preventDefault();
+                    e.stopPropagation();
                     console.log('End session button clicked');
-                    endSession();
+                    console.log('endSession type:', typeof endSession);
+                    try {
+                        endSession();
+                    } catch(err) {
+                        console.error('Error calling endSession:', err);
+                        alert('Error: ' + err.message);
+                    }
                 });
             }
         });
