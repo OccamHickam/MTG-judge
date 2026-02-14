@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Veritas - Advanced Battle Analysis</title>
+    <title>Veritas - Game Analysis</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -13,10 +13,6 @@
             --teal: #00A7B5;
             --gold: #C9A86A;
             --light: #e0e0ff;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --error: #ef4444;
-            --info: #3b82f6;
         }
 
         body {
@@ -27,8 +23,68 @@
             padding: 20px;
         }
 
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; }
 
+        /* Loading Overlay - Guaranteed to work */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 10, 0.98);
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(0, 167, 181, 0.2);
+            border-top-color: var(--teal);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--teal);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+        }
+
+        .show-analysis-btn {
+            padding: 15px 30px;
+            background: var(--teal);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .show-analysis-btn:hover {
+            background: #008a96;
+        }
+
+        .loading-hint {
+            color: var(--slate-gray);
+            font-size: 12px;
+        }
+
+        /* Header */
         header {
             text-align: center;
             padding: 40px 0;
@@ -49,32 +105,31 @@
             font-size: 1.2rem;
         }
 
-        /* Executive Summary */
-        .executive-summary {
-            background: linear-gradient(135deg, rgba(0, 167, 181, 0.1) 0%, rgba(201, 168, 106, 0.1) 100%);
-            border: 1px solid rgba(0, 167, 181, 0.3);
+        /* Summary */
+        .summary-box {
+            background: rgba(10, 26, 47, 0.6);
+            border: 1px solid rgba(0, 167, 181, 0.2);
             border-radius: 16px;
             padding: 30px;
             margin-bottom: 30px;
+            text-align: center;
         }
 
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 20px;
             margin-top: 20px;
         }
 
         .summary-item {
-            text-align: center;
             padding: 20px;
-            background: rgba(10, 26, 47, 0.5);
+            background: rgba(5, 10, 20, 0.5);
             border-radius: 12px;
-            border: 1px solid rgba(74, 85, 104, 0.2);
         }
 
         .summary-value {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: bold;
             color: var(--teal);
         }
@@ -87,512 +142,56 @@
             margin-top: 5px;
         }
 
-        .summary-context {
-            font-size: 0.85rem;
-            color: var(--gold);
-            margin-top: 5px;
-        }
-
-        /* Navigation */
-        .nav-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            justify-content: center;
-            flex-wrap: wrap;
+        /* Content */
+        .content-section {
             background: rgba(10, 26, 47, 0.5);
-            padding: 10px;
-            border-radius: 12px;
             border: 1px solid rgba(74, 85, 104, 0.2);
-        }
-
-        .nav-tab {
-            padding: 12px 24px;
-            background: transparent;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.95rem;
-            color: var(--slate-gray);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 500;
-        }
-
-        .nav-tab:hover {
-            color: var(--teal);
-            background: rgba(0, 167, 181, 0.1);
-        }
-
-        .nav-tab.active {
-            background: var(--teal);
-            color: white;
-        }
-
-        .panel {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .panel.active { display: block; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Strategic Insights */
-        .insight-section {
-            margin-bottom: 30px;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
         }
 
         .section-title {
-            font-size: 1.5rem;
             color: var(--teal);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .insight-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
-        }
-
-        .insight-card {
-            background: rgba(10, 26, 47, 0.5);
-            border: 1px solid rgba(74, 85, 104, 0.2);
-            border-radius: 12px;
-            padding: 25px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .insight-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-        }
-
-        .insight-card.excellent::before { background: var(--success); }
-        .insight-card.good::before { background: var(--teal); }
-        .insight-card.warning::before { background: var(--warning); }
-        .insight-card.critical::before { background: var(--error); }
-        .insight-card.info::before { background: var(--info); }
-
-        .insight-card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(0, 167, 181, 0.3);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .insight-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
+            font-size: 1.3rem;
             margin-bottom: 15px;
-        }
-
-        .insight-category {
-            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
+        }
+
+        .no-data {
             color: var(--slate-gray);
-            margin-bottom: 5px;
+            font-style: italic;
+            text-align: center;
+            padding: 40px;
         }
 
-        .insight-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--light);
-        }
-
-        .insight-severity {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .severity-excellent { background: rgba(16, 185, 129, 0.2); color: var(--success); }
-        .severity-good { background: rgba(0, 167, 181, 0.2); color: var(--teal); }
-        .severity-warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
-        .severity-critical { background: rgba(239, 68, 68, 0.2); color: var(--error); }
-        .severity-info { background: rgba(59, 130, 246, 0.2); color: var(--info); }
-
-        .insight-players {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .player-tag {
-            background: rgba(201, 168, 106, 0.2);
-            color: var(--gold);
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-        }
-
-        .insight-description {
-            color: var(--slate-gray);
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-
-        .insight-evidence {
-            background: rgba(5, 10, 20, 0.5);
-            border-left: 3px solid var(--gold);
-            padding: 12px 15px;
-            border-radius: 0 8px 8px 0;
-            font-size: 0.9rem;
-            color: var(--light);
-            margin-bottom: 15px;
-        }
-
-        .insight-recommendation {
-            background: rgba(0, 167, 181, 0.1);
+        .event-item {
             padding: 15px;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 167, 181, 0.2);
-        }
-
-        .insight-recommendation strong {
-            color: var(--teal);
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        /* Player Deep Dive */
-        .player-profile {
-            background: rgba(10, 26, 47, 0.5);
-            border: 1px solid rgba(74, 85, 104, 0.2);
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-
-        .player-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
             border-bottom: 1px solid rgba(74, 85, 104, 0.2);
         }
 
-        .player-info h3 {
-            font-size: 1.8rem;
-            color: var(--teal);
+        .event-item:last-child {
+            border-bottom: none;
+        }
+
+        .event-time {
+            color: var(--gold);
+            font-size: 0.85rem;
             margin-bottom: 5px;
         }
 
-        .player-role {
+        .event-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .event-desc {
             color: var(--slate-gray);
             font-size: 0.9rem;
         }
 
-        .player-grade {
-            font-size: 3rem;
-            font-weight: bold;
-            color: var(--gold);
-        }
-
-        .player-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .player-stat {
-            text-align: center;
-            padding: 15px;
-            background: rgba(5, 10, 20, 0.5);
-            border-radius: 8px;
-        }
-
-        .player-stat-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--teal);
-        }
-
-        .player-stat-label {
-            font-size: 0.8rem;
-            color: var(--slate-gray);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 5px;
-        }
-
-        .strengths-weaknesses {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .sw-column h4 {
-            color: var(--teal);
-            margin-bottom: 12px;
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .sw-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(74, 85, 104, 0.1);
-        }
-
-        .sw-item:last-child { border-bottom: none; }
-
-        .sw-icon { font-size: 1.2rem; }
-
-        /* Timeline */
-        .timeline-container {
-            background: rgba(10, 26, 47, 0.5);
-            border: 1px solid rgba(74, 85, 104, 0.2);
-            border-radius: 16px;
-            padding: 30px;
-        }
-
-        .timeline-filters {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 8px 16px;
-            background: rgba(74, 85, 104, 0.2);
-            border: 1px solid rgba(74, 85, 104, 0.3);
-            border-radius: 20px;
-            color: var(--slate-gray);
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.85rem;
-        }
-
-        .filter-btn:hover, .filter-btn.active {
-            background: var(--teal);
-            border-color: var(--teal);
-            color: white;
-        }
-
-        .timeline {
-            position: relative;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 24px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: rgba(74, 85, 104, 0.3);
-        }
-
-        .timeline-item {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 25px;
-            position: relative;
-        }
-
-        .timeline-dot {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            flex-shrink: 0;
-            z-index: 1;
-            border: 3px solid;
-            background: var(--deep-navy);
-        }
-
-        .timeline-dot.turn { border-color: var(--info); }
-        .timeline-dot.combat { border-color: var(--error); }
-        .timeline-dot.spell { border-color: var(--teal); }
-        .timeline-dot.ability { border-color: var(--warning); }
-        .timeline-dot.dispute { border-color: var(--gold); }
-        .timeline-dot.mistake { border-color: #ef4444; }
-        .timeline-dot.optimal { border-color: var(--success); }
-
-        .timeline-content {
-            flex: 1;
-            background: rgba(5, 10, 20, 0.5);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid rgba(74, 85, 104, 0.2);
-        }
-
-        .timeline-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .timeline-time {
-            font-size: 0.85rem;
-            color: var(--gold);
-            font-weight: 600;
-        }
-
-        .timeline-turn {
-            font-size: 0.8rem;
-            color: var(--slate-gray);
-            background: rgba(74, 85, 104, 0.2);
-            padding: 4px 10px;
-            border-radius: 12px;
-        }
-
-        .timeline-title {
-            font-weight: 600;
-            color: var(--light);
-            margin-bottom: 8px;
-            font-size: 1.1rem;
-        }
-
-        .timeline-details {
-            color: var(--slate-gray);
-            line-height: 1.5;
-            margin-bottom: 10px;
-        }
-
-        .timeline-impact {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .impact-positive { background: rgba(16, 185, 129, 0.2); color: var(--success); }
-        .impact-negative { background: rgba(239, 68, 68, 0.2); color: var(--error); }
-        .impact-neutral { background: rgba(74, 85, 104, 0.2); color: var(--slate-gray); }
-
-        /* Meta Analysis */
-        .meta-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .meta-card {
-            background: rgba(10, 26, 47, 0.5);
-            border: 1px solid rgba(74, 85, 104, 0.2);
-            border-radius: 12px;
-            padding: 25px;
-        }
-
-        .meta-card h4 {
-            color: var(--teal);
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-        }
-
-        .meta-stat-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(74, 85, 104, 0.1);
-        }
-
-        .meta-stat-row:last-child { border-bottom: none; }
-
-        .trend-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.85rem;
-        }
-
-        .trend-up { color: var(--success); }
-        .trend-down { color: var(--error); }
-
-        /* Action Items */
-        .action-items {
-            background: rgba(10, 26, 47, 0.5);
-            border: 1px solid rgba(0, 167, 181, 0.3);
-            border-radius: 12px;
-            padding: 25px;
-            margin-top: 30px;
-        }
-
-        .action-items h3 {
-            color: var(--teal);
-            margin-bottom: 20px;
-            font-size: 1.3rem;
-        }
-
-        .action-list {
-            list-style: none;
-        }
-
-        .action-item {
-            display: flex;
-            align-items: start;
-            gap: 15px;
-            padding: 15px 0;
-            border-bottom: 1px solid rgba(74, 85, 104, 0.1);
-        }
-
-        .action-item:last-child { border-bottom: none; }
-
-        .action-priority {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-top: 8px;
-            flex-shrink: 0;
-        }
-
-        .priority-high { background: var(--error); box-shadow: 0 0 10px var(--error); }
-        .priority-medium { background: var(--warning); }
-        .priority-low { background: var(--teal); }
-
-        .action-content {
-            flex: 1;
-        }
-
-        .action-title {
-            font-weight: 600;
-            color: var(--light);
-            margin-bottom: 5px;
-        }
-
-        .action-desc {
-            color: var(--slate-gray);
-            font-size: 0.9rem;
-        }
-
-        .action-for {
-            color: var(--gold);
-            font-size: 0.8rem;
-            margin-top: 5px;
-        }
-
-        /* Footer Actions */
+        /* Footer */
         .footer-actions {
             display: flex;
             gap: 15px;
@@ -621,12 +220,6 @@
         .btn-primary {
             background: linear-gradient(135deg, var(--teal) 0%, #008a96 100%);
             color: white;
-            box-shadow: 0 8px 25px rgba(0, 167, 181, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(0, 167, 181, 0.5);
         }
 
         .btn-secondary {
@@ -639,978 +232,129 @@
             border-color: var(--teal);
             color: var(--teal);
         }
-
-        /* Loading */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(5, 5, 10, 0.95);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-        }
-
-        .loading-overlay.hidden { display: none; }
-
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 3px solid rgba(0, 167, 181, 0.2);
-            border-top-color: var(--teal);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .loading-text {
-            font-size: 1.2rem;
-            color: var(--teal);
-            letter-spacing: 2px;
-        }
-
-        @media (max-width: 768px) {
-            h1 { font-size: 2rem; }
-            .insight-cards { grid-template-columns: 1fr; }
-            .strengths-weaknesses { grid-template-columns: 1fr; }
-            .player-header { flex-direction: column; text-align: center; }
-        }
     </style>
 <base target="_blank">
 </head>
 <body>
-        <div id="loading-overlay" class="loading-overlay" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 5, 10, 0.98); z-index: 9999;">
-        <div class="loading-spinner" style="width: 60px; height: 60px; border: 3px solid rgba(0, 167, 181, 0.2); border-top-color: #00A7B5; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-        <div class="loading-text" style="margin-top: 20px; color: #00A7B5; font-size: 1.2rem; letter-spacing: 2px;">The Arbiter analyzes the battle...</div>
-        <button onclick="document.getElementById('loading-overlay').style.display='none';" style="margin-top: 30px; padding: 15px 30px; background: #00A7B5; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Show Analysis</button>
-        <p style="margin-top: 15px; color: #4A5568; font-size: 12px;">Click if stuck loading</p>
-    </div>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="loading-spinner"></div>
         <div class="loading-text">The Arbiter analyzes the battle...</div>
-        <button onclick="skipLoading()" style="margin-top: 30px; padding: 12px 24px; background: transparent; border: 2px solid var(--teal); color: var(--teal); border-radius: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-family: inherit;">Skip to Preview</button>
+        <button class="show-analysis-btn" onclick="hideLoader()">Show Analysis</button>
+        <div class="loading-hint">Auto-closing in 1 second...</div>
     </div>
 
     <div class="container">
         <header>
-            <h1>⚖️ Advanced Battle Analysis</h1>
-            <p class="subtitle">Deep strategic insights from your game session</p>
+            <h1>⚖️ Game Analysis</h1>
+            <p class="subtitle">Session Review</p>
         </header>
 
-        <!-- Executive Summary -->
-        <div class="executive-summary">
-            <h2 style="font-size: 1.5rem; color: var(--teal); margin-bottom: 10px;">Executive Summary</h2>
-            <p id="session-overview" style="color: var(--slate-gray); line-height: 1.6;">
-                Analysis in progress...
-            </p>
-            <div class="summary-grid" id="summary-metrics">
-                <!-- Populated by JS -->
-            </div>
-        </div>
-
-        <!-- Navigation -->
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="switchTab('insights')">🎯 Strategic Insights</button>
-            <button class="nav-tab" onclick="switchTab('players')">👥 Player Analysis</button>
-            <button class="nav-tab" onclick="switchTab('timeline')">📜 Detailed Timeline</button>
-            <button class="nav-tab" onclick="switchTab('meta')">📊 Meta Analysis</button>
-        </div>
-
-        <!-- Strategic Insights Panel -->
-        <div id="insights-panel" class="panel active">
-            <div class="insight-section">
-                <h3 class="section-title">🎖️ Critical Moments</h3>
-                <div class="insight-cards" id="critical-moments">
-                    <!-- Populated by JS -->
+        <div class="summary-box">
+            <h2 style="color: var(--teal); margin-bottom: 10px;">Session Summary</h2>
+            <p id="session-info" style="color: var(--slate-gray);">Loading...</p>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-value" id="duration">0m</div>
+                    <div class="summary-label">Duration</div>
                 </div>
-            </div>
-
-            <div class="insight-section">
-                <h3 class="section-title">⚠️ Mistakes & Missed Opportunities</h3>
-                <div class="insight-cards" id="mistakes-analysis">
-                    <!-- Populated by JS -->
+                <div class="summary-item">
+                    <div class="summary-value" id="events-count">0</div>
+                    <div class="summary-label">Events</div>
                 </div>
-            </div>
-
-            <div class="insight-section">
-                <h3 class="section-title">💡 Strategic Recommendations</h3>
-                <div class="insight-cards" id="strategic-recommendations">
-                    <!-- Populated by JS -->
+                <div class="summary-item">
+                    <div class="summary-value" id="disputes-count">0</div>
+                    <div class="summary-label">Disputes</div>
                 </div>
-            </div>
-
-            <div class="action-items">
-                <h3>📋 Action Items for Next Game</h3>
-                <ul class="action-list" id="action-items">
-                    <!-- Populated by JS -->
-                </ul>
-            </div>
-        </div>
-
-        <!-- Player Analysis Panel -->
-        <div id="players-panel" class="panel">
-            <div id="player-profiles">
-                <!-- Populated by JS -->
-            </div>
-        </div>
-
-        <!-- Timeline Panel -->
-        <div id="timeline-panel" class="panel">
-            <div class="timeline-container">
-                <div class="timeline-filters">
-                    <button class="filter-btn active" onclick="filterTimeline('all')">All Events</button>
-                    <button class="filter-btn" onclick="filterTimeline('combat')">Combat</button>
-                    <button class="filter-btn" onclick="filterTimeline('spell')">Spells</button>
-                    <button class="filter-btn" onclick="filterTimeline('dispute')">Disputes</button>
-                    <button class="filter-btn" onclick="filterTimeline('optimal')">Optimal Plays</button>
-                    <button class="filter-btn" onclick="filterTimeline('mistake')">Mistakes</button>
-                </div>
-                <div class="timeline" id="detailed-timeline">
-                    <!-- Populated by JS -->
+                <div class="summary-item">
+                    <div class="summary-value" id="winner">-</div>
+                    <div class="summary-label">Winner</div>
                 </div>
             </div>
         </div>
 
-        <!-- Meta Analysis Panel -->
-        <div id="meta-panel" class="panel">
-            <div class="meta-grid" id="meta-stats">
-                <!-- Populated by JS -->
+        <div class="content-section">
+            <h3 class="section-title">📜 Game Events</h3>
+            <div id="events-list">
+                <div class="no-data">No events recorded in this session.</div>
             </div>
         </div>
 
-        <!-- Footer -->
         <div class="footer-actions">
             <a href="game-session.html" class="btn btn-primary">🎮 New Session</a>
             <a href="index.html" class="btn btn-secondary">🏠 Home</a>
-            <button class="btn btn-secondary" onclick="exportReport()">📥 Export Full Report</button>
         </div>
     </div>
 
     <script>
-        // Emergency loader close
-        function forceCloseLoader() {
-            console.log('Force closing loader');
+        // CRITICAL: Hide loader function - defined FIRST
+        function hideLoader() {
+            console.log('Hiding loader');
             document.getElementById('loading-overlay').style.display = 'none';
-            // Try to render anyway
-            try {
-                if (!sessionData) {
-                    sessionData = createEmptySession();
-                }
-                if (!analysisResults) {
-                    analysisResults = performDeepAnalysis(sessionData);
-                }
-                renderExecutiveSummary(sessionData, analysisResults);
-                renderInsights(analysisResults);
-                renderPlayerAnalysis(analysisResults);
-                renderTimeline(sessionData);
-                renderMetaStats(analysisResults);
-            } catch(e) {
-                console.error('Render error:', e);
-            }
         }
 
-        // Auto-hide after 2 seconds
-        setTimeout(function() {
-            console.log('Auto-hiding loader');
-            var loader = document.getElementById('loading-overlay');
-            if (loader) {
-                loader.style.display = 'none';
-            }
-        }, 2000);
+        // Auto-hide after 1 second
+        setTimeout(hideLoader, 1000);
 
-        // ============================================
-        // ADVANCED ANALYSIS ENGINE
-        // ============================================
+        // Load and display session data
+        function loadSession() {
+            console.log('Loading session...');
 
-        let sessionData = null;
-        let analysisResults = null;
-
-        // Comprehensive demo data for rich analysis
-        function generateRichDemoData() {
-            return {
-                startTime: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
-                endTime: new Date().toISOString(),
-                players: ['Alex (You)', 'Jordan', 'Taylor', 'Morgan'],
-                format: 'Commander',
-                winner: 'Jordan',
-                gameLength: 7200, // seconds
-
-                events: [
-                    // Early Game
-                    { time: '0:05', turn: 1, phase: 'Main', type: 'optimal', player: 'Alex (You)', 
-                      title: 'Perfect Opening', description: 'Played Sol Ring into Arcane Signet - ideal mana acceleration',
-                      impact: 'positive', strategicValue: 8, category: 'Resource Development' },
-
-                    { time: '0:08', turn: 2, phase: 'Combat', type: 'combat', player: 'Jordan',
-                      title: 'Early Pressure', description: 'Attacked with 2/2 on turn 2, forcing early block',
-                      impact: 'neutral', strategicValue: 5, category: 'Combat' },
-
-                    { time: '0:12', turn: 3, phase: 'Main', type: 'spell', player: 'Taylor',
-                      title: 'Ramp Spell', description: 'Cultivate - solid ramp but telegraphed strategy',
-                      impact: 'neutral', strategicValue: 6, category: 'Resource Development' },
-
-                    // Mid Game - Critical Mistake
-                    { time: '0:18', turn: 5, phase: 'Combat', type: 'mistake', player: 'Alex (You)',
-                      title: 'Blocked Incorrectly', description: 'Blocked 4/4 with 3/3 when you could have taken damage and kept creature',
-                      impact: 'negative', strategicValue: -7, category: 'Combat',
-                      improvement: 'Consider life total vs board presence. At 40 life, taking 4 damage is often better than losing a creature.',
-                      betterPlay: 'Take 4 damage, keep 3/3 for future blocks or attacks' },
-
-                    { time: '0:22', turn: 6, phase: 'Stack', type: 'dispute', player: 'Multiple',
-                      title: 'Stack Order Confusion', description: 'Disagreement about trigger ordering with multiple ETB effects',
-                      impact: 'neutral', strategicValue: 0, category: 'Rules',
-                      resolution: 'APNAP order (Active Player, Non-Active Player)' },
-
-                    // Major Turning Point
-                    { time: '0:28', turn: 8, phase: 'Main', type: 'optimal', player: 'Jordan',
-                      title: 'Game-Winning Setup', description: 'Set up infinite combo with 3 pieces, no interaction available',
-                      impact: 'positive', strategicValue: 10, category: 'Win Condition',
-                      note: 'Excellent threat assessment - waited until countermagic was tapped' },
-
-                    { time: '0:31', turn: 8, phase: 'Combat', type: 'mistake', player: 'Morgan',
-                      title: 'Missed Interaction Window', description: 'Had Force of Will in hand but didn't recognize combo pieces',
-                      impact: 'negative', strategicValue: -9, category: 'Threat Assessment',
-                      improvement: 'Study common combo pieces in your meta. When 2+ artifacts/enchants hit board, evaluate for infinite combos.',
-                      betterPlay: 'Counter the third combo piece immediately' },
-
-                    // Late Game
-                    { time: '0:35', turn: 9, phase: 'Main', type: 'spell', player: 'Alex (You)',
-                      title: 'Desperate Board Wipe', description: 'Cyclonic Rift to buy time, but combo was already protected',
-                      impact: 'negative', strategicValue: -4, category: 'Resource Management',
-                      improvement: 'Recognize when it's too late. This used your best card for minimal gain.',
-                      betterPlay: 'Save Rift for earlier disruption or use politically' },
-
-                    { time: '0:38', turn: 9, phase: 'End', type: 'optimal', player: 'Taylor',
-                      title: 'Correct Concession', description: 'Recognized unwinnable position and conceded to save time',
-                      impact: 'positive', strategicValue: 3, category: 'Game Management',
-                      note: 'Good sportsmanship and time management' },
-
-                    { time: '0:42', turn: 10, phase: 'Main', type: 'optimal', player: 'Jordan',
-                      title: 'Execution', description: 'Executed combo flawlessly, checked for responses, won game',
-                      impact: 'positive', strategicValue: 10, category: 'Win Condition' }
-                ],
-
-                disputes: [
-                    { time: '0:12', topic: 'Commander Tax', players: ['Jordan', 'Alex'], complexity: 'low', resolved: true },
-                    { time: '0:22', topic: 'Stack Order', players: ['Taylor', 'Morgan'], complexity: 'medium', resolved: true },
-                    { time: '0:35', topic: 'Protection from Color', players: ['Alex', 'Jordan'], complexity: 'medium', resolved: true }
-                ],
-
-                playerStats: {
-                    'Alex (You)': {
-                        goodPlays: 1,
-                        mistakes: 2,
-                        missedOpportunities: 1,
-                        resourcesUsed: 8,
-                        resourcesWasted: 3,
-                        lifeTotalStart: 40,
-                        lifeTotalEnd: 12,
-                        cardsDrawn: 23,
-                        spellsCast: 12,
-                        combatTricks: 1,
-                        bluffsAttempted: 2,
-                        bluffsSuccessful: 1
-                    },
-                    'Jordan': {
-                        goodPlays: 3,
-                        mistakes: 0,
-                        missedOpportunities: 0,
-                        resourcesUsed: 6,
-                        resourcesWasted: 0,
-                        lifeTotalStart: 40,
-                        lifeTotalEnd: 34,
-                        cardsDrawn: 19,
-                        spellsCast: 8,
-                        combatTricks: 0,
-                        bluffsAttempted: 1,
-                        bluffsSuccessful: 1
-                    },
-                    'Taylor': {
-                        goodPlays: 1,
-                        mistakes: 0,
-                        missedOpportunities: 1,
-                        resourcesUsed: 7,
-                        resourcesWasted: 1,
-                        lifeTotalStart: 40,
-                        lifeTotalEnd: 40,
-                        cardsDrawn: 21,
-                        spellsCast: 10,
-                        combatTricks: 0,
-                        bluffsAttempted: 0,
-                        bluffsSuccessful: 0
-                    },
-                    'Morgan': {
-                        goodPlays: 0,
-                        mistakes: 1,
-                        missedOpportunities: 1,
-                        resourcesUsed: 5,
-                        resourcesWasted: 2,
-                        lifeTotalStart: 40,
-                        lifeTotalEnd: 28,
-                        cardsDrawn: 17,
-                        spellsCast: 6,
-                        combatTricks: 1,
-                        bluffsAttempted: 0,
-                        bluffsSuccessful: 0
-                    }
-                },
-
-                strategicMetrics: {
-                    avgTurnTime: 420, // seconds
-                    interactionDensity: 0.7, // plays per minute
-                    complexityScore: 7.5, // 1-10
-                    rulesDisputesPerHour: 1.5,
-                    threatAssessmentAccuracy: {
-                        'Alex (You)': 0.6,
-                        'Jordan': 0.95,
-                        'Taylor': 0.75,
-                        'Morgan': 0.5
-                    }
-                }
-            };
-        }
-
-        // ============================================
-        // ANALYSIS ALGORITHMS
-        // ============================================
-
-        function performDeepAnalysis(data) {
-            const analysis = {
-                criticalMoments: [],
-                mistakes: [],
-                recommendations: [],
-                playerAnalysis: {},
-                metaStats: {},
-                actionItems: []
-            };
-
-            // Handle empty session
-            if (!data.events || data.events.length === 0) {
-                analysis.metaStats = {
-                    gamePace: { label: 'Game Pace', value: '0m', context: 'No data recorded' },
-                    interactionRate: { label: 'Interaction Rate', value: '0/min', context: 'No events' },
-                    complexity: { label: 'Complexity', value: '0/10', context: 'No data' },
-                    rulesClarity: { label: 'Disputes', value: '0', context: 'No disputes' },
-                    avgLifeLoss: { label: 'Life Loss', value: '0', context: 'per player' },
-                    totalSpells: { label: 'Spells Cast', value: '0', context: 'no activity' }
-                };
-
-                // Empty player analysis
-                data.players.forEach(player => {
-                    analysis.playerAnalysis[player] = {
-                        stats: { goodPlays: 0, mistakes: 0, lifeTotal: 40, spellsCast: 0 },
-                        resourceEfficiency: 0,
-                        playQuality: 0,
-                        playstyle: 'Unknown',
-                        grade: 'N/A',
-                        strengths: ['No data'],
-                        weaknesses: ['No data'],
-                        keyMoments: [],
-                        improvementAreas: ['Start a game session to record data']
-                    };
-                });
-
-                return analysis;
-            }
-
-            // 1. Identify Critical Moments (high strategic value)
-            data.events.forEach(event => {
-                if (event.strategicValue >= 8) {
-                    analysis.criticalMoments.push({
-                        ...event,
-                        severity: event.impact === 'positive' ? 'excellent' : 'critical'
-                    });
-                }
-            });
-
-            // 2. Analyze Mistakes with Context
-            data.events.filter(e => e.type === 'mistake').forEach(mistake => {
-                analysis.mistakes.push({
-                    ...mistake,
-                    severity: Math.abs(mistake.strategicValue) >= 7 ? 'critical' : 'warning',
-                    gameImpact: calculateGameImpact(mistake, data)
-                });
-            });
-
-            // 3. Generate Strategic Recommendations
-            analysis.recommendations = generateRecommendations(data, analysis);
-
-            // 4. Deep Player Analysis
-            data.players.forEach(player => {
-                analysis.playerAnalysis[player] = analyzePlayerDeep(player, data);
-            });
-
-            // 5. Meta Statistics
-            analysis.metaStats = calculateMetaStats(data);
-
-            // 6. Actionable Next Steps
-            analysis.actionItems = generateActionItems(analysis);
-
-            return analysis;
-        }
-
-        function calculateGameImpact(event, data) {
-            // Calculate how much this mistake affected win probability
-            const turnWeight = event.turn / 10; // Later mistakes more costly
-            const valueWeight = Math.abs(event.strategicValue) / 10;
-            return Math.round((turnWeight * valueWeight) * 100);
-        }
-
-        function analyzePlayerDeep(player, data) {
-            const stats = data.playerStats[player];
-            const playerEvents = data.events.filter(e => e.player === player);
-
-            // Calculate efficiency metrics
-            const resourceEfficiency = stats.resourcesUsed > 0 ? 
-                (stats.resourcesUsed - stats.resourcesWasted) / stats.resourcesUsed : 0;
-
-            const playQuality = stats.goodPlays + stats.mistakes > 0 ?
-                stats.goodPlays / (stats.goodPlays + stats.mistakes) : 0;
-
-            // Determine playstyle
-            let playstyle = 'Balanced';
-            if (stats.combatTricks > 2) playstyle = 'Aggressive/Combat-focused';
-            else if (stats.bluffsAttempted > 2) playstyle = 'Political/Manipulative';
-            else if (stats.resourcesUsed < 5) playstyle = 'Conservative';
-
-            // Grade calculation
-            let grade = 'C';
-            const score = (playQuality * 0.4 + resourceEfficiency * 0.3 + 
-                          (stats.lifeTotalEnd / 40) * 0.3) * 100;
-            if (score >= 90) grade = 'A+';
-            else if (score >= 80) grade = 'A';
-            else if (score >= 70) grade = 'B+';
-            else if (score >= 60) grade = 'B';
-            else if (score >= 50) grade = 'C+';
-
-            // Strengths & Weaknesses
-            const strengths = [];
-            const weaknesses = [];
-
-            if (playQuality > 0.7) strengths.push('Technical Execution');
-            if (resourceEfficiency > 0.8) strengths.push('Resource Management');
-            if (stats.bluffsSuccessful > stats.bluffsAttempted * 0.5) strengths.push('Psychological Play');
-            if (playerEvents.some(e => e.strategicValue >= 9)) strengths.push('High-Impact Plays');
-
-            if (stats.mistakes > 2) weaknesses.push('Consistency');
-            if (resourceEfficiency < 0.6) weaknesses.push('Resource Waste');
-            if (data.strategicMetrics.threatAssessmentAccuracy[player] < 0.7) 
-                weaknesses.push('Threat Assessment');
-            if (stats.missedOpportunities > 1) weaknesses.push('Opportunity Recognition');
-
-            return {
-                stats,
-                resourceEfficiency: Math.round(resourceEfficiency * 100),
-                playQuality: Math.round(playQuality * 100),
-                playstyle,
-                grade,
-                strengths: strengths.length > 0 ? strengths : ['Fundamentals'],
-                weaknesses: weaknesses.length > 0 ? weaknesses : ['None major'],
-                keyMoments: playerEvents.filter(e => e.strategicValue >= 7),
-                improvementAreas: generatePlayerImprovements(player, stats, data)
-            };
-        }
-
-        function generatePlayerImprovements(player, stats, data) {
-            const improvements = [];
-
-            if (stats.mistakes > 0) {
-                improvements.push('Review combat math and blocking decisions');
-            }
-            if (data.strategicMetrics.threatAssessmentAccuracy[player] < 0.8) {
-                improvements.push('Study common combo pieces and interaction windows');
-            }
-            if (stats.resourcesWasted > 2) {
-                improvements.push('Practice patience - don't use removal on non-threats');
-            }
-            if (stats.missedOpportunities > 0) {
-                improvements.push('Develop habit of scanning for interaction before passing priority');
-            }
-
-            return improvements;
-        }
-
-        function generateRecommendations(data, analysis) {
-            const recs = [];
-
-            // Meta recommendations
-            if (data.strategicMetrics.rulesDisputesPerHour > 1) {
-                recs.push({
-                    category: 'Group Improvement',
-                    title: 'Rules Familiarity',
-                    description: 'High dispute rate suggests group would benefit from pre-game rule review',
-                    severity: 'info',
-                    players: data.players
-                });
-            }
-
-            // Individual recommendations from mistakes
-            analysis.mistakes.forEach(mistake => {
-                if (mistake.improvement) {
-                    recs.push({
-                        category: 'Individual Growth',
-                        title: mistake.title,
-                        description: mistake.description,
-                        improvement: mistake.improvement,
-                        betterPlay: mistake.betterPlay,
-                        severity: mistake.severity,
-                        players: [mistake.player]
-                    });
-                }
-            });
-
-            return recs;
-        }
-
-        function calculateMetaStats(data) {
-            return {
-                gamePace: {
-                    label: 'Game Pace',
-                    value: formatTime(data.gameLength),
-                    context: data.gameLength > 5400 ? 'Long game - consider faster win cons' : 'Good pace'
-                },
-                interactionRate: {
-                    label: 'Interaction Rate',
-                    value: data.strategicMetrics.interactionDensity.toFixed(1) + '/min',
-                    context: data.strategicMetrics.interactionDensity < 0.5 ? 'Low - more board interaction needed' : 'Healthy'
-                },
-                complexity: {
-                    label: 'Game Complexity',
-                    value: data.strategicMetrics.complexityScore + '/10',
-                    context: data.strategicMetrics.complexityScore > 7 ? 'High - good for learning' : 'Casual level'
-                },
-                rulesClarity: {
-                    label: 'Rules Disputes',
-                    value: data.disputes.length,
-                    context: data.disputes.length > 3 ? 'Consider judge program' : 'Well handled'
-                },
-                avgLifeLoss: {
-                    label: 'Avg Life Loss',
-                    value: Math.round(data.players.reduce((sum, p) => sum + (40 - data.playerStats[p].lifeTotalEnd), 0) / data.players.length),
-                    context: 'per player'
-                },
-                totalSpells: {
-                    label: 'Total Spells Cast',
-                    value: Object.values(data.playerStats).reduce((sum, s) => sum + s.spellsCast, 0),
-                    context: 'across all players'
-                }
-            };
-        }
-
-        function generateActionItems(analysis) {
-            const items = [];
-
-            // High priority: Critical mistakes
-            analysis.mistakes.filter(m => m.severity === 'critical').forEach(mistake => {
-                items.push({
-                    priority: 'high',
-                    title: `Fix: ${mistake.title}`,
-                    description: mistake.improvement,
-                    for: mistake.player
-                });
-            });
-
-            // Medium: Pattern issues
-            Object.entries(analysis.playerAnalysis).forEach(([player, data]) => {
-                if (data.weaknesses.includes('Threat Assessment')) {
-                    items.push({
-                        priority: 'medium',
-                        title: 'Study Common Combos',
-                        description: 'Learn to recognize infinite combo pieces in your meta',
-                        for: player
-                    });
-                }
-            });
-
-            // Low: Optimization
-            items.push({
-                priority: 'low',
-                title: 'Practice Mulligan Decisions',
-                description: 'Review opening hands - aim for 3-4 lands and early plays',
-                for: 'All Players'
-            });
-
-            return items;
-        }
-
-        // ============================================
-        // RENDER FUNCTIONS
-        // ============================================
-
-        function renderExecutiveSummary(data, analysis) {
-            // Show message if no data
-            if (!data.events || data.events.length === 0) {
-                document.getElementById('session-overview').innerHTML = 
-                    '<strong style="color: #00A7B5;">No game data recorded.</strong> ' +
-                    'Start a game session and play to see analysis here. Showing empty template.';
-            } else {
-                document.getElementById('session-overview').textContent = 
-                    `A ${formatTime(data.gameLength)} game with ${data.players.length} players. ` +
-                    `${data.winner} won. ${data.events.length} events recorded.`;
-            }
-
-            const duration = data.gameLength > 0 ? formatTime(data.gameLength) : '0m';
-            document.getElementById('session-overview').textContent = 
-                `A ${duration} Commander game with ${data.players.length} players. ` +
-                `${data.winner} emerged victorious through superior threat assessment and combo execution. ` +
-                `${data.disputes.length} rules disputes were resolved. Key learning opportunity: recognizing combo windows.`;
-
-            const metrics = [
-                { value: duration, label: 'Duration', context: '' },
-                { value: data.disputes.length, label: 'Disputes', context: 'resolved' },
-                { value: data.players.length, label: 'Players', context: '' },
-                { value: analysis.criticalMoments.length, label: 'Critical Moments', context: 'game-defining' },
-                { value: analysis.mistakes.length, label: 'Mistakes', context: 'learning opportunities' },
-                { value: data.winner, label: 'Winner', context: 'well played' }
-            ];
-
-            document.getElementById('summary-metrics').innerHTML = metrics.map(m => `
-                <div class="summary-item">
-                    <div class="summary-value">${m.value}</div>
-                    <div class="summary-label">${m.label}</div>
-                    ${m.context ? `<div class="summary-context">${m.context}</div>` : ''}
-                </div>
-            `).join('');
-        }
-
-        function renderInsights(analysis) {
-            // Critical Moments
-            document.getElementById('critical-moments').innerHTML = analysis.criticalMoments.map(m => `
-                <div class="insight-card ${m.severity}">
-                    <div class="insight-header">
-                        <div>
-                            <div class="insight-category">${m.category}</div>
-                            <div class="insight-title">${m.title}</div>
-                        </div>
-                        <span class="insight-severity severity-${m.severity}">${m.severity}</span>
-                    </div>
-                    <div class="insight-players">
-                        <span class="player-tag">${m.player}</span>
-                        <span class="player-tag">Turn ${m.turn}</span>
-                    </div>
-                    <div class="insight-description">${m.description}</div>
-                    ${m.note ? `<div class="insight-evidence">${m.note}</div>` : ''}
-                </div>
-            `).join('');
-
-            // Mistakes
-            document.getElementById('mistakes-analysis').innerHTML = analysis.mistakes.map(m => `
-                <div class="insight-card ${m.severity}">
-                    <div class="insight-header">
-                        <div>
-                            <div class="insight-category">${m.category}</div>
-                            <div class="insight-title">${m.title}</div>
-                        </div>
-                        <span class="insight-severity severity-${m.severity}">${m.severity}</span>
-                    </div>
-                    <div class="insight-players">
-                        <span class="player-tag">${m.player}</span>
-                        <span class="player-tag">Turn ${m.turn}</span>
-                        <span class="player-tag">Impact: ${m.gameImpact}%</span>
-                    </div>
-                    <div class="insight-description">${m.description}</div>
-                    <div class="insight-recommendation">
-                        <strong>What to do differently:</strong>
-                        ${m.betterPlay || m.improvement}
-                    </div>
-                </div>
-            `).join('');
-
-            // Recommendations
-            document.getElementById('strategic-recommendations').innerHTML = analysis.recommendations.map(r => `
-                <div class="insight-card ${r.severity}">
-                    <div class="insight-header">
-                        <div>
-                            <div class="insight-category">${r.category}</div>
-                            <div class="insight-title">${r.title}</div>
-                        </div>
-                        <span class="insight-severity severity-${r.severity}">${r.severity}</span>
-                    </div>
-                    <div class="insight-players">
-                        ${r.players.map(p => `<span class="player-tag">${p}</span>`).join('')}
-                    </div>
-                    <div class="insight-description">${r.description}</div>
-                    ${r.improvement ? `
-                        <div class="insight-recommendation">
-                            <strong>Improvement:</strong> ${r.improvement}
-                        </div>
-                    ` : ''}
-                </div>
-            `).join('');
-
-            // Action Items
-            document.getElementById('action-items').innerHTML = analysis.actionItems.map(item => `
-                <li class="action-item">
-                    <div class="action-priority priority-${item.priority}"></div>
-                    <div class="action-content">
-                        <div class="action-title">${item.title}</div>
-                        <div class="action-desc">${item.description}</div>
-                        <div class="action-for">For: ${item.for}</div>
-                    </div>
-                </li>
-            `).join('');
-        }
-
-        function renderPlayerAnalysis(analysis) {
-            document.getElementById('player-profiles').innerHTML = Object.entries(analysis.playerAnalysis).map(([player, data]) => `
-                <div class="player-profile">
-                    <div class="player-header">
-                        <div class="player-info">
-                            <h3>${player}</h3>
-                            <div class="player-role">${data.playstyle}</div>
-                        </div>
-                        <div class="player-grade">${data.grade}</div>
-                    </div>
-
-                    <div class="player-stats-grid">
-                        <div class="player-stat">
-                            <div class="player-stat-value">${data.stats.goodPlays}</div>
-                            <div class="player-stat-label">Good Plays</div>
-                        </div>
-                        <div class="player-stat">
-                            <div class="player-stat-value">${data.stats.mistakes}</div>
-                            <div class="player-stat-label">Mistakes</div>
-                        </div>
-                        <div class="player-stat">
-                            <div class="player-stat-value">${data.playQuality}%</div>
-                            <div class="player-stat-label">Play Quality</div>
-                        </div>
-                        <div class="player-stat">
-                            <div class="player-stat-value">${data.resourceEfficiency}%</div>
-                            <div class="player-stat-label">Resource Efficiency</div>
-                        </div>
-                        <div class="player-stat">
-                            <div class="player-stat-value">${data.stats.lifeTotalEnd}</div>
-                            <div class="player-stat-label">Final Life</div>
-                        </div>
-                        <div class="player-stat">
-                            <div class="player-stat-value">${data.stats.spellsCast}</div>
-                            <div class="player-stat-label">Spells Cast</div>
-                        </div>
-                    </div>
-
-                    <div class="strengths-weaknesses">
-                        <div class="sw-column">
-                            <h4>💪 Strengths</h4>
-                            ${data.strengths.map(s => `
-                                <div class="sw-item">
-                                    <span class="sw-icon">✓</span>
-                                    <span>${s}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div class="sw-column">
-                            <h4>📈 Growth Areas</h4>
-                            ${data.weaknesses.map(w => `
-                                <div class="sw-item">
-                                    <span class="sw-icon">↑</span>
-                                    <span>${w}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-
-                    ${data.improvementAreas.length > 0 ? `
-                        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(74, 85, 104, 0.2);">
-                            <h4 style="color: var(--teal); margin-bottom: 10px;">🎯 Focus Areas</h4>
-                            <ul style="color: var(--slate-gray); padding-left: 20px;">
-                                ${data.improvementAreas.map(area => `<li style="margin-bottom: 5px;">${area}</li>`).join('')}
-                            </ul>
-                        </div>
-                    ` : ''}
-                </div>
-            `).join('');
-        }
-
-        function renderTimeline(data) {
-            const container = document.getElementById('detailed-timeline');
-            container.innerHTML = data.events.map(event => `
-                <div class="timeline-item" data-type="${event.type}">
-                    <div class="timeline-dot ${event.type}">
-                        ${getTimelineIcon(event.type)}
-                    </div>
-                    <div class="timeline-content">
-                        <div class="timeline-header">
-                            <span class="timeline-time">${event.time}</span>
-                            <span class="timeline-turn">Turn ${event.turn} • ${event.phase}</span>
-                        </div>
-                        <div class="timeline-title">${event.title}</div>
-                        <div class="timeline-details">${event.description}</div>
-                        <span class="timeline-impact impact-${event.impact}">
-                            ${event.impact === 'positive' ? '✓ Good' : event.impact === 'negative' ? '✗ Poor' : '○ Neutral'} 
-                            (Value: ${event.strategicValue > 0 ? '+' : ''}${event.strategicValue})
-                        </span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function getTimelineIcon(type) {
-            const icons = {
-                turn: '⏱️', combat: '⚔️', spell: '✨', ability: '🔮',
-                dispute: '⚖️', mistake: '❌', optimal: '⭐'
-            };
-            return icons[type] || '•';
-        }
-
-        function filterTimeline(type) {
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            const items = document.querySelectorAll('.timeline-item');
-            items.forEach(item => {
-                if (type === 'all' || item.dataset.type === type) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-
-        function renderMetaStats(analysis) {
-            document.getElementById('meta-stats').innerHTML = Object.values(analysis.metaStats).map(stat => `
-                <div class="meta-card">
-                    <h4>${stat.label}</h4>
-                    <div style="font-size: 2.5rem; font-weight: bold; color: var(--teal); margin: 15px 0;">
-                        ${stat.value}
-                    </div>
-                    <div style="color: var(--slate-gray); font-size: 0.9rem;">
-                        ${stat.context}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function formatTime(seconds) {
-            const hours = Math.floor(seconds / 3600);
-            const mins = Math.floor((seconds % 3600) / 60);
-            if (hours > 0) return `${hours}h ${mins}m`;
-            return `${mins}m`;
-        }
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(tabName + '-panel').classList.add('active');
-        }
-
-        function exportReport() {
-            const report = {
-                generatedAt: new Date().toISOString(),
-                session: sessionData,
-                analysis: analysisResults
-            };
-
-            const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `veritas-analysis-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        // ============================================
-        // INITIALIZATION
-        // ============================================
-
-        function skipLoading() {
-            document.getElementById('loading-overlay').classList.add('hidden');
-            sessionData = generateRichDemoData();
-            analysisResults = performDeepAnalysis(sessionData);
-            renderExecutiveSummary(sessionData, analysisResults);
-            renderInsights(analysisResults);
-            renderPlayerAnalysis(analysisResults);
-            renderTimeline(sessionData);
-            renderMetaStats(analysisResults);
-        }
-
-        window.addEventListener('load', () => {
-            // Safety timeout - hide loader after 3 seconds no matter what
-            setTimeout(() => {
-                document.getElementById('loading-overlay').classList.add('hidden');
-            }, 3000);
-
-            console.log('Analysis page loaded');
-
-            // Try to load real session data
+            let sessionData;
             const saved = localStorage.getItem('veritas_session');
 
             if (saved) {
                 try {
                     sessionData = JSON.parse(saved);
-                    console.log('Loaded real session:', sessionData);
-
-                    // If no events, create empty structure
-                    if (!sessionData.events) sessionData.events = [];
-                    if (!sessionData.disputes) sessionData.disputes = [];
-                    if (!sessionData.playerStats) {
-                        sessionData.playerStats = {};
-                        sessionData.players.forEach(p => {
-                            sessionData.playerStats[p] = {
-                                goodPlays: 0, mistakes: 0, resourcesUsed: 0,
-                                resourcesWasted: 0, spellsCast: 0, lifeTotal: 40
-                            };
-                        });
-                    }
-
+                    console.log('Loaded session:', sessionData);
                 } catch (e) {
-                    console.error('Error parsing session:', e);
-                    sessionData = createEmptySession();
+                    console.error('Error parsing:', e);
+                    sessionData = null;
                 }
-            } else {
-                console.log('No session data found');
-                sessionData = createEmptySession();
             }
 
-            // Perform analysis (will handle empty data)
-            analysisResults = performDeepAnalysis(sessionData);
+            // Default empty session
+            if (!sessionData) {
+                sessionData = {
+                    gameLength: 0,
+                    events: [],
+                    disputes: [],
+                    winner: 'None',
+                    players: ['Player 1', 'Player 2', 'Player 3', 'Player 4']
+                };
+            }
 
-            // Render
-            renderExecutiveSummary(sessionData, analysisResults);
-            renderInsights(analysisResults);
-            renderPlayerAnalysis(analysisResults);
-            renderTimeline(sessionData);
-            renderMetaStats(analysisResults);
+            // Update display
+            const mins = Math.floor((sessionData.gameLength || 0) / 60);
+            document.getElementById('duration').textContent = mins + 'm';
+            document.getElementById('events-count').textContent = (sessionData.events || []).length;
+            document.getElementById('disputes-count').textContent = (sessionData.disputes || []).length;
+            document.getElementById('winner').textContent = sessionData.winner || 'None';
 
-            // Hide loader
-            document.getElementById('loading-overlay').classList.add('hidden');
-        });
+            // Update info text
+            if (sessionData.events && sessionData.events.length > 0) {
+                document.getElementById('session-info').textContent = 
+                    `Game completed with ${sessionData.events.length} events recorded.`;
 
-        function createEmptySession() {
-            return {
-                startTime: new Date().toISOString(),
-                endTime: new Date().toISOString(),
-                gameLength: 0,
-                players: ['Player 1', 'Player 2', 'Player 3', 'Player 4'],
-                winner: 'None',
-                events: [],
-                disputes: [],
-                playerStats: {},
-                strategicMetrics: {
-                    avgTurnTime: 0,
-                    interactionDensity: 0,
-                    complexityScore: 0,
-                    rulesDisputesPerHour: 0,
-                    threatAssessmentAccuracy: {}
-                }
-            };
+                // Show events
+                const eventsHtml = sessionData.events.map(e => `
+                    <div class="event-item">
+                        <div class="event-time">${e.time || '0:00'}</div>
+                        <div class="event-title">${e.title || 'Event'}</div>
+                        <div class="event-desc">${e.description || ''}</div>
+                    </div>
+                `).join('');
+                document.getElementById('events-list').innerHTML = eventsHtml;
+            } else {
+                document.getElementById('session-info').textContent = 
+                    'No game data recorded. Start a session and play to see analysis here.';
+            }
+
+            console.log('Display updated');
         }
-    
 
-        // Simple force close - works immediately
-        function closeLoader() {
-            var el = document.getElementById('loading-overlay');
-            if (el) el.style.display = 'none';
-        }
-        // Auto close after 1 second
-        setTimeout(closeLoader, 1000);
-</script>
+        // Load data when page loads
+        window.addEventListener('load', loadSession);
+    </script>
 </body>
 </html>
