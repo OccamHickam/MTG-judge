@@ -643,34 +643,60 @@
 
         // CRITICAL: endSession must be defined BEFORE the button that calls it
         function endSession() {
-            console.log('Ending session...');
-            sessionData.endTime = new Date().toISOString();
-            sessionData.gameLength = (new Date(sessionData.endTime) - new Date(sessionData.startTime)) / 1000;
-            sessionData.disputes = disputeLog;
+            console.log('=== END SESSION STARTED ===');
 
-            // Calculate winner
-            const playerScores = Object.entries(sessionData.playerStats).map(([name, stats]) => ({
-                name,
-                score: stats.goodPlays * 10 - stats.mistakes * 5 + stats.lifeTotal
-            }));
-            playerScores.sort((a, b) => b.score - a.score);
-            sessionData.winner = playerScores[0]?.name || 'Unknown';
+            try {
+                // Update end time
+                sessionData.endTime = new Date().toISOString();
+                sessionData.gameLength = Math.floor((new Date(sessionData.endTime) - new Date(sessionData.startTime)) / 1000);
+                sessionData.disputes = disputeLog || [];
 
-            // Add metrics
-            sessionData.strategicMetrics = {
-                avgTurnTime: sessionData.gameLength / currentTurn,
-                interactionDensity: sessionData.events.length / (sessionData.gameLength / 60),
-                complexityScore: calculateComplexity(),
-                rulesDisputesPerHour: (disputeLog.length / (sessionData.gameLength / 3600)),
-                threatAssessmentAccuracy: calculateThreatAccuracy()
-            };
+                console.log('Session duration:', sessionData.gameLength, 'seconds');
+                console.log('Events recorded:', sessionData.events.length);
+                console.log('Disputes recorded:', sessionData.disputes.length);
 
-            // Save to localStorage
-            localStorage.setItem('veritas_session', JSON.stringify(sessionData));
-            console.log('Session saved, navigating to analysis...');
+                // Calculate winner
+                const playerScores = Object.entries(sessionData.playerStats).map(([name, stats]) => ({
+                    name,
+                    score: (stats.goodPlays * 10) - (stats.mistakes * 5) + stats.lifeTotal
+                }));
+                playerScores.sort((a, b) => b.score - a.score);
+                sessionData.winner = playerScores.length > 0 ? playerScores[0].name : 'Unknown';
 
-            // Navigate to analysis
-            window.location.href = 'analysis.html';
+                console.log('Winner calculated:', sessionData.winner);
+
+                // Add metrics
+                sessionData.strategicMetrics = {
+                    avgTurnTime: currentTurn > 0 ? Math.floor(sessionData.gameLength / currentTurn) : 0,
+                    interactionDensity: sessionData.gameLength > 0 ? (sessionData.events.length / (sessionData.gameLength / 60)).toFixed(2) : 0,
+                    complexityScore: calculateComplexity(),
+                    rulesDisputesPerHour: sessionData.gameLength > 0 ? ((disputeLog.length / (sessionData.gameLength / 3600))).toFixed(1) : 0,
+                    threatAssessmentAccuracy: calculateThreatAccuracy()
+                };
+
+                // Save to localStorage
+                const dataString = JSON.stringify(sessionData);
+                console.log('Data size:', dataString.length, 'characters');
+
+                localStorage.setItem('veritas_session', dataString);
+                console.log('✓ Data saved to localStorage');
+
+                // Verify save worked
+                const verify = localStorage.getItem('veritas_session');
+                if (verify) {
+                    console.log('✓ Verified data in localStorage');
+                } else {
+                    console.error('✗ Failed to verify data in localStorage');
+                }
+
+                // Navigate to analysis
+                console.log('Navigating to analysis.html...');
+                window.location.replace('analysis.html');
+
+            } catch (err) {
+                console.error('ERROR in endSession:', err);
+                alert('Error ending session: ' + err.message);
+            }
         }
 
         function trackEvent(type, title, description, options = {}) {
