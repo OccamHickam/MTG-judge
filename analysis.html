@@ -1457,49 +1457,63 @@
         }
 
         window.addEventListener('load', () => {
+            console.log('Analysis page loaded');
+
             try {
                 // Load real data or use demo
                 const saved = localStorage.getItem('veritas_session');
-                console.log('Loading session data...', saved ? 'Found saved data' : 'Using demo');
+                console.log('Checking localStorage...');
 
-                if (saved) {
+                if (saved && saved.length > 0) {
+                    console.log('Found saved data, length:', saved.length);
                     try {
                         sessionData = JSON.parse(saved);
+                        console.log('✓ Parsed session data');
+                        console.log('  - Duration:', sessionData.gameLength, 'seconds');
+                        console.log('  - Events:', sessionData.events?.length || 0);
+                        console.log('  - Disputes:', sessionData.disputes?.length || 0);
+                        console.log('  - Winner:', sessionData.winner);
                     } catch (e) {
-                        console.error('Failed to parse saved data:', e);
+                        console.error('✗ Failed to parse saved data:', e);
                         sessionData = generateRichDemoData();
                     }
                 } else {
+                    console.log('No saved data found, using demo');
                     sessionData = generateRichDemoData();
                 }
 
                 // Validate data structure
-                if (!sessionData || !sessionData.events) {
-                    console.warn('Invalid data structure, using demo');
+                if (!sessionData || !sessionData.events || sessionData.events.length === 0) {
+                    console.warn('Invalid or empty data, using demo');
                     sessionData = generateRichDemoData();
                 }
 
                 // Perform analysis
+                console.log('Performing analysis...');
                 analysisResults = performDeepAnalysis(sessionData);
+                console.log('✓ Analysis complete');
 
                 // Render all sections
+                console.log('Rendering...');
                 renderExecutiveSummary(sessionData, analysisResults);
                 renderInsights(analysisResults);
                 renderPlayerAnalysis(analysisResults);
                 renderTimeline(sessionData);
                 renderMetaStats(analysisResults);
-
-                console.log('Analysis complete, hiding loader...');
+                console.log('✓ Render complete');
 
                 // Hide loading
                 setTimeout(() => {
                     document.getElementById('loading-overlay').classList.add('hidden');
-                }, 800);
+                    console.log('✓ Loader hidden');
+                }, 500);
 
             } catch (error) {
-                console.error('Fatal error during initialization:', error);
-                document.querySelector('.loading-text').textContent = 'Error loading analysis. Click Skip to continue.';
+                console.error('✗ Fatal error:', error);
+                document.querySelector('.loading-text').textContent = 'Error: ' + error.message;
                 document.querySelector('.loading-text').style.color = '#ef4444';
+                document.querySelector('.loading-text').style.cursor = 'pointer';
+                document.querySelector('.loading-text').onclick = skipLoading;
             }
         });
     </script>
