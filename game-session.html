@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Veritas - Game Session</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -16,7 +20,6 @@
             width: 100vw;
         }
 
-        /* Particle Canvas Background */
         #particle-canvas {
             position: fixed;
             top: 0;
@@ -27,7 +30,6 @@
             pointer-events: none;
         }
 
-        /* Main Game Session Container */
         #game-session {
             position: fixed;
             top: 0;
@@ -42,14 +44,15 @@
             background: radial-gradient(ellipse at center, rgba(20, 20, 40, 0.3) 0%, rgba(5, 5, 10, 0.9) 100%);
         }
 
-        /* Listening Indicator */
         .listening-container {
             text-align: center;
             opacity: 0.6;
             transition: opacity 0.3s ease;
         }
 
-        .listening-container.active { opacity: 1; }
+        .listening-container.active {
+            opacity: 1;
+        }
 
         .listening-pulse {
             width: 120px;
@@ -104,7 +107,6 @@
             font-style: italic;
         }
 
-        /* End Session Button */
         .end-session-btn {
             position: absolute;
             top: 40px;
@@ -129,7 +131,6 @@
             color: white;
         }
 
-        /* Status Bar */
         .status-bar {
             position: absolute;
             bottom: 40px;
@@ -162,7 +163,16 @@
             box-shadow: 0 0 10px rgba(0, 167, 181, 0.8);
         }
 
-        /* Fullscreen Ruling Overlay */
+        .debug-info {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #4a5568;
+            font-size: 12px;
+            text-align: center;
+        }
+
         #ruling-overlay {
             position: fixed;
             top: 0;
@@ -179,7 +189,9 @@
             backdrop-filter: blur(20px);
         }
 
-        #ruling-overlay.active { display: flex; }
+        #ruling-overlay.active {
+            display: flex;
+        }
 
         .ruling-header {
             text-align: center;
@@ -255,31 +267,19 @@
             border: none;
         }
 
-        .ruling-close:hover { color: #00a7b5; }
-
-        /* Debug Info */
-        .debug-info {
-            position: absolute;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #4a5568;
-            font-size: 12px;
-            text-align: center;
+        .ruling-close:hover {
+            color: #00a7b5;
         }
     </style>
 <base target="_blank">
 </head>
 <body>
-    <!-- Particle Canvas -->
     <canvas id="particle-canvas"></canvas>
 
-    <!-- End Session Button -->
-    <button class="end-session-btn" onclick="endSession()">← End Session & Analyze</button>
+    <button class="end-session-btn" onclick="endSession()">End Session & Analyze</button>
 
-    <!-- Main Game Session -->
     <div id="game-session">
-        <div class="listening-container" id="listening-container">
+        <div class="listening-container active" id="listening-container">
             <div class="listening-pulse"></div>
             <div class="listening-text">Listening</div>
             <div class="listening-subtext">The Arbiter hears all</div>
@@ -295,7 +295,6 @@
         </div>
     </div>
 
-    <!-- Fullscreen Ruling Overlay -->
     <div id="ruling-overlay">
         <div class="ruling-header">
             <div class="ruling-icon">⚖️</div>
@@ -312,9 +311,9 @@
 
     <script>
         // ============================================
-        // SESSION DATA
+        // SESSION DATA - Global variable accessible everywhere
         // ============================================
-        const sessionData = {
+        window.sessionData = {
             startTime: new Date().toISOString(),
             endTime: null,
             players: ['Player 1', 'Player 2', 'Player 3', 'Player 4'],
@@ -324,31 +323,50 @@
         };
 
         let disputeCount = 0;
+        let recognition;
 
         // ============================================
         // TIMER & DEBUG INFO
         // ============================================
         function updateDebugInfo() {
-            const elapsed = Math.floor((new Date() - new Date(sessionData.startTime)) / 1000);
+            const elapsed = Math.floor((new Date() - new Date(window.sessionData.startTime)) / 1000);
             const mins = Math.floor(elapsed / 60);
             const secs = elapsed % 60;
             document.getElementById('debug-info').textContent = 
                 `Session time: ${mins}:${secs.toString().padStart(2, '0')} | Disputes: ${disputeCount}`;
         }
+        
         setInterval(updateDebugInfo, 1000);
         updateDebugInfo();
 
         // ============================================
-        // END SESSION
+        // END SESSION - FIXED VERSION
         // ============================================
         function endSession() {
-            console.log('Ending session...');
-            sessionData.endTime = new Date().toISOString();
-            sessionData.gameLength = Math.floor((new Date() - new Date(sessionData.startTime)) / 1000);
-
-            localStorage.setItem('veritas_session', JSON.stringify(sessionData));
-            console.log('Saved:', sessionData);
-
+            console.log('=== ENDING SESSION ===');
+            
+            // Update session data
+            window.sessionData.endTime = new Date().toISOString();
+            window.sessionData.gameLength = Math.floor((new Date() - new Date(window.sessionData.startTime)) / 1000);
+            
+            console.log('Session data to save:', window.sessionData);
+            
+            // Save to localStorage - USING CONSISTENT KEY
+            const dataString = JSON.stringify(window.sessionData);
+            localStorage.setItem('veritas_session', dataString);
+            
+            // Verify it saved
+            const verify = localStorage.getItem('veritas_session');
+            console.log('Verified saved data:', verify);
+            console.log('Parse test:', JSON.parse(verify));
+            
+            // Stop speech recognition before leaving
+            if (recognition) {
+                recognition.stop();
+            }
+            
+            // Redirect to analysis
+            console.log('Redirecting to analysis.html...');
             window.location.href = 'analysis.html';
         }
 
@@ -363,7 +381,6 @@
                 'Please wait while the Law is determined.';
             document.getElementById('ruling-overlay').classList.add('active');
 
-            // Speak
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(
                     'A disturbance ripples through the aether. The Law has heard.'
@@ -422,8 +439,6 @@
         // ============================================
         // SPEECH RECOGNITION
         // ============================================
-        let recognition;
-
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
@@ -466,10 +481,14 @@
 
         function handleDispute(text) {
             disputeCount++;
-            sessionData.disputes.push({
+            
+            // Add to session data - USING WINDOW.SESSIONDATA
+            window.sessionData.disputes.push({
                 time: new Date().toISOString(),
                 text: text
             });
+            
+            console.log('Dispute recorded:', window.sessionData.disputes);
             showRuling(text);
             updateDebugInfo();
         }
