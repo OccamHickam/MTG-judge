@@ -65,12 +65,12 @@
         }
 
         .listening-pulse.thinking {
-            animation: thinking 1s ease-in-out infinite;
+            animation: spin 2s linear infinite;
             background: radial-gradient(circle, rgba(201, 168, 106, 0.5) 0%, transparent 70%);
         }
 
         .listening-pulse.speaking {
-            animation: speaking 0.5s ease-in-out infinite;
+            animation: bounce 0.5s ease-in-out infinite;
             background: radial-gradient(circle, rgba(0, 167, 181, 0.6) 0%, transparent 70%);
         }
 
@@ -79,27 +79,13 @@
             50% { transform: scale(1.1); opacity: 1; }
         }
 
-        @keyframes thinking {
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes bounce {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.2); }
-        }
-
-        @keyframes speaking {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.15); opacity: 1; }
-        }
-
-        .listening-pulse::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 167, 181, 0.5) 0%, transparent 70%);
-            animation: pulse 3s ease-in-out infinite 0.5s;
         }
 
         .listening-pulse::after {
@@ -128,24 +114,6 @@
             max-width: 500px;
             margin: 0 auto;
             line-height: 1.4;
-        }
-
-        .arbiter-status {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: rgba(0, 167, 181, 0.1);
-            border: 1px solid rgba(0, 167, 181, 0.3);
-            border-radius: 20px;
-            font-size: 12px;
-            color: #00a7b5;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .arbiter-status.visible {
-            opacity: 1;
         }
 
         .end-session-btn {
@@ -214,7 +182,7 @@
             text-align: center;
         }
 
-        /* FULLSCREEN RULING DISPLAY */
+        /* RULING OVERLAY */
         #ruling-overlay {
             position: fixed;
             top: 0;
@@ -227,7 +195,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 60px;
+            padding: 40px;
             backdrop-filter: blur(20px);
         }
 
@@ -238,20 +206,18 @@
         .ruling-card {
             display: flex;
             gap: 40px;
-            max-width: 1000px;
+            max-width: 900px;
             width: 100%;
-            align-items: flex-start;
         }
 
         .card-image-container {
             flex-shrink: 0;
-            width: 300px;
-            height: 420px;
+            width: 280px;
+            height: 390px;
             background: rgba(0, 0, 0, 0.5);
             border-radius: 16px;
             border: 3px solid rgba(0, 167, 181, 0.3);
             overflow: hidden;
-            box-shadow: 0 0 40px rgba(0, 167, 181, 0.2);
         }
 
         .card-image {
@@ -264,74 +230,46 @@
             flex: 1;
         }
 
-        .ruling-header-text {
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            color: #c9a86a;
-            margin-bottom: 10px;
-        }
-
         .ruling-title {
-            font-size: 36px;
-            font-weight: 300;
-            color: #e0e0ff;
+            font-size: 32px;
+            color: #00a7b5;
             margin-bottom: 20px;
-            text-shadow: 0 0 30px rgba(0, 167, 181, 0.3);
         }
 
         .arbiter-ruling {
             background: rgba(0, 167, 181, 0.1);
             border-left: 4px solid #00a7b5;
-            padding: 25px;
-            margin-bottom: 20px;
-            border-radius: 0 12px 12px 0;
-            font-size: 18px;
-            line-height: 1.6;
-            color: #e0e0ff;
-        }
-
-        .card-name-display {
-            font-size: 24px;
-            color: #00a7b5;
-            margin-bottom: 15px;
-            font-weight: 500;
-        }
-
-        .oracle-text-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(0, 167, 181, 0.2);
-            border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+            font-size: 18px;
+            line-height: 1.6;
         }
 
-        .oracle-text-box h4 {
+        .oracle-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 167, 181, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .oracle-box h4 {
             color: #c9a86a;
             font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-        }
-
-        .oracle-text-box p {
-            color: #8892b0;
-            line-height: 1.6;
-            font-style: italic;
+            margin-bottom: 8px;
         }
 
         .ruling-close {
-            margin-top: 30px;
-            padding: 15px 50px;
+            padding: 12px 30px;
             background: transparent;
             border: 2px solid #00a7b5;
             color: #00a7b5;
+            border-radius: 25px;
+            cursor: pointer;
             font-size: 14px;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-radius: 25px;
         }
 
         .ruling-close:hover {
@@ -341,22 +279,21 @@
 
         .conversation-log {
             position: absolute;
-            bottom: 150px;
+            bottom: 140px;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
             max-width: 600px;
+            width: 90%;
         }
 
         .log-entry {
-            background: rgba(0, 0, 0, 0.6);
-            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 16px;
             border-radius: 20px;
-            margin-bottom: 10px;
-            font-size: 14px;
-            color: #8892b0;
-            opacity: 0;
-            animation: fadeIn 0.5s forwards;
+            margin-bottom: 8px;
+            font-size: 13px;
+            animation: fadeIn 0.3s;
         }
 
         .log-entry.arbiter {
@@ -369,7 +306,8 @@
         }
 
         @keyframes fadeIn {
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -381,133 +319,114 @@
     <div id="game-session">
         <div class="listening-container active" id="listening-container">
             <div class="listening-pulse" id="pulse"></div>
-            <div class="listening-text" id="status-text">Listening</div>
-            <div class="listening-subtext" id="status-subtext">The Arbiter hears all</div>
+            <div class="listening-text" id="main-text">Listening</div>
+            <div class="listening-subtext" id="sub-text">The Arbiter hears all disputes</div>
         </div>
 
-        <div class="arbiter-status" id="arbiter-status">Waiting for dispute...</div>
-
-        <div class="conversation-log" id="conversation-log"></div>
-
-        <div class="debug-info" id="debug-info">Session time: 0:00 | Disputes: 0</div>
+        <div class="conversation-log" id="log"></div>
+        <div class="debug-info" id="debug">Session: 0:00 | Disputes: 0</div>
 
         <div class="status-bar">
             <div class="status-item">
-                <div class="status-dot active" id="mic-status"></div>
+                <div class="status-dot active"></div>
                 <span>Microphone Active</span>
             </div>
         </div>
     </div>
 
-    <!-- RULING OVERLAY -->
     <div id="ruling-overlay">
         <div class="ruling-card">
-            <div class="card-image-container" id="card-image-box">
-                <div style="color: #4a5568; text-align: center; padding-top: 180px;">Loading...</div>
+            <div class="card-image-container" id="card-box">
+                <div style="padding-top: 180px; text-align: center; color: #4a5568;">Loading...</div>
             </div>
-            
             <div class="ruling-content">
-                <div class="ruling-header-text">The Law Has Been Determined</div>
-                <div class="ruling-title" id="ruling-card-name">Card Name</div>
-                
-                <div class="arbiter-ruling" id="arbiter-ruling-text">
-                    The Arbiter is consulting the archives...
-                </div>
-
-                <div class="oracle-text-box">
+                <div class="ruling-title" id="card-name">Card</div>
+                <div class="arbiter-ruling" id="ruling-text">Ruling...</div>
+                <div class="oracle-box">
                     <h4>Oracle Text</h4>
-                    <p id="oracle-text">Loading...</p>
+                    <p id="oracle-text">...</p>
                 </div>
-
-                <button class="ruling-close" onclick="closeRuling()">The Stack Resolves. Continue.</button>
+                <button class="ruling-close" onclick="closeRuling()">Continue</button>
             </div>
         </div>
     </div>
 
     <script>
         // ============================================
-        // SESSION DATA
+        // DATA
         // ============================================
         window.sessionData = {
             startTime: new Date().toISOString(),
             endTime: null,
             players: ['Player 1', 'Player 2', 'Player 3', 'Player 4'],
-            events: [],
             disputes: [],
             winner: 'Unknown'
         };
 
         let disputeCount = 0;
-        let recognition;
-        let conversationState = 'listening'; // listening, asking_card, asking_context, searching, ruling
+        let recognition = null;
+        let isProcessing = false;
+        let expectingCardName = false;
         let currentDispute = null;
-        let silenceTimer = null;
 
         // ============================================
-        // TIMER & DEBUG INFO
+        // UI HELPERS
         // ============================================
-        function updateDebugInfo() {
+        function updateStatus(main, sub, type = 'normal') {
+            document.getElementById('main-text').textContent = main;
+            document.getElementById('sub-text').textContent = sub;
+            const pulse = document.getElementById('pulse');
+            pulse.classList.remove('thinking', 'speaking');
+            if (type === 'thinking') pulse.classList.add('thinking');
+            if (type === 'speaking') pulse.classList.add('speaking');
+        }
+
+        function addLog(text, speaker) {
+            const log = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${speaker}`;
+            entry.textContent = text;
+            log.appendChild(entry);
+            if (log.children.length > 4) log.removeChild(log.firstChild);
+        }
+
+        function updateTimer() {
             const elapsed = Math.floor((new Date() - new Date(window.sessionData.startTime)) / 1000);
             const mins = Math.floor(elapsed / 60);
             const secs = elapsed % 60;
-            document.getElementById('debug-info').textContent = 
-                `Session time: ${mins}:${secs.toString().padStart(2, '0')} | Disputes: ${disputeCount}`;
+            document.getElementById('debug').textContent = 
+                `Session: ${mins}:${secs.toString().padStart(2, '0')} | Disputes: ${disputeCount}`;
         }
-        setInterval(updateDebugInfo, 1000);
-        updateDebugInfo();
-
-        function addLogEntry(text, speaker) {
-            const log = document.getElementById('conversation-log');
-            const entry = document.createElement('div');
-            entry.className = `log-entry ${speaker}`;
-            entry.textContent = `${speaker === 'arbiter' ? 'Arbiter: ' : 'You: '}${text}`;
-            log.appendChild(entry);
-            log.scrollTop = log.scrollHeight;
-            
-            // Keep only last 3 entries
-            while (log.children.length > 3) {
-                log.removeChild(log.firstChild);
-            }
-        }
+        setInterval(updateTimer, 1000);
 
         // ============================================
-        // ARBITER SPEECH
+        // SPEECH
         // ============================================
-        function speak(text, callback) {
+        function speak(text, onDone) {
             if (!('speechSynthesis' in window)) {
-                if (callback) callback();
+                if (onDone) setTimeout(onDone, 1000);
                 return;
             }
 
-            // Update UI to show speaking
-            document.getElementById('pulse').classList.add('speaking');
-            document.getElementById('status-text').textContent = 'Arbiter Speaking';
-            document.getElementById('status-subtext').textContent = text.substring(0, 60) + '...';
+            updateStatus('Arbiter Speaking', text.substring(0, 50) + '...', 'speaking');
+            addLog('Arbiter: ' + text, 'arbiter');
 
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 0.85;
-            utterance.pitch = 0.9;
-            utterance.volume = 1;
-
-            // Try to find a good voice
+            const u = new SpeechSynthesisUtterance(text);
+            u.rate = 0.9;
+            u.pitch = 0.9;
+            
             const voices = speechSynthesis.getVoices();
-            const preferredVoice = voices.find(v => v.name.includes('Google US English')) ||
-                                  voices.find(v => v.name.includes('Samantha')) ||
-                                  voices.find(v => v.lang === 'en-US');
-            if (preferredVoice) utterance.voice = preferredVoice;
+            const v = voices.find(x => x.name.includes('Google US')) || 
+                     voices.find(x => x.name.includes('Samantha')) ||
+                     voices.find(x => x.lang === 'en-US');
+            if (v) u.voice = v;
 
-            utterance.onend = () => {
-                document.getElementById('pulse').classList.remove('speaking');
-                if (callback) callback();
+            u.onend = () => {
+                updateStatus('Listening', 'Speak to the Arbiter');
+                if (onDone) onDone();
             };
 
-            utterance.onerror = () => {
-                document.getElementById('pulse').classList.remove('speaking');
-                if (callback) callback();
-            };
-
-            speechSynthesis.speak(utterance);
-            addLogEntry(text, 'arbiter');
+            speechSynthesis.speak(u);
         }
 
         // ============================================
@@ -522,225 +441,140 @@
         }
 
         // ============================================
-        // SCRYFALL API
+        // SCRYFALL
         // ============================================
-        async function searchCard(cardName) {
+        async function findCard(name) {
             try {
-                const response = await fetch(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(cardName)}`);
-                if (!response.ok) throw new Error('Card not found');
-                return await response.json();
-            } catch (error) {
+                const r = await fetch(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(name)}`);
+                if (!r.ok) return null;
+                return await r.json();
+            } catch (e) {
                 return null;
             }
         }
 
         // ============================================
-        // CONVERSATION FLOW
+        // RULING DISPLAY
         // ============================================
-        function startDispute(text) {
-            conversationState = 'asking_card';
-            currentDispute = {
-                initialText: text,
-                timestamp: new Date().toISOString()
-            };
+        async function showRuling(cardName) {
+            isProcessing = true;
+            updateStatus('Searching', `Looking for ${cardName}...`, 'thinking');
 
-            document.getElementById('arbiter-status').textContent = 'Clarifying dispute...';
-            document.getElementById('arbiter-status').classList.add('visible');
+            const card = await findCard(cardName);
 
-            // Arbiter asks for card name
-            const questions = [
-                "A dispute echoes through the aether. What card is the subject of this question?",
-                "The threads of fate tangle. Speak the name of the card in question.",
-                "I sense confusion. Name the card you seek clarity upon.",
-                "The Law requires specifics. What card do you ask about?"
-            ];
-            
-            const question = questions[Math.floor(Math.random() * questions.length)];
-            speak(question, () => {
-                conversationState = 'waiting_card';
-                document.getElementById('status-text').textContent = 'Say Card Name';
-                document.getElementById('status-subtext').textContent = 'Speak the name of the card clearly';
-                startSilenceTimer(10); // 10 seconds to respond
-            });
-        }
-
-        function handleCardResponse(text) {
-            clearSilenceTimer();
-            currentDispute.cardName = text;
-            addLogEntry(text, 'player');
-
-            // Check if we need more context
-            const needsContext = !currentDispute.initialText.toLowerCase().includes('target') &&
-                                !currentDispute.initialText.toLowerCase().includes('destroy') &&
-                                !currentDispute.initialText.toLowerCase().includes('counter');
-
-            if (needsContext) {
-                conversationState = 'asking_context';
-                const contextQuestions = [
-                    `You asked about ${text}. Describe the situation briefly.`,
-                    `${text} you say? What is happening in the game right now?`,
-                    `Tell me quickly: what are you trying to do with ${text}?`
-                ];
-                
-                const question = contextQuestions[Math.floor(Math.random() * contextQuestions.length)];
-                speak(question, () => {
-                    conversationState = 'waiting_context';
-                    document.getElementById('status-text').textContent = 'Describe Situation';
-                    document.getElementById('status-subtext').textContent = 'Briefly explain what is happening';
-                    startSilenceTimer(15);
+            if (!card) {
+                speak(`I cannot find ${cardName}. Speak the name again.`, () => {
+                    expectingCardName = true;
+                    isProcessing = false;
+                    updateStatus('Say Card Name', 'Speak clearly');
                 });
-            } else {
-                // Enough info, search immediately
-                currentDispute.context = currentDispute.initialText;
-                searchAndRule();
+                return;
             }
-        }
 
-        function handleContextResponse(text) {
-            clearSilenceTimer();
-            currentDispute.context = text;
-            addLogEntry(text, 'player');
-            searchAndRule();
-        }
-
-        async function searchAndRule() {
-            conversationState = 'searching';
-            document.getElementById('pulse').classList.add('thinking');
-            document.getElementById('status-text').textContent = 'Consulting Archives';
-            document.getElementById('status-subtext').textContent = 'The Arbiter searches the comprehensive rules...';
-
-            const cardData = await searchCard(currentDispute.cardName);
-
-            if (cardData) {
-                currentDispute.cardData = cardData;
-                showRuling(cardData);
-            } else {
-                // Card not found, ask again
-                conversationState = 'asking_card';
-                speak(`I cannot find ${currentDispute.cardName} in the archives. Speak the name again, clearly.`, () => {
-                    conversationState = 'waiting_card';
-                    document.getElementById('status-text').textContent = 'Say Card Name';
-                    document.getElementById('status-subtext').textContent = 'Try again with exact card name';
-                    startSilenceTimer(10);
-                });
-            }
-        }
-
-        function showRuling(cardData) {
-            conversationState = 'ruling';
-            document.getElementById('pulse').classList.remove('thinking');
+            // Found card - show ruling
+            currentDispute.cardData = card;
             
-            // Update overlay
-            document.getElementById('ruling-card-name').textContent = cardData.name;
-            document.getElementById('oracle-text').textContent = cardData.oracle_text || 'No oracle text available.';
+            document.getElementById('card-name').textContent = card.name;
+            document.getElementById('oracle-text').textContent = card.oracle_text || 'No oracle text.';
             
-            if (cardData.image_uris) {
-                document.getElementById('card-image-box').innerHTML = 
-                    `<img src="${cardData.image_uris.normal}" class="card-image" alt="${cardData.name}">`;
+            if (card.image_uris) {
+                document.getElementById('card-box').innerHTML = 
+                    `<img src="${card.image_uris.normal}" class="card-image">`;
             }
 
             // Generate ruling
-            const rulings = [
-                `The card ${cardData.name} functions as printed. ${getSimpleExplanation(cardData)}`,
-                `Regarding ${cardData.name}: ${getContextualRuling(cardData, currentDispute.context)}`,
-                `The Law is clear on ${cardData.name}. ${cardData.oracle_text || 'Follow the printed text.'}`
-            ];
-            
-            const ruling = rulings[Math.floor(Math.random() * rulings.length)];
-            document.getElementById('arbiter-ruling-text').textContent = ruling;
+            let ruling = `Regarding ${card.name}: `;
+            if (card.oracle_text) {
+                ruling += card.oracle_text.substring(0, 100) + 
+                         (card.oracle_text.length > 100 ? '...' : '');
+            } else {
+                ruling += 'Follow the printed text.';
+            }
 
-            // Show overlay
+            document.getElementById('ruling-text').textContent = ruling;
             document.getElementById('ruling-overlay').classList.add('active');
 
-            // Speak ruling
             speak(ruling, () => {
-                speak("The stack resolves. Continue your game.");
+                speak('The stack resolves. Continue.', () => {
+                    isProcessing = false;
+                    expectingCardName = false;
+                });
             });
 
-            // Save dispute
+            // Save
             window.sessionData.disputes.push(currentDispute);
             disputeCount++;
-            updateDebugInfo();
-
-            // Reset after delay
-            setTimeout(() => {
-                conversationState = 'listening';
-                document.getElementById('status-text').textContent = 'Listening';
-                document.getElementById('status-subtext').textContent = 'The Arbiter hears all';
-                document.getElementById('arbiter-status').classList.remove('visible');
-            }, 2000);
-        }
-
-        function getSimpleExplanation(cardData) {
-            if (cardData.type_line.includes('Creature')) return 'It enters the battlefield and can attack or block as permitted by the rules.';
-            if (cardData.type_line.includes('Instant')) return 'It can be cast at any time you have priority.';
-            if (cardData.type_line.includes('Sorcery')) return 'It can only be cast during your main phase when the stack is empty.';
-            return 'Follow the instructions printed on the card in order.';
-        }
-
-        function getContextualRuling(cardData, context) {
-            const lowerContext = (context || '').toLowerCase();
-            
-            if (lowerContext.includes('target')) {
-                return 'Targets are chosen when the spell or ability is put on the stack. All targets must be legal.';
-            }
-            if (lowerContext.includes('destroy')) {
-                return 'Destroyed creatures go to the graveyard. Regeneration or indestructible can prevent this.';
-            }
-            if (lowerContext.includes('counter')) {
-                return 'A countered spell is removed from the stack and goes to the graveyard. Its effects do not occur.';
-            }
-            if (lowerContext.includes('trigger')) {
-                return 'Triggers go on the stack when the triggering event occurs and resolve like other spells/abilities.';
-            }
-            return getSimpleExplanation(cardData);
         }
 
         function closeRuling() {
             document.getElementById('ruling-overlay').classList.remove('active');
-            document.getElementById('status-text').textContent = 'Listening';
-            document.getElementById('status-subtext').textContent = 'The Arbiter hears all';
-            document.getElementById('pulse').classList.remove('thinking');
-            conversationState = 'listening';
+            updateStatus('Listening', 'The Arbiter hears all disputes');
+            isProcessing = false;
+            expectingCardName = false;
             currentDispute = null;
         }
 
-        function startSilenceTimer(seconds) {
-            clearSilenceTimer();
-            silenceTimer = setTimeout(() => {
-                if (conversationState === 'waiting_card') {
-                    speak("I am waiting. Speak the card name.", () => {
-                        startSilenceTimer(10);
-                    });
-                } else if (conversationState === 'waiting_context') {
-                    speak("No matter. I shall determine the ruling from what I know.", () => {
-                        currentDispute.context = 'Not provided';
-                        searchAndRule();
-                    });
-                }
-            }, seconds * 1000);
-        }
+        // ============================================
+        // MAIN LOGIC
+        // ============================================
+        function handleSpeech(text) {
+            console.log('Heard:', text, 'Processing:', isProcessing, 'Expecting:', expectingCardName);
+            
+            if (isProcessing && !expectingCardName) return;
 
-        function clearSilenceTimer() {
-            if (silenceTimer) {
-                clearTimeout(silenceTimer);
-                silenceTimer = null;
+            const lower = text.toLowerCase();
+            addLog('You: ' + text, 'player');
+
+            // If we're expecting a card name
+            if (expectingCardName) {
+                currentDispute = {
+                    timestamp: new Date().toISOString(),
+                    cardName: text,
+                    context: ''
+                };
+                showRuling(text);
+                return;
+            }
+
+            // Check for dispute triggers
+            const triggers = ['wait', 'hold on', 'can you', 'does that', 'is that', 
+                            "you can't", 'illegal', 'wrong', 'target', 'stack', 
+                            'priority', 'trigger', 'combat', 'destroy', 'counter'];
+            
+            const isDispute = triggers.some(t => lower.includes(t));
+            
+            if (isDispute) {
+                isProcessing = true;
+                currentDispute = { initialText: text, timestamp: new Date().toISOString() };
+                
+                const questions = [
+                    'A dispute! What card are you asking about?',
+                    'The Law requires clarity. Name the card.',
+                    'I sense confusion. Speak the card name.'
+                ];
+                
+                const q = questions[Math.floor(Math.random() * questions.length)];
+                
+                speak(q, () => {
+                    expectingCardName = true;
+                    updateStatus('Say Card Name', 'Speak the card name clearly');
+                });
             }
         }
 
         // ============================================
-        // MAIN SPEECH RECOGNITION
+        // SPEECH RECOGNITION SETUP
         // ============================================
-        function initSpeechRecognition() {
+        function setupRecognition() {
             if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                alert('Speech recognition not supported. Please use Chrome.');
+                alert('Please use Chrome for voice features');
                 return;
             }
 
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
             recognition.continuous = true;
-            recognition.interimResults = true;
+            recognition.interimResults = false;
             recognition.lang = 'en-US';
 
             recognition.onstart = () => {
@@ -748,60 +582,43 @@
             };
 
             recognition.onend = () => {
-                document.getElementById('listening-container').classList.remove('active');
-                setTimeout(() => recognition.start(), 100);
+                // Restart immediately
+                setTimeout(() => {
+                    if (recognition) recognition.start();
+                }, 100);
             };
 
             recognition.onresult = (event) => {
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0].transcript;
-                    
-                    if (event.results[i].isFinal) {
-                        console.log('State:', conversationState, 'Heard:', transcript);
-                        
-                        if (conversationState === 'listening') {
-                            // Check for dispute triggers
-                            const lower = transcript.toLowerCase();
-                            const isDispute = ['wait', 'hold on', 'can you', 'does that', 'is that', 
-                                             'you can't', 'illegal', 'wrong', 'target', 'stack', 
-                                             'priority', 'trigger', 'combat'].some(word => lower.includes(word));
-                            
-                            if (isDispute) {
-                                addLogEntry(transcript, 'player');
-                                startDispute(transcript);
-                            }
-                        } else if (conversationState === 'waiting_card') {
-                            handleCardResponse(transcript);
-                        } else if (conversationState === 'waiting_context') {
-                            handleContextResponse(transcript);
-                        }
-                    }
-                }
+                const text = event.results[event.results.length - 1][0].transcript;
+                handleSpeech(text);
             };
 
             recognition.onerror = (e) => {
-                console.log('Speech error:', e.error);
-                setTimeout(() => recognition.start(), 1000);
+                console.log('Error:', e.error);
+                // Auto-restart on error
+                setTimeout(() => {
+                    if (recognition) recognition.start();
+                }, 500);
             };
 
             recognition.start();
         }
 
-        // Initialize voices then start
+        // Start
         if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = initSpeechRecognition;
+            speechSynthesis.onvoiceschanged = setupRecognition;
         } else {
-            initSpeechRecognition();
+            setupRecognition();
         }
 
         // ============================================
-        // PARTICLE SYSTEM
+        // PARTICLES
         // ============================================
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
 
-        function resizeCanvas() {
+        function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
@@ -811,29 +628,23 @@
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
                 this.size = Math.random() * 2 + 0.5;
-                this.speedX = (Math.random() - 0.5) * 0.5;
-                this.speedY = (Math.random() - 0.5) * 0.5;
-                this.opacity = Math.random() * 0.5 + 0.1;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.alpha = Math.random() * 0.5 + 0.1;
                 this.color = Math.random() > 0.5 ? '#00a7b5' : '#c9a86a';
             }
             update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-                    this.reset();
-                }
-            }
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
             }
             draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.globalAlpha = this.opacity;
                 ctx.fill();
-                ctx.globalAlpha = 1;
             }
         }
 
@@ -842,16 +653,16 @@
             for (let i = 0; i < 50; i++) particles.push(new Particle());
         }
 
-        function animateParticles() {
+        function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animateParticles);
+            requestAnimationFrame(animate);
         }
 
-        window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
-        resizeCanvas();
+        window.addEventListener('resize', () => { resize(); initParticles(); });
+        resize();
         initParticles();
-        animateParticles();
+        animate();
     </script>
 </body>
 </html>
