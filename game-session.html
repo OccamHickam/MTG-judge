@@ -173,20 +173,22 @@
             text-align: center;
         }
 
+        /* RULING OVERLAY - ENHANCED */
         #ruling-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(5, 5, 10, 0.95);
+            background: rgba(5, 5, 10, 0.98);
             z-index: 100;
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 60px;
+            justify-content: flex-start;
+            padding: 40px;
             backdrop-filter: blur(20px);
+            overflow-y: auto;
         }
 
         #ruling-overlay.active {
@@ -195,12 +197,13 @@
 
         .ruling-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
+            width: 100%;
         }
 
         .ruling-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
+            font-size: 48px;
+            margin-bottom: 15px;
             animation: iconPulse 2s ease-in-out infinite;
         }
 
@@ -210,7 +213,7 @@
         }
 
         .ruling-announcement {
-            font-size: 14px;
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 4px;
             color: #c9a86a;
@@ -218,60 +221,146 @@
         }
 
         .ruling-title {
-            font-size: 42px;
+            font-size: 32px;
             font-weight: 300;
             color: #e0e0ff;
             text-shadow: 0 0 30px rgba(0, 167, 181, 0.3);
         }
 
-        .ruling-content {
-            max-width: 800px;
+        /* CARD DISPLAY */
+        .card-display {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            max-width: 900px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .card-image-container {
+            flex-shrink: 0;
+            width: 250px;
+            height: 350px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            border: 2px solid rgba(0, 167, 181, 0.3);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .card-placeholder {
+            color: #4a5568;
+            font-size: 14px;
             text-align: center;
         }
 
-        .ruling-rule {
+        .ruling-content {
+            flex: 1;
+            text-align: left;
+        }
+
+        .card-name {
             font-size: 28px;
             color: #00a7b5;
-            margin-bottom: 30px;
-            line-height: 1.4;
+            margin-bottom: 10px;
             font-weight: 500;
         }
 
-        .ruling-explanation {
-            font-size: 20px;
+        .arbiter-dialogue {
+            background: rgba(0, 167, 181, 0.1);
+            border-left: 4px solid #00a7b5;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #e0e0ff;
+            line-height: 1.6;
+        }
+
+        .arbiter-dialogue::before {
+            content: '"';
+            font-size: 40px;
+            color: #00a7b5;
+            float: left;
+            margin-right: 10px;
+            line-height: 1;
+        }
+
+        .ruling-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 167, 181, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .ruling-section h3 {
+            color: #c9a86a;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .ruling-section p {
             color: #8892b0;
             line-height: 1.6;
-            margin-bottom: 30px;
         }
 
-        .ruling-action {
-            background: rgba(0, 167, 181, 0.1);
-            border: 1px solid rgba(0, 167, 181, 0.3);
-            border-radius: 12px;
-            padding: 25px 40px;
-            font-size: 22px;
-            color: #e0e0ff;
-            font-weight: 500;
+        .official-rulings {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .ruling-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            border-left: 3px solid #c9a86a;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 167, 181, 0.3);
+            border-top-color: #00a7b5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .ruling-close {
-            position: absolute;
-            bottom: 60px;
+            margin-top: 20px;
+            padding: 15px 40px;
+            background: transparent;
+            border: 2px solid #00a7b5;
+            color: #00a7b5;
             font-size: 14px;
-            color: #4a5568;
             text-transform: uppercase;
             letter-spacing: 2px;
             cursor: pointer;
-            transition: color 0.3s ease;
-            background: none;
-            border: none;
+            transition: all 0.3s ease;
+            border-radius: 25px;
         }
 
         .ruling-close:hover {
-            color: #00a7b5;
+            background: #00a7b5;
+            color: white;
         }
     </style>
-<base target="_blank">
 </head>
 <body>
     <canvas id="particle-canvas"></canvas>
@@ -295,23 +384,31 @@
         </div>
     </div>
 
+    <!-- ENHANCED RULING OVERLAY -->
     <div id="ruling-overlay">
         <div class="ruling-header">
             <div class="ruling-icon">⚖️</div>
             <div class="ruling-announcement">A disturbance ripples through the aether</div>
-            <div class="ruling-title">Dispute Detected</div>
+            <div class="ruling-title">The Law Has Been Determined</div>
         </div>
-        <div class="ruling-content">
-            <div class="ruling-rule" id="ruling-rule">The Law has heard your question...</div>
-            <div class="ruling-explanation" id="ruling-explanation"></div>
-            <div class="ruling-action" id="ruling-action">Consulting the archives...</div>
+
+        <div class="card-display" id="card-display">
+            <div class="card-image-container">
+                <div class="card-placeholder" id="card-image">Searching for card...</div>
+            </div>
+            
+            <div class="ruling-content" id="ruling-content">
+                <div class="loading-spinner"></div>
+                <p style="text-align: center; color: #4a5568;">The Arbiter consults the archives...</p>
+            </div>
         </div>
-        <button class="ruling-close" onclick="closeRuling()">Click to Continue</button>
+
+        <button class="ruling-close" onclick="closeRuling()">The Stack Resolves. Continue.</button>
     </div>
 
     <script>
         // ============================================
-        // SESSION DATA - Global variable accessible everywhere
+        // SESSION DATA
         // ============================================
         window.sessionData = {
             startTime: new Date().toISOString(),
@@ -324,6 +421,7 @@
 
         let disputeCount = 0;
         let recognition;
+        let currentCardData = null;
 
         // ============================================
         // TIMER & DEBUG INFO
@@ -340,58 +438,239 @@
         updateDebugInfo();
 
         // ============================================
-        // END SESSION - FIXED VERSION
+        // END SESSION
         // ============================================
         function endSession() {
             console.log('=== ENDING SESSION ===');
             
-            // Update session data
             window.sessionData.endTime = new Date().toISOString();
             window.sessionData.gameLength = Math.floor((new Date() - new Date(window.sessionData.startTime)) / 1000);
             
-            console.log('Session data to save:', window.sessionData);
-            
-            // Save to localStorage - USING CONSISTENT KEY
             const dataString = JSON.stringify(window.sessionData);
             localStorage.setItem('veritas_session', dataString);
             
-            // Verify it saved
-            const verify = localStorage.getItem('veritas_session');
-            console.log('Verified saved data:', verify);
-            console.log('Parse test:', JSON.parse(verify));
-            
-            // Stop speech recognition before leaving
             if (recognition) {
                 recognition.stop();
             }
             
-            // Redirect to analysis
-            console.log('Redirecting to analysis.html...');
             window.location.href = 'analysis.html';
         }
 
         // ============================================
-        // RULING OVERLAY
+        // CARD NAME EXTRACTION
         // ============================================
-        function showRuling(text) {
-            document.getElementById('ruling-rule').textContent = 'Question: "' + text + '"';
-            document.getElementById('ruling-explanation').textContent = 
-                'The Arbiter is consulting the comprehensive rules...';
-            document.getElementById('ruling-action').textContent = 
-                'Please wait while the Law is determined.';
-            document.getElementById('ruling-overlay').classList.add('active');
+        function extractCardName(text) {
+            // Common MTG card name patterns
+            const patterns = [
+                /target\s+my\s+(\w+(?:\s+\w+)*)/i,
+                /target\s+(\w+(?:\s+\w+)*)/i,
+                /cast\s+(\w+(?:\s+\w+)*)/i,
+                /play\s+(\w+(?:\s+\w+)*)/i,
+                /(\w+(?:\s+\w+)*)\s+trigger/i,
+                /(\w+(?:\s+\w+)*)\s+ability/i,
+                /destroy\s+(\w+(?:\s+\w+)*)/i,
+                /exile\s+(\w+(?:\s+\w+)*)/i,
+                /return\s+(\w+(?:\s+\w+)*)/i,
+                /(\w+(?:\s+\w+)*)\s+enters/i,
+                /when\s+(\w+(?:\s+\w+)*)/i,
+                /if\s+(\w+(?:\s+\w+)*)/i
+            ];
 
+            for (const pattern of patterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    return match[1].trim();
+                }
+            }
+
+            // If no pattern matches, return the most capitalized word sequence
+            const words = text.split(/\s+/);
+            let bestGuess = '';
+            let currentSequence = '';
+            
+            for (const word of words) {
+                if (word[0] && word[0] === word[0].toUpperCase()) {
+                    currentSequence += (currentSequence ? ' ' : '') + word;
+                } else {
+                    if (currentSequence.length > bestGuess.length) {
+                        bestGuess = currentSequence;
+                    }
+                    currentSequence = '';
+                }
+            }
+            
+            return bestGuess || text;
+        }
+
+        // ============================================
+        // SCRYFALL API SEARCH
+        // ============================================
+        async function searchCard(cardName) {
+            try {
+                const response = await fetch(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(cardName)}`);
+                if (!response.ok) throw new Error('Card not found');
+                return await response.json();
+            } catch (error) {
+                console.error('Scryfall search failed:', error);
+                return null;
+            }
+        }
+
+        async function getCardRulings(cardId) {
+            try {
+                const response = await fetch(`https://api.scryfall.com/cards/${cardId}/rulings`);
+                if (!response.ok) throw new Error('No rulings found');
+                const data = await response.json();
+                return data.data || [];
+            } catch (error) {
+                console.error('Rulings fetch failed:', error);
+                return [];
+            }
+        }
+
+        // ============================================
+        // ARBITER DIALOGUE GENERATOR
+        // ============================================
+        function generateArbiterDialogue(cardName, oracleText, context) {
+            const openers = [
+                "The threads of fate have brought this matter before me.",
+                "I have gazed into the aether and the Law is clear.",
+                "Your dispute echoes across the planes. Hear now my judgment.",
+                "The scales tip toward clarity. Listen well.",
+                "I have walked the blind eternities to bring you this truth."
+            ];
+
+            const explanations = [
+                `The card ${cardName} operates within the comprehensive rules as follows.`,
+                `The mechanics of ${cardName} are bound by these principles.`,
+                `This Arbiter has consulted the ancient texts regarding ${cardName}.`,
+                `The interaction you question is governed by these laws.`
+            ];
+
+            const closers = [
+                "The stack resolves. Continue your game.",
+                "May this knowledge guide your path to victory.",
+                "The Law has spoken. Play on.",
+                "With clarity comes power. Use it wisely."
+            ];
+
+            const opener = openers[Math.floor(Math.random() * openers.length)];
+            const explanation = explanations[Math.floor(Math.random() * explanations.length)];
+            const closer = closers[Math.floor(Math.random() * closers.length)];
+
+            return {
+                opener: opener,
+                explanation: explanation,
+                closer: closer
+            };
+        }
+
+        // ============================================
+        // DISPLAY RULING
+        // ============================================
+        async function showRuling(text) {
+            const cardName = extractCardName(text);
+            console.log('Detected card name:', cardName);
+
+            // Show overlay immediately with loading state
+            document.getElementById('ruling-overlay').classList.add('active');
+            document.getElementById('card-image').innerHTML = 'Searching for card...';
+            document.getElementById('ruling-content').innerHTML = `
+                <div class="loading-spinner"></div>
+                <p style="text-align: center; color: #4a5568;">The Arbiter consults the archives...</p>
+            `;
+
+            // Search for card
+            const cardData = await searchCard(cardName);
+            currentCardData = cardData;
+
+            let rulings = [];
+            if (cardData) {
+                rulings = await getCardRulings(cardData.id);
+            }
+
+            // Generate dialogue
+            const dialogue = generateArbiterDialogue(
+                cardData ? cardData.name : cardName,
+                cardData ? cardData.oracle_text : '',
+                text
+            );
+
+            // Build display
+            let html = '';
+
+            // Arbiter dialogue
+            html += `<div class="arbiter-dialogue">${dialogue.opener} ${dialogue.explanation}</div>`;
+
+            // Card info
+            if (cardData) {
+                html += `<div class="card-name">${cardData.name}</div>`;
+                
+                // Oracle text
+                html += `
+                    <div class="ruling-section">
+                        <h3>Oracle Text</h3>
+                        <p>${cardData.oracle_text || 'No oracle text available.'}</p>
+                    </div>
+                `;
+
+                // Official rulings
+                if (rulings.length > 0) {
+                    html += `
+                        <div class="ruling-section">
+                            <h3>Official Rulings</h3>
+                            <div class="official-rulings">
+                    `;
+                    
+                    rulings.slice(0, 3).forEach(ruling => {
+                        html += `<div class="ruling-item">${ruling.comment}</div>`;
+                    });
+                    
+                    html += `</div></div>`;
+                }
+
+                // Update card image
+                const imageUrl = cardData.image_uris ? cardData.image_uris.normal : 
+                                (cardData.card_faces && cardData.card_faces[0].image_uris ? 
+                                 cardData.card_faces[0].image_uris.normal : null);
+                
+                if (imageUrl) {
+                    document.getElementById('card-image').innerHTML = 
+                        `<img src="${imageUrl}" class="card-image" alt="${cardData.name}">`;
+                } else {
+                    document.getElementById('card-image').innerHTML = 
+                        `<div class="card-placeholder">No image available<br>for ${cardData.name}</div>`;
+                }
+            } else {
+                html += `
+                    <div class="ruling-section">
+                        <h3>General Ruling</h3>
+                        <p>The Arbiter could not locate the specific card "${cardName}" in the archives. 
+                        However, based on your question "${text}", remember that targets must be legal 
+                        when chosen and the spell or ability must have a valid target to be put on the stack.</p>
+                    </div>
+                `;
+                document.getElementById('card-image').innerHTML = 
+                    `<div class="card-placeholder">Card not found:<br>${cardName}</div>`;
+            }
+
+            // Add closer
+            html += `<div class="arbiter-dialogue" style="border-left-color: #c9a86a; background: rgba(201, 168, 106, 0.1);">${dialogue.closer}</div>`;
+
+            document.getElementById('ruling-content').innerHTML = html;
+
+            // Speak the ruling
             if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(
-                    'A disturbance ripples through the aether. The Law has heard.'
-                );
+                const utterance = new SpeechSynthesisUtterance(dialogue.opener);
                 utterance.rate = 0.8;
+                utterance.pitch = 0.9;
                 speechSynthesis.speak(utterance);
             }
         }
 
         function closeRuling() {
             document.getElementById('ruling-overlay').classList.remove('active');
+            currentCardData = null;
         }
 
         // ============================================
@@ -407,7 +686,7 @@
                 this.triggers = {
                     uncertainty: ['wait', 'hold on', 'does that', 'can you', 'not sure', 'confused'],
                     challenge: ["you can't", 'you cannot', 'illegal', 'wrong', 'not legal', 'invalid'],
-                    mtg_terms: ['target', 'stack', 'priority', 'trigger', 'combat', 'phase']
+                    mtg_terms: ['target', 'stack', 'priority', 'trigger', 'combat', 'phase', 'cast', 'destroy']
                 };
 
                 this.weights = { uncertainty: 2, challenge: 3, mtg_terms: 1 };
@@ -482,13 +761,12 @@
         function handleDispute(text) {
             disputeCount++;
             
-            // Add to session data - USING WINDOW.SESSIONDATA
             window.sessionData.disputes.push({
                 time: new Date().toISOString(),
                 text: text
             });
             
-            console.log('Dispute recorded:', window.sessionData.disputes);
+            console.log('Dispute recorded:', text);
             showRuling(text);
             updateDebugInfo();
         }
