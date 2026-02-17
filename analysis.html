@@ -134,9 +134,6 @@
         .insight-card h3 {
             color: #C9A86A;
             margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
         }
 
         .insight-card p {
@@ -156,11 +153,8 @@
             margin-right: 1rem;
         }
 
-        .grade-a { background: rgba(0, 167, 181, 0.3); color: #00A7B5; border: 2px solid #00A7B5; }
         .grade-b { background: rgba(0, 167, 181, 0.2); color: #00A7B5; }
         .grade-c { background: rgba(201, 168, 106, 0.2); color: #C9A86A; border: 2px solid #C9A86A; }
-        .grade-d { background: rgba(239, 68, 68, 0.2); color: #EF4444; }
-        .grade-f { background: rgba(239, 68, 68, 0.3); color: #EF4444; border: 2px solid #EF4444; }
 
         .player-card {
             display: flex;
@@ -239,12 +233,6 @@
             color: #64748B;
         }
 
-        .empty-state-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
         .btn {
             display: inline-block;
             padding: 0.75rem 1.5rem;
@@ -283,7 +271,6 @@
             border-radius: 0 4px 4px 0;
         }
 
-        .severity-high { border-left-color: #EF4444; background: rgba(239, 68, 68, 0.1); }
         .severity-medium { border-left-color: #C9A86A; }
         .severity-low { border-left-color: #00A7B5; background: rgba(0, 167, 181, 0.1); }
 
@@ -293,8 +280,18 @@
             padding-top: 2rem;
             border-top: 1px solid rgba(0, 167, 181, 0.2);
         }
+
+        .debug-box {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid red;
+            padding: 1rem;
+            margin: 1rem;
+            color: #ff6b6b;
+            font-family: monospace;
+            font-size: 12px;
+            display: none;
+        }
     </style>
-<base target="_blank">
 </head>
 <body>
     <div class="container">
@@ -303,22 +300,44 @@
             <p class="subtitle">The Arbiter's observations and insights</p>
         </header>
 
+        <div id="debug-info" class="debug-box"></div>
+
         <div id="content">
             <!-- Content will be populated by JavaScript -->
         </div>
     </div>
 
     <script>
-        // Load session data from localStorage - CORRECTED KEY
-        const sessionData = JSON.parse(localStorage.getItem('veritas_session') || 'null');
+        console.log('=== ANALYSIS PAGE LOADED ===');
         
+        // Try to get data from localStorage
+        const rawData = localStorage.getItem('veritas_session');
+        console.log('Raw data from localStorage:', rawData);
+        
+        let sessionData = null;
+        
+        try {
+            sessionData = JSON.parse(rawData);
+            console.log('Parsed session data:', sessionData);
+        } catch (e) {
+            console.error('Error parsing session data:', e);
+        }
+
         const content = document.getElementById('content');
 
+        // DEBUG: Show what's in localStorage
+        const debugDiv = document.getElementById('debug-info');
+        debugDiv.style.display = 'block';
+        debugDiv.innerHTML = `
+            <strong>Debug Info:</strong><br>
+            Raw localStorage: ${rawData ? rawData.substring(0, 100) + '...' : 'NULL'}<br>
+            Has data: ${sessionData ? 'YES' : 'NO'}<br>
+            Disputes: ${sessionData && sessionData.disputes ? sessionData.disputes.length : 0}
+        `;
+
         if (!sessionData) {
-            // Empty state - no session data found
             content.innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-state-icon">📊</div>
                     <h2>No Session Data Found</h2>
                     <p>Complete a game session to view analysis and insights.</p>
                     <br>
@@ -326,7 +345,7 @@
                 </div>
             `;
         } else {
-            // Calculate stats from ACTUAL session data
+            // Calculate stats
             const duration = sessionData.gameLength ? Math.floor(sessionData.gameLength / 60) : 
                 (sessionData.endTime && sessionData.startTime ? 
                 Math.floor((new Date(sessionData.endTime) - new Date(sessionData.startTime)) / 60000) : 0);
@@ -364,14 +383,14 @@
 
                 <div id="strategic" class="tab-content active">
                     <div class="insight-card">
-                        <h3>🎯 Critical Moments</h3>
+                        <h3>Critical Moments</h3>
                         <p>${disputes.length > 0 ? 
                             `Detected ${disputes.length} rule disputes requiring intervention. The Arbiter intervened to maintain order.` : 
                             'No critical disputes recorded. Game proceeded smoothly with minimal intervention required.'}</p>
                     </div>
                     
                     <div class="insight-card">
-                        <h3>⚠️ Areas for Improvement</h3>
+                        <h3>Areas for Improvement</h3>
                         <ul class="action-items">
                             ${disputes.length > 0 ? 
                                 `<li class="severity-medium">Review disputed rules - ${disputes.length} clarification${disputes.length > 1 ? 's' : ''} needed</li>` : 
@@ -381,7 +400,7 @@
                     </div>
 
                     <div class="insight-card">
-                        <h3>💡 Strategic Recommendations</h3>
+                        <h3>Strategic Recommendations</h3>
                         <p>Based on this session's flow:</p>
                         <ul style="margin-top: 0.5rem; margin-left: 1.5rem; color: #CBD5E1;">
                             <li>Maintain current pace (${duration} minutes optimal)</li>
@@ -415,34 +434,28 @@
                                 <div class="timeline-event">Dispute: "${dispute.text}"</div>
                             </div>
                         `).join('') : '<p style="color: #64748B;">No disputes recorded in this session.</p>'}
-                        ${events.length > 0 ? events.map((event, index) => `
-                            <div class="timeline-item">
-                                <div class="timeline-time">${new Date(event.timestamp).toLocaleTimeString()}</div>
-                                <div class="timeline-event">${event.type}: ${event.description || 'Event recorded'}</div>
-                            </div>
-                        `).join('') : ''}
                     </div>
                 </div>
 
                 <div id="meta" class="tab-content">
                     <div class="insight-card">
-                        <h3>📈 Session Patterns</h3>
+                        <h3>Session Patterns</h3>
                         <p>Session duration: ${duration} minutes | Disputes: ${disputes.length} | Players: ${sessionData.players ? sessionData.players.length : 0}</p>
                     </div>
                     
                     <div class="insight-card">
-                        <h3>🎴 Dispute Analysis</h3>
+                        <h3>Dispute Analysis</h3>
                         <p>${disputes.length > 0 ? `${disputes.length} total dispute${disputes.length > 1 ? 's' : ''} detected and resolved by the Arbiter.` : 'No disputes - smooth gameplay!'}</p>
                     </div>
 
                     <div class="insight-card">
-                        <h3>⚖️ Arbiter Performance</h3>
+                        <h3>Arbiter Performance</h3>
                         <p>All disputes were detected and rulings were issued in a timely manner.</p>
                     </div>
                 </div>
 
                 <div class="export-section">
-                    <button class="btn" onclick="exportSession()">📥 Export Session Data (JSON)</button>
+                    <button class="btn" onclick="exportSession()">Export Session Data (JSON)</button>
                 </div>
             `;
         }
