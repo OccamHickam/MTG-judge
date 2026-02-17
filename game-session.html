@@ -6,141 +6,345 @@
     <title>Veritas - Game Session</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #0a0a0f;
             color: #e0e0ff;
             overflow: hidden;
             height: 100vh;
+            width: 100vw;
+        }
+
+        /* Particle Canvas Background */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Main Game Session Container */
+        #game-session {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            background: radial-gradient(ellipse at center, rgba(20, 20, 40, 0.3) 0%, rgba(5, 5, 10, 0.9) 100%);
         }
-        .container {
+
+        /* Listening Indicator */
+        .listening-container {
             text-align: center;
-            z-index: 2;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
         }
-        .pulse {
-            width: 100px;
-            height: 100px;
+
+        .listening-container.active { opacity: 1; }
+
+        .listening-pulse {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 167, 181, 0.3) 0%, transparent 70%);
+            margin: 0 auto 30px;
+            position: relative;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .listening-pulse::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             background: radial-gradient(circle, rgba(0, 167, 181, 0.5) 0%, transparent 70%);
-            margin: 0 auto 20px;
-            animation: pulse 2s infinite;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
+            animation: pulse 3s ease-in-out infinite 0.5s;
         }
+
+        .listening-pulse::after {
+            content: '🎙️';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            filter: drop-shadow(0 0 10px rgba(0, 167, 181, 0.8));
+        }
+
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 0.6; }
             50% { transform: scale(1.1); opacity: 1; }
         }
-        .title {
-            font-size: 24px;
-            color: #00a7b5;
-            text-transform: uppercase;
+
+        .listening-text {
+            font-size: 18px;
             letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #00a7b5;
+            text-shadow: 0 0 20px rgba(0, 167, 181, 0.5);
             margin-bottom: 10px;
         }
-        .subtitle {
+
+        .listening-subtext {
+            font-size: 14px;
             color: #4a5568;
-            margin-bottom: 30px;
+            font-style: italic;
         }
-        .end-btn {
-            background: transparent;
+
+        /* End Session Button */
+        .end-session-btn {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 10, 15, 0.8);
             border: 2px solid #00a7b5;
             color: #00a7b5;
-            padding: 15px 40px;
-            border-radius: 30px;
-            font-size: 16px;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 2px;
             cursor: pointer;
-            margin-top: 20px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 10;
         }
-        .end-btn:hover {
+
+        .end-session-btn:hover {
             background: #00a7b5;
             color: white;
         }
-        .status {
-            margin-top: 30px;
-            color: #4a5568;
-            font-size: 14px;
+
+        /* Status Bar */
+        .status-bar {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            align-items: center;
         }
-        #ruling {
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4a5568;
+        }
+
+        .status-dot.active {
+            background: #00a7b5;
+            box-shadow: 0 0 10px rgba(0, 167, 181, 0.8);
+        }
+
+        /* Fullscreen Ruling Overlay */
+        #ruling-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(5, 5, 10, 0.95);
+            z-index: 100;
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 100;
+            padding: 60px;
+            backdrop-filter: blur(20px);
         }
-        #ruling.active { display: flex; }
-        .ruling-text {
-            font-size: 20px;
-            color: #00a7b5;
-            margin-bottom: 20px;
-            max-width: 600px;
+
+        #ruling-overlay.active { display: flex; }
+
+        .ruling-header {
             text-align: center;
-            padding: 20px;
+            margin-bottom: 40px;
         }
-        .close-btn {
-            background: #00a7b5;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 20px;
+
+        .ruling-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(0, 167, 181, 0.5)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(0, 167, 181, 0.8)); }
+        }
+
+        .ruling-announcement {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #c9a86a;
+            margin-bottom: 10px;
+        }
+
+        .ruling-title {
+            font-size: 42px;
+            font-weight: 300;
+            color: #e0e0ff;
+            text-shadow: 0 0 30px rgba(0, 167, 181, 0.3);
+        }
+
+        .ruling-content {
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .ruling-rule {
+            font-size: 28px;
+            color: #00a7b5;
+            margin-bottom: 30px;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        .ruling-explanation {
+            font-size: 20px;
+            color: #8892b0;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .ruling-action {
+            background: rgba(0, 167, 181, 0.1);
+            border: 1px solid rgba(0, 167, 181, 0.3);
+            border-radius: 12px;
+            padding: 25px 40px;
+            font-size: 22px;
+            color: #e0e0ff;
+            font-weight: 500;
+        }
+
+        .ruling-close {
+            position: absolute;
+            bottom: 60px;
+            font-size: 14px;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             cursor: pointer;
-            font-size: 16px;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+        }
+
+        .ruling-close:hover { color: #00a7b5; }
+
+        /* Debug Info */
+        .debug-info {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #4a5568;
+            font-size: 12px;
+            text-align: center;
         }
     </style>
 <base target="_blank">
 </head>
 <body>
-    <div class="container">
-        <div class="pulse">🎙️</div>
-        <div class="title">Listening</div>
-        <div class="subtitle">The Arbiter hears all</div>
-        <button class="end-btn" onclick="endSession()">End Session & Analyze</button>
-        <div class="status" id="status">Session: 0:00 | Disputes: 0</div>
+    <!-- Particle Canvas -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- End Session Button -->
+    <button class="end-session-btn" onclick="endSession()">← End Session & Analyze</button>
+
+    <!-- Main Game Session -->
+    <div id="game-session">
+        <div class="listening-container" id="listening-container">
+            <div class="listening-pulse"></div>
+            <div class="listening-text">Listening</div>
+            <div class="listening-subtext">The Arbiter hears all</div>
+        </div>
+
+        <div class="debug-info" id="debug-info">Session time: 0:00 | Disputes: 0</div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-dot active" id="mic-status"></div>
+                <span>Microphone Active</span>
+            </div>
+        </div>
     </div>
 
-    <div id="ruling">
-        <div class="ruling-text" id="ruling-text">Dispute detected!</div>
-        <button class="close-btn" onclick="closeRuling()">Continue</button>
+    <!-- Fullscreen Ruling Overlay -->
+    <div id="ruling-overlay">
+        <div class="ruling-header">
+            <div class="ruling-icon">⚖️</div>
+            <div class="ruling-announcement">A disturbance ripples through the aether</div>
+            <div class="ruling-title">Dispute Detected</div>
+        </div>
+        <div class="ruling-content">
+            <div class="ruling-rule" id="ruling-rule">The Law has heard your question...</div>
+            <div class="ruling-explanation" id="ruling-explanation"></div>
+            <div class="ruling-action" id="ruling-action">Consulting the archives...</div>
+        </div>
+        <button class="ruling-close" onclick="closeRuling()">Click to Continue</button>
     </div>
 
     <script>
-        // Session data
+        // ============================================
+        // SESSION DATA
+        // ============================================
         const sessionData = {
-            startTime: Date.now(),
+            startTime: new Date().toISOString(),
+            endTime: null,
+            players: ['Player 1', 'Player 2', 'Player 3', 'Player 4'],
             events: [],
-            disputes: []
+            disputes: [],
+            winner: 'Unknown'
         };
+
         let disputeCount = 0;
 
-        // Update status display
-        function updateStatus() {
-            const elapsed = Math.floor((Date.now() - sessionData.startTime) / 1000);
+        // ============================================
+        // TIMER & DEBUG INFO
+        // ============================================
+        function updateDebugInfo() {
+            const elapsed = Math.floor((new Date() - new Date(sessionData.startTime)) / 1000);
             const mins = Math.floor(elapsed / 60);
             const secs = elapsed % 60;
-            document.getElementById('status').textContent = 
-                `Session: ${mins}:${secs.toString().padStart(2, '0')} | Disputes: ${disputeCount}`;
+            document.getElementById('debug-info').textContent = 
+                `Session time: ${mins}:${secs.toString().padStart(2, '0')} | Disputes: ${disputeCount}`;
         }
-        setInterval(updateStatus, 1000);
+        setInterval(updateDebugInfo, 1000);
+        updateDebugInfo();
 
-        // End session
+        // ============================================
+        // END SESSION
+        // ============================================
         function endSession() {
-            console.log('Ending session');
-            sessionData.endTime = Date.now();
-            sessionData.gameLength = Math.floor((sessionData.endTime - sessionData.startTime) / 1000);
+            console.log('Ending session...');
+            sessionData.endTime = new Date().toISOString();
+            sessionData.gameLength = Math.floor((new Date() - new Date(sessionData.startTime)) / 1000);
 
             localStorage.setItem('veritas_session', JSON.stringify(sessionData));
             console.log('Saved:', sessionData);
@@ -148,56 +352,188 @@
             window.location.href = 'analysis.html';
         }
 
-        // Dispute detection
-        const triggers = ['wait', 'hold on', 'you can't', 'illegal', 'wrong', 'target', 'stack', 'priority'];
+        // ============================================
+        // RULING OVERLAY
+        // ============================================
+        function showRuling(text) {
+            document.getElementById('ruling-rule').textContent = 'Question: "' + text + '"';
+            document.getElementById('ruling-explanation').textContent = 
+                'The Arbiter is consulting the comprehensive rules...';
+            document.getElementById('ruling-action').textContent = 
+                'Please wait while the Law is determined.';
+            document.getElementById('ruling-overlay').classList.add('active');
+
+            // Speak
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(
+                    'A disturbance ripples through the aether. The Law has heard.'
+                );
+                utterance.rate = 0.8;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function closeRuling() {
+            document.getElementById('ruling-overlay').classList.remove('active');
+        }
+
+        // ============================================
+        // DISPUTE DETECTION
+        // ============================================
+        class DisputeDetector {
+            constructor() {
+                this.confidence = 0;
+                this.threshold = 3;
+                this.lastTriggerTime = 0;
+                this.cooldown = 5000;
+
+                this.triggers = {
+                    uncertainty: ['wait', 'hold on', 'does that', 'can you', 'not sure', 'confused'],
+                    challenge: ["you can't", 'you cannot', 'illegal', 'wrong', 'not legal', 'invalid'],
+                    mtg_terms: ['target', 'stack', 'priority', 'trigger', 'combat', 'phase']
+                };
+
+                this.weights = { uncertainty: 2, challenge: 3, mtg_terms: 1 };
+            }
+
+            analyze(text) {
+                const lowerText = text.toLowerCase();
+                let score = 0;
+
+                for (const [category, words] of Object.entries(this.triggers)) {
+                    for (const word of words) {
+                        if (lowerText.includes(word)) {
+                            score += this.weights[category];
+                        }
+                    }
+                }
+
+                const now = Date.now();
+                if (score >= this.threshold && (now - this.lastTriggerTime) > this.cooldown) {
+                    this.lastTriggerTime = now;
+                    return { detected: true, text: text };
+                }
+                return { detected: false };
+            }
+        }
+
+        const detector = new DisputeDetector();
+
+        // ============================================
+        // SPEECH RECOGNITION
+        // ============================================
+        let recognition;
 
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const recognition = new SpeechRecognition();
+            recognition = new SpeechRecognition();
             recognition.continuous = true;
-            recognition.interimResults = false;
+            recognition.interimResults = true;
             recognition.lang = 'en-US';
 
-            recognition.onresult = (event) => {
-                const text = event.results[event.results.length - 1][0].transcript.toLowerCase();
-                console.log('Heard:', text);
+            recognition.onstart = () => {
+                document.getElementById('listening-container').classList.add('active');
+                console.log('Listening started');
+            };
 
-                // Check for triggers
-                for (const trigger of triggers) {
-                    if (text.includes(trigger)) {
-                        console.log('Trigger found:', trigger);
-                        handleDispute(text);
-                        break;
+            recognition.onend = () => {
+                document.getElementById('listening-container').classList.remove('active');
+                setTimeout(() => recognition.start(), 100);
+            };
+
+            recognition.onresult = (event) => {
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        console.log('Heard:', transcript);
+                        const result = detector.analyze(transcript);
+                        if (result.detected) {
+                            handleDispute(result.text);
+                        }
                     }
                 }
             };
 
-            recognition.onerror = (e) => console.log('Error:', e.error);
+            recognition.onerror = (e) => {
+                console.log('Speech error:', e.error);
+                setTimeout(() => recognition.start(), 1000);
+            };
+
             recognition.start();
-            console.log('Listening started');
         } else {
-            alert('Speech recognition not supported. Use Chrome.');
+            alert('Speech recognition not supported. Please use Chrome.');
         }
 
-        // Handle dispute
         function handleDispute(text) {
             disputeCount++;
-            sessionData.disputes.push({ time: Date.now(), text: text });
+            sessionData.disputes.push({
+                time: new Date().toISOString(),
+                text: text
+            });
+            showRuling(text);
+            updateDebugInfo();
+        }
 
-            // Show ruling
-            document.getElementById('ruling-text').textContent = 'Dispute: "' + text + '"';
-            document.getElementById('ruling').classList.add('active');
+        // ============================================
+        // PARTICLE SYSTEM
+        // ============================================
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
 
-            // Speak
-            if ('speechSynthesis' in window) {
-                speechSynthesis.speak(new SpeechSynthesisUtterance('Dispute detected'));
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random() * 0.5 + 0.1;
+                this.color = Math.random() > 0.5 ? '#00a7b5' : '#c9a86a';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
+                ctx.fill();
+                ctx.globalAlpha = 1;
             }
         }
 
-        // Close ruling
-        function closeRuling() {
-            document.getElementById('ruling').classList.remove('active');
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle());
+            }
         }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+        resizeCanvas();
+        initParticles();
+        animateParticles();
     </script>
 </body>
 </html>
