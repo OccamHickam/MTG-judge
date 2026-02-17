@@ -173,7 +173,7 @@
             text-align: center;
         }
 
-        /* RULING OVERLAY - ENHANCED */
+        /* RULING OVERLAY */
         #ruling-overlay {
             position: fixed;
             top: 0;
@@ -225,6 +225,121 @@
             font-weight: 300;
             color: #e0e0ff;
             text-shadow: 0 0 30px rgba(0, 167, 181, 0.3);
+        }
+
+        /* QUESTION FORM */
+        .question-form {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 167, 181, 0.3);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .arbiter-question {
+            font-size: 20px;
+            color: #00a7b5;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .arbiter-question::before {
+            content: '"';
+            font-size: 30px;
+            color: #c9a86a;
+            margin-right: 5px;
+        }
+
+        .arbiter-question::after {
+            content: '"';
+            font-size: 30px;
+            color: #c9a86a;
+            margin-left: 5px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #94a3b8;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 167, 181, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            color: #e0e0ff;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #00a7b5;
+        }
+
+        .input-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .voice-input-btn {
+            background: rgba(0, 167, 181, 0.1);
+            border: 1px solid #00a7b5;
+            color: #00a7b5;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .voice-input-btn:hover {
+            background: #00a7b5;
+            color: white;
+        }
+
+        .voice-input-btn.recording {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: white;
+            animation: pulse 1s infinite;
+        }
+
+        .submit-btn {
+            background: #00a7b5;
+            border: none;
+            color: #0a0a0f;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #008a99;
+        }
+
+        .submit-btn:disabled {
+            background: #4a5568;
+            cursor: not-allowed;
         }
 
         /* CARD DISPLAY */
@@ -360,6 +475,30 @@
             background: #00a7b5;
             color: white;
         }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .step-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4a5568;
+            transition: all 0.3s;
+        }
+
+        .step-dot.active {
+            background: #00a7b5;
+            box-shadow: 0 0 10px rgba(0, 167, 181, 0.5);
+        }
+
+        .step-dot.complete {
+            background: #c9a86a;
+        }
     </style>
 </head>
 <body>
@@ -384,26 +523,23 @@
         </div>
     </div>
 
-    <!-- ENHANCED RULING OVERLAY -->
+    <!-- RULING OVERLAY -->
     <div id="ruling-overlay">
         <div class="ruling-header">
             <div class="ruling-icon">⚖️</div>
-            <div class="ruling-announcement">A disturbance ripples through the aether</div>
-            <div class="ruling-title">The Law Has Been Determined</div>
+            <div class="ruling-announcement" id="overlay-subtitle">A disturbance ripples through the aether</div>
+            <div class="ruling-title" id="overlay-title">Dispute Detected</div>
         </div>
 
-        <div class="card-display" id="card-display">
-            <div class="card-image-container">
-                <div class="card-placeholder" id="card-image">Searching for card...</div>
-            </div>
-            
-            <div class="ruling-content" id="ruling-content">
-                <div class="loading-spinner"></div>
-                <p style="text-align: center; color: #4a5568;">The Arbiter consults the archives...</p>
-            </div>
+        <div class="step-indicator" id="step-indicator" style="display: none;">
+            <div class="step-dot active" id="step-1"></div>
+            <div class="step-dot" id="step-2"></div>
+            <div class="step-dot" id="step-3"></div>
         </div>
 
-        <button class="ruling-close" onclick="closeRuling()">The Stack Resolves. Continue.</button>
+        <div id="overlay-content">
+            <!-- Dynamic content goes here -->
+        </div>
     </div>
 
     <script>
@@ -421,7 +557,8 @@
 
         let disputeCount = 0;
         let recognition;
-        let currentCardData = null;
+        let currentDispute = null;
+        let questionRecognition = null;
 
         // ============================================
         // TIMER & DEBUG INFO
@@ -441,69 +578,187 @@
         // END SESSION
         // ============================================
         function endSession() {
-            console.log('=== ENDING SESSION ===');
-            
             window.sessionData.endTime = new Date().toISOString();
             window.sessionData.gameLength = Math.floor((new Date() - new Date(window.sessionData.startTime)) / 1000);
             
-            const dataString = JSON.stringify(window.sessionData);
-            localStorage.setItem('veritas_session', dataString);
+            localStorage.setItem('veritas_session', JSON.stringify(window.sessionData));
             
-            if (recognition) {
-                recognition.stop();
-            }
-            
+            if (recognition) recognition.stop();
             window.location.href = 'analysis.html';
         }
 
         // ============================================
-        // CARD NAME EXTRACTION
+        // DISPUTE DETECTION
         // ============================================
-        function extractCardName(text) {
-            // Common MTG card name patterns
-            const patterns = [
-                /target\s+my\s+(\w+(?:\s+\w+)*)/i,
-                /target\s+(\w+(?:\s+\w+)*)/i,
-                /cast\s+(\w+(?:\s+\w+)*)/i,
-                /play\s+(\w+(?:\s+\w+)*)/i,
-                /(\w+(?:\s+\w+)*)\s+trigger/i,
-                /(\w+(?:\s+\w+)*)\s+ability/i,
-                /destroy\s+(\w+(?:\s+\w+)*)/i,
-                /exile\s+(\w+(?:\s+\w+)*)/i,
-                /return\s+(\w+(?:\s+\w+)*)/i,
-                /(\w+(?:\s+\w+)*)\s+enters/i,
-                /when\s+(\w+(?:\s+\w+)*)/i,
-                /if\s+(\w+(?:\s+\w+)*)/i
-            ];
-
-            for (const pattern of patterns) {
-                const match = text.match(pattern);
-                if (match) {
-                    return match[1].trim();
-                }
+        class DisputeDetector {
+            constructor() {
+                this.lastTriggerTime = 0;
+                this.cooldown = 5000;
+                this.triggers = {
+                    uncertainty: ['wait', 'hold on', 'does that', 'can you', 'not sure', 'confused', 'question'],
+                    challenge: ["you can't", 'you cannot', 'illegal', 'wrong', 'not legal', 'invalid', 'cheat'],
+                    mtg_terms: ['target', 'stack', 'priority', 'trigger', 'combat', 'phase', 'cast', 'destroy', 'counter']
+                };
+                this.weights = { uncertainty: 2, challenge: 3, mtg_terms: 1 };
             }
 
-            // If no pattern matches, return the most capitalized word sequence
-            const words = text.split(/\s+/);
-            let bestGuess = '';
-            let currentSequence = '';
-            
-            for (const word of words) {
-                if (word[0] && word[0] === word[0].toUpperCase()) {
-                    currentSequence += (currentSequence ? ' ' : '') + word;
-                } else {
-                    if (currentSequence.length > bestGuess.length) {
-                        bestGuess = currentSequence;
+            analyze(text) {
+                const lowerText = text.toLowerCase();
+                let score = 0;
+
+                for (const [category, words] of Object.entries(this.triggers)) {
+                    for (const word of words) {
+                        if (lowerText.includes(word)) score += this.weights[category];
                     }
-                    currentSequence = '';
                 }
+
+                const now = Date.now();
+                if (score >= 3 && (now - this.lastTriggerTime) > this.cooldown) {
+                    this.lastTriggerTime = now;
+                    return { detected: true, text: text };
+                }
+                return { detected: false };
             }
-            
-            return bestGuess || text;
+        }
+
+        const detector = new DisputeDetector();
+
+        // ============================================
+        // SHOW QUESTION FORM (STEP 1)
+        // ============================================
+        function showQuestionForm(initialText) {
+            currentDispute = {
+                initialText: initialText,
+                cardName: '',
+                situation: '',
+                timestamp: new Date().toISOString()
+            };
+
+            document.getElementById('ruling-overlay').classList.add('active');
+            document.getElementById('step-indicator').style.display = 'flex';
+            updateSteps(1);
+
+            const content = document.getElementById('overlay-content');
+            content.innerHTML = `
+                <div class="question-form">
+                    <div class="arbiter-question">
+                        A dispute has been detected. Before I render judgment, 
+                        I must understand the nature of your question. Speak clearly, planeswalker.
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>What card are you asking about? (Required)</label>
+                        <input type="text" id="card-input" placeholder="e.g., Sol Ring, Counterspell, Lightning Bolt">
+                        <button class="voice-input-btn" id="voice-card-btn" onclick="startVoiceInput('card')">
+                            🎤 Speak Card Name
+                        </button>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Describe the situation (Optional but helpful)</label>
+                        <textarea id="situation-input" placeholder="e.g., My opponent tried to destroy my creature during my turn..."></textarea>
+                        <button class="voice-input-btn" id="voice-sit-btn" onclick="startVoiceInput('situation')">
+                            🎤 Describe Situation
+                        </button>
+                    </div>
+
+                    <button class="submit-btn" onclick="submitQuestion()">
+                        Consult the Arbiter
+                    </button>
+                </div>
+            `;
+
+            // Speak the question
+            speak("A dispute has been detected. What card are you asking about?");
         }
 
         // ============================================
-        // SCRYFALL API SEARCH
+        // VOICE INPUT FOR FORM
+        // ============================================
+        function startVoiceInput(field) {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('Voice input not supported');
+                return;
+            }
+
+            const btn = document.getElementById(field === 'card' ? 'voice-card-btn' : 'voice-sit-btn');
+            btn.classList.add('recording');
+            btn.textContent = '🔴 Listening...';
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            questionRecognition = new SpeechRecognition();
+            questionRecognition.lang = 'en-US';
+            questionRecognition.interimResults = false;
+            questionRecognition.maxAlternatives = 1;
+
+            questionRecognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                const input = document.getElementById(field === 'card' ? 'card-input' : 'situation-input');
+                input.value = transcript;
+                btn.classList.remove('recording');
+                btn.textContent = '🎤 ' + (field === 'card' ? 'Speak Card Name' : 'Describe Situation');
+            };
+
+            questionRecognition.onerror = () => {
+                btn.classList.remove('recording');
+                btn.textContent = '🎤 ' + (field === 'card' ? 'Speak Card Name' : 'Describe Situation');
+            };
+
+            questionRecognition.onend = () => {
+                btn.classList.remove('recording');
+                btn.textContent = '🎤 ' + (field === 'card' ? 'Speak Card Name' : 'Describe Situation');
+            };
+
+            questionRecognition.start();
+        }
+
+        // ============================================
+        // SUBMIT QUESTION & SEARCH (STEP 2)
+        // ============================================
+        async function submitQuestion() {
+            const cardName = document.getElementById('card-input').value.trim();
+            const situation = document.getElementById('situation-input').value.trim();
+
+            if (!cardName) {
+                alert('Please provide a card name');
+                return;
+            }
+
+            currentDispute.cardName = cardName;
+            currentDispute.situation = situation;
+
+            // Show loading
+            updateSteps(2);
+            const content = document.getElementById('overlay-content');
+            content.innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <div class="loading-spinner"></div>
+                    <p style="color: #4a5568; margin-top: 20px;">
+                        The Arbiter searches the infinite archives for ${cardName}...
+                    </p>
+                </div>
+            `;
+
+            // Search Scryfall
+            const cardData = await searchCard(cardName);
+            currentDispute.cardData = cardData;
+
+            if (cardData) {
+                const rulings = await getCardRulings(cardData.id);
+                currentDispute.rulings = rulings;
+                showRulingResult(cardData, rulings);
+            } else {
+                showNotFoundResult(cardName);
+            }
+
+            // Save to session
+            window.sessionData.disputes.push(currentDispute);
+            disputeCount++;
+            updateDebugInfo();
+        }
+
+        // ============================================
+        // SCRYFALL API
         // ============================================
         async function searchCard(cardName) {
             try {
@@ -523,145 +778,148 @@
                 const data = await response.json();
                 return data.data || [];
             } catch (error) {
-                console.error('Rulings fetch failed:', error);
                 return [];
             }
         }
 
         // ============================================
-        // ARBITER DIALOGUE GENERATOR
+        // SHOW RULING RESULT (STEP 3)
         // ============================================
-        function generateArbiterDialogue(cardName, oracleText, context) {
+        function showRulingResult(cardData, rulings) {
+            updateSteps(3);
+            document.getElementById('overlay-title').textContent = 'The Law Has Been Determined';
+
+            const dialogue = generateArbiterDialogue(cardData.name);
+
+            let html = `
+                <div class="card-display">
+                    <div class="card-image-container">
+                        ${cardData.image_uris ? 
+                            `<img src="${cardData.image_uris.normal}" class="card-image" alt="${cardData.name}">` :
+                            `<div class="card-placeholder">No image available</div>`
+                        }
+                    </div>
+                    
+                    <div class="ruling-content">
+                        <div class="arbiter-dialogue">${dialogue.opener} ${dialogue.explanation}</div>
+                        
+                        <div class="card-name">${cardData.name}</div>
+                        
+                        <div class="ruling-section">
+                            <h3>Oracle Text</h3>
+                            <p>${cardData.oracle_text || 'No oracle text available.'}</p>
+                        </div>
+            `;
+
+            if (rulings.length > 0) {
+                html += `
+                    <div class="ruling-section">
+                        <h3>Relevant Rulings</h3>
+                        <div class="official-rulings">
+                `;
+                rulings.slice(0, 3).forEach(ruling => {
+                    html += `<div class="ruling-item">${ruling.comment}</div>`;
+                });
+                html += `</div></div>`;
+            }
+
+            if (currentDispute.situation) {
+                html += `
+                    <div class="ruling-section">
+                        <h3>Regarding Your Situation</h3>
+                        <p>Based on your description: "${currentDispute.situation}" - 
+                        The Arbiter notes that ${cardData.name} ${getContextualAdvice(cardData)}</p>
+                    </div>
+                `;
+            }
+
+            html += `
+                        <div class="arbiter-dialogue" style="border-left-color: #c9a86a; background: rgba(201, 168, 106, 0.1);">
+                            ${dialogue.closer}
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="ruling-close" onclick="closeRuling()">The Stack Resolves. Continue.</button>
+            `;
+
+            document.getElementById('overlay-content').innerHTML = html;
+            speak(dialogue.opener + " " + dialogue.explanation);
+        }
+
+        function showNotFoundResult(cardName) {
+            updateSteps(3);
+            document.getElementById('overlay-title').textContent = 'The Archives Are Unclear';
+
+            const content = document.getElementById('overlay-content');
+            content.innerHTML = `
+                <div class="question-form" style="text-align: center;">
+                    <div class="arbiter-dialogue">
+                        I have searched the blind eternities but cannot find "${cardName}" 
+                        in the comprehensive rules. Perhaps the name was spoken unclearly?
+                    </div>
+                    
+                    <p style="color: #8892b0; margin: 20px 0;">
+                        Try asking again with the exact card name, or consult the printed text on the card itself.
+                    </p>
+
+                    <button class="submit-btn" onclick="showQuestionForm(currentDispute.initialText)" style="margin-bottom: 10px;">
+                        Try Again
+                    </button>
+                    <br>
+                    <button class="ruling-close" onclick="closeRuling()">Continue Without Ruling</button>
+                </div>
+            `;
+        }
+
+        // ============================================
+        // HELPER FUNCTIONS
+        // ============================================
+        function updateSteps(step) {
+            for (let i = 1; i <= 3; i++) {
+                const dot = document.getElementById(`step-${i}`);
+                dot.classList.remove('active', 'complete');
+                if (i === step) dot.classList.add('active');
+                else if (i < step) dot.classList.add('complete');
+            }
+        }
+
+        function generateArbiterDialogue(cardName) {
             const openers = [
                 "The threads of fate have brought this matter before me.",
                 "I have gazed into the aether and the Law is clear.",
                 "Your dispute echoes across the planes. Hear now my judgment.",
-                "The scales tip toward clarity. Listen well.",
-                "I have walked the blind eternities to bring you this truth."
+                "The scales tip toward clarity. Listen well."
             ];
-
             const explanations = [
                 `The card ${cardName} operates within the comprehensive rules as follows.`,
                 `The mechanics of ${cardName} are bound by these principles.`,
-                `This Arbiter has consulted the ancient texts regarding ${cardName}.`,
-                `The interaction you question is governed by these laws.`
+                `This Arbiter has consulted the ancient texts regarding ${cardName}.`
             ];
-
             const closers = [
                 "The stack resolves. Continue your game.",
                 "May this knowledge guide your path to victory.",
-                "The Law has spoken. Play on.",
-                "With clarity comes power. Use it wisely."
+                "The Law has spoken. Play on."
             ];
 
-            const opener = openers[Math.floor(Math.random() * openers.length)];
-            const explanation = explanations[Math.floor(Math.random() * explanations.length)];
-            const closer = closers[Math.floor(Math.random() * closers.length)];
-
             return {
-                opener: opener,
-                explanation: explanation,
-                closer: closer
+                opener: openers[Math.floor(Math.random() * openers.length)],
+                explanation: explanations[Math.floor(Math.random() * explanations.length)],
+                closer: closers[Math.floor(Math.random() * closers.length)]
             };
         }
 
-        // ============================================
-        // DISPLAY RULING
-        // ============================================
-        async function showRuling(text) {
-            const cardName = extractCardName(text);
-            console.log('Detected card name:', cardName);
+        function getContextualAdvice(cardData) {
+            // Simple contextual advice based on card type
+            if (cardData.type_line.includes('Instant')) return 'can be cast at instant speed, even during your opponent\'s turn.';
+            if (cardData.type_line.includes('Creature')) return 'enters the battlefield following the stack resolution rules.';
+            if (cardData.type_line.includes('Sorcery')) return 'can only be cast during your main phase when the stack is empty.';
+            return 'operates according to its printed text and the comprehensive rules.';
+        }
 
-            // Show overlay immediately with loading state
-            document.getElementById('ruling-overlay').classList.add('active');
-            document.getElementById('card-image').innerHTML = 'Searching for card...';
-            document.getElementById('ruling-content').innerHTML = `
-                <div class="loading-spinner"></div>
-                <p style="text-align: center; color: #4a5568;">The Arbiter consults the archives...</p>
-            `;
-
-            // Search for card
-            const cardData = await searchCard(cardName);
-            currentCardData = cardData;
-
-            let rulings = [];
-            if (cardData) {
-                rulings = await getCardRulings(cardData.id);
-            }
-
-            // Generate dialogue
-            const dialogue = generateArbiterDialogue(
-                cardData ? cardData.name : cardName,
-                cardData ? cardData.oracle_text : '',
-                text
-            );
-
-            // Build display
-            let html = '';
-
-            // Arbiter dialogue
-            html += `<div class="arbiter-dialogue">${dialogue.opener} ${dialogue.explanation}</div>`;
-
-            // Card info
-            if (cardData) {
-                html += `<div class="card-name">${cardData.name}</div>`;
-                
-                // Oracle text
-                html += `
-                    <div class="ruling-section">
-                        <h3>Oracle Text</h3>
-                        <p>${cardData.oracle_text || 'No oracle text available.'}</p>
-                    </div>
-                `;
-
-                // Official rulings
-                if (rulings.length > 0) {
-                    html += `
-                        <div class="ruling-section">
-                            <h3>Official Rulings</h3>
-                            <div class="official-rulings">
-                    `;
-                    
-                    rulings.slice(0, 3).forEach(ruling => {
-                        html += `<div class="ruling-item">${ruling.comment}</div>`;
-                    });
-                    
-                    html += `</div></div>`;
-                }
-
-                // Update card image
-                const imageUrl = cardData.image_uris ? cardData.image_uris.normal : 
-                                (cardData.card_faces && cardData.card_faces[0].image_uris ? 
-                                 cardData.card_faces[0].image_uris.normal : null);
-                
-                if (imageUrl) {
-                    document.getElementById('card-image').innerHTML = 
-                        `<img src="${imageUrl}" class="card-image" alt="${cardData.name}">`;
-                } else {
-                    document.getElementById('card-image').innerHTML = 
-                        `<div class="card-placeholder">No image available<br>for ${cardData.name}</div>`;
-                }
-            } else {
-                html += `
-                    <div class="ruling-section">
-                        <h3>General Ruling</h3>
-                        <p>The Arbiter could not locate the specific card "${cardName}" in the archives. 
-                        However, based on your question "${text}", remember that targets must be legal 
-                        when chosen and the spell or ability must have a valid target to be put on the stack.</p>
-                    </div>
-                `;
-                document.getElementById('card-image').innerHTML = 
-                    `<div class="card-placeholder">Card not found:<br>${cardName}</div>`;
-            }
-
-            // Add closer
-            html += `<div class="arbiter-dialogue" style="border-left-color: #c9a86a; background: rgba(201, 168, 106, 0.1);">${dialogue.closer}</div>`;
-
-            document.getElementById('ruling-content').innerHTML = html;
-
-            // Speak the ruling
+        function speak(text) {
             if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(dialogue.opener);
+                const utterance = new SpeechSynthesisUtterance(text);
                 utterance.rate = 0.8;
                 utterance.pitch = 0.9;
                 speechSynthesis.speak(utterance);
@@ -670,53 +928,13 @@
 
         function closeRuling() {
             document.getElementById('ruling-overlay').classList.remove('active');
-            currentCardData = null;
+            document.getElementById('step-indicator').style.display = 'none';
+            document.getElementById('overlay-title').textContent = 'Dispute Detected';
+            currentDispute = null;
         }
 
         // ============================================
-        // DISPUTE DETECTION
-        // ============================================
-        class DisputeDetector {
-            constructor() {
-                this.confidence = 0;
-                this.threshold = 3;
-                this.lastTriggerTime = 0;
-                this.cooldown = 5000;
-
-                this.triggers = {
-                    uncertainty: ['wait', 'hold on', 'does that', 'can you', 'not sure', 'confused'],
-                    challenge: ["you can't", 'you cannot', 'illegal', 'wrong', 'not legal', 'invalid'],
-                    mtg_terms: ['target', 'stack', 'priority', 'trigger', 'combat', 'phase', 'cast', 'destroy']
-                };
-
-                this.weights = { uncertainty: 2, challenge: 3, mtg_terms: 1 };
-            }
-
-            analyze(text) {
-                const lowerText = text.toLowerCase();
-                let score = 0;
-
-                for (const [category, words] of Object.entries(this.triggers)) {
-                    for (const word of words) {
-                        if (lowerText.includes(word)) {
-                            score += this.weights[category];
-                        }
-                    }
-                }
-
-                const now = Date.now();
-                if (score >= this.threshold && (now - this.lastTriggerTime) > this.cooldown) {
-                    this.lastTriggerTime = now;
-                    return { detected: true, text: text };
-                }
-                return { detected: false };
-            }
-        }
-
-        const detector = new DisputeDetector();
-
-        // ============================================
-        // SPEECH RECOGNITION
+        // MAIN SPEECH RECOGNITION
         // ============================================
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -727,7 +945,6 @@
 
             recognition.onstart = () => {
                 document.getElementById('listening-container').classList.add('active');
-                console.log('Listening started');
             };
 
             recognition.onend = () => {
@@ -741,34 +958,18 @@
                     if (event.results[i].isFinal) {
                         console.log('Heard:', transcript);
                         const result = detector.analyze(transcript);
-                        if (result.detected) {
-                            handleDispute(result.text);
+                        if (result.detected && !document.getElementById('ruling-overlay').classList.contains('active')) {
+                            showQuestionForm(transcript);
                         }
                     }
                 }
             };
 
             recognition.onerror = (e) => {
-                console.log('Speech error:', e.error);
                 setTimeout(() => recognition.start(), 1000);
             };
 
             recognition.start();
-        } else {
-            alert('Speech recognition not supported. Please use Chrome.');
-        }
-
-        function handleDispute(text) {
-            disputeCount++;
-            
-            window.sessionData.disputes.push({
-                time: new Date().toISOString(),
-                text: text
-            });
-            
-            console.log('Dispute recorded:', text);
-            showRuling(text);
-            updateDebugInfo();
         }
 
         // ============================================
@@ -816,9 +1017,7 @@
 
         function initParticles() {
             particles = [];
-            for (let i = 0; i < 50; i++) {
-                particles.push(new Particle());
-            }
+            for (let i = 0; i < 50; i++) particles.push(new Particle());
         }
 
         function animateParticles() {
