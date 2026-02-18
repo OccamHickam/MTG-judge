@@ -537,6 +537,9 @@
             <button class="quick-action-btn" onclick="showRuleReference()">
                 📖 Rule Lookup
             </button>
+            <button class="quick-action-btn" onclick="testManually()">
+                🧪 Test (no voice)
+            </button>
         </div>
 
         <div class="confidence-indicator" id="confidence-indicator">
@@ -978,7 +981,7 @@
                     }
                 };
 
-                this.threshold = 4;
+                this.threshold = 2;  // ← LOWERED from 4
                 this.cooldown = 5000;
                 this.lastTrigger = 0;
             }
@@ -1813,11 +1816,56 @@
         function handleSpeech(text) {
             if (isProcessing || isPaused) return;
 
+            console.log('=== handleSpeech called ===');
+            console.log('Text:', text);
+            console.log('isProcessing:', isProcessing);
+            console.log('isPaused:', isPaused);
+
             addLog('You: ' + text, 'player');
             conversationContext.add('question', text);
 
-            // Check for dispute detection with confidence
+            const analysis = analyzeQuestion(text);
+            console.log('Analysis result:', analysis);
+
+            // BYPASS dispute detection if keywords are found
+            // This ensures keyword questions ALWAYS work
+            if (analysis.type === 'keyword' || 
+                analysis.type === 'multiple_keywords' ||
+                analysis.type === 'bypass_answer' || 
+                analysis.type === 'prevention_answer' || 
+                analysis.type === 'interaction_answer' || 
+                analysis.type === 'comparison_answer') {
+
+                console.log('Keyword/semantic detected - processing immediately');
+
+                // Process keyword questions
+                if (analysis.type === 'bypass_answer' || 
+                    analysis.type === 'prevention_answer' || 
+                    analysis.type === 'interaction_answer' || 
+                    analysis.type === 'comparison_answer') {
+                    showSemanticAnswer(analysis);
+                    return;
+                }
+
+                if (analysis.type === 'multiple_keywords') {
+                    showMultipleKeywords(analysis.keywords);
+                    return;
+                }
+
+                if (analysis.type === 'keyword') {
+                    if (analysis.hasCards && analysis.cards.length > 0) {
+                        showKeywordWithCard(analysis.keywords[0], analysis.cards[0]);
+                    } else {
+                        showKeywordRuling(analysis.keywords[0].keyword, analysis.keywords[0].data);
+                    }
+                    return;
+                }
+            }
+
+            // For everything else, check dispute detection
             const disputeCheck = detector.analyze(text);
+            console.log('Dispute check:', disputeCheck);
+
             if (disputeCheck.detected) {
                 const indicator = document.getElementById('confidence-indicator');
                 const level = document.getElementById('confidence-level');
@@ -1828,13 +1876,12 @@
                     indicator.className = 'confidence-indicator';
                 }, 3000);
 
-                if (disputeCheck.confidence === 'low') {
-                    speak('I sense uncertainty. Please clarify your question.');
-                    return;
-                }
+                // REMOVED: Don't filter out low confidence anymore
+                // if (disputeCheck.confidence === 'low') {
+                //     speak('I sense uncertainty. Please clarify your question.');
+                //     return;
+                // }
             }
-
-            const analysis = analyzeQuestion(text);
 
             // Handle semantic answers
             if (analysis.type === 'bypass_answer' || 
@@ -1879,9 +1926,29 @@
                 return;
             }
 
-            // No clear question detected
-            if (disputeCheck.detected && disputeCheck.confidence === 'medium') {
-                speak('I sense a dispute. Please ask about a specific card or rule.');
+            // Handle combo (multiple cards)
+            if (analysis.type === 'combo') {
+                showComboRuling(analysis.cards);
+                return;
+            }
+
+            // Handle single card
+            if (analysis.type === 'card') {
+                if (analysis.needsCardName) {
+                    expectingCardName = true;
+                    speak('What card are you asking about?');
+                    setState(States.WAITING);
+                } else {
+                    showCardRuling(analysis.cards[0]);
+                }
+                return;
+            }
+
+            // If we got here and dispute was detected, ask for clarification
+            if (disputeCheck.detected) {
+                speak('I heard you. Please ask about a specific card or rule.');
+            } else {
+                console.log('No dispute detected, ignoring');
             }
         }
 
@@ -1942,6 +2009,22 @@
         }
 
         // ==========================================
+        // MANUAL TEST FUNCTION
+        // ==========================================
+        function testManually() {
+            console.log('=== MANUAL TEST ===');
+            const testPhrases = [
+                "How does hexproof work?",
+                "Wait, what is trample?",
+                "Can you explain deathtouch?"
+            ];
+
+            const phrase = testPhrases[Math.floor(Math.random() * testPhrases.length)];
+            addLog(`Testing with: ${phrase}`, 'system');
+            handleSpeech(phrase);
+        }
+
+        // ==========================================
         // SPEECH RECOGNITION SETUP
         // ==========================================
         function setupSpeechRecognition() {
@@ -1959,7 +2042,23 @@
             recognition.lang = 'en-US';
 
             recognition.onstart = () => {
-                addLog('Speech recognition started', 'system');
+                console.log('=== RECOGNITION STARTED ===');
+                addLog('Speech recognition started - SPEAK NOW', 'system');
+                // Flash the pulse to show it's active
+                const pulse = document.getElementById('pulse');
+                pulse.style.transform = 'scale(1.3)';
+                setTimeout(() => pulse.style.transform = 'scale(1)', 300);
+            };
+
+            recognition.onspeechstart = () => {
+                console.log('=== SPEECH DETECTED ===');
+                addLog('Speech detected!', 'system');
+                document.getElementById('sub-text').textContent = 'I hear you speaking...';
+            };
+
+            recognition.onspeechend = () => {
+                console.log('=== SPEECH ENDED ===');
+                addLog('Speech ended, processing...', 'system');
             };
 
             recognition.onresult = (event) => {
@@ -1975,11 +2074,22 @@
                     }
                 }
 
+                // ADD LOGGING
+                if (interimTranscript) {
+                    console.log('INTERIM:', interimTranscript);
+                    document.getElementById('sub-text').textContent = `Hearing: "${interimTranscript}..."`;
+                }
+
                 if (finalTranscript) {
+                    console.log('FINAL TRANSCRIPT:', finalTranscript);
+                    addLog(`Heard: ${finalTranscript}`, 'system');
+
                     if (expectingCardName) {
+                        console.log('Expecting card name - calling showCardRuling');
                         expectingCardName = false;
                         showCardRuling(finalTranscript.trim());
                     } else {
+                        console.log('Calling handleSpeech with:', finalTranscript);
                         handleSpeech(finalTranscript.trim());
                     }
                 }
@@ -1997,14 +2107,20 @@
             };
 
             recognition.onend = () => {
+                console.log('=== RECOGNITION ENDED ===');
+                addLog('Recognition ended', 'system');
+
                 if (!isPaused) {
+                    console.log('Auto-restarting in 300ms...');
                     setTimeout(() => {
                         try {
                             recognition.start();
+                            console.log('Recognition restarted');
                         } catch (e) {
-                            console.error('Failed to restart recognition:', e);
+                            console.error('Failed to restart:', e);
+                            addLog(`ERROR restarting: ${e.message}`, 'system');
                         }
-                    }, 500);
+                    }, 300);  // Shorter delay
                 }
             };
 
@@ -2059,11 +2175,23 @@
         // INITIALIZATION
         // ==========================================
         window.addEventListener('load', () => {
+            console.log('=== GAME SESSION LOADED ===');
+            console.log('Keywords available:', Object.keys(keywords).length);
+            console.log('Sample keywords:', Object.keys(keywords).slice(0, 5));
+            console.log('Speech Recognition available:', 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window);
+
             createParticles();
             loadCardNames();
             setupSpeechRecognition();
 
             addLog('Veritas the Arbiter is listening...', 'system');
+            addLog('Try saying: "How does hexproof work?"', 'system');
+
+            // Test keyword detection
+            console.log('Testing keyword detection...');
+            const testText = "how does hexproof work";
+            const result = analyzeQuestion(testText);
+            console.log('Test result for "' + testText + '":', result);
 
             // Save session data on unload
             window.addEventListener('beforeunload', () => {
