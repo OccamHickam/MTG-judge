@@ -69,11 +69,6 @@
             background: radial-gradient(circle, rgba(201, 168, 106, 0.5) 0%, transparent 70%);
         }
 
-        .listening-pulse.speaking {
-            animation: bounce 0.5s ease-in-out infinite;
-            background: radial-gradient(circle, rgba(0, 167, 181, 0.6) 0%, transparent 70%);
-        }
-
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 0.6; }
             50% { transform: scale(1.1); opacity: 1; }
@@ -81,11 +76,6 @@
 
         @keyframes spin {
             100% { transform: rotate(360deg); }
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
         }
 
         .listening-pulse::after {
@@ -111,7 +101,7 @@
             font-size: 14px;
             color: #4a5568;
             font-style: italic;
-            max-width: 500px;
+            max-width: 600px;
             margin: 0 auto;
             line-height: 1.4;
         }
@@ -182,7 +172,7 @@
             text-align: center;
         }
 
-        /* RULING OVERLAY */
+        /* RULING OVERLAY - ADAPTIVE */
         #ruling-overlay {
             position: fixed;
             top: 0;
@@ -197,17 +187,104 @@
             justify-content: center;
             padding: 40px;
             backdrop-filter: blur(20px);
+            overflow-y: auto;
         }
 
         #ruling-overlay.active {
             display: flex;
         }
 
-        .ruling-card {
+        .ruling-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .ruling-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .ruling-announcement {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #c9a86a;
+            margin-bottom: 10px;
+        }
+
+        .ruling-title {
+            font-size: 32px;
+            font-weight: 300;
+            color: #e0e0ff;
+        }
+
+        /* KEYWORD RULING LAYOUT */
+        .keyword-ruling {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .keyword-title {
+            font-size: 48px;
+            color: #00a7b5;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px rgba(0, 167, 181, 0.3);
+        }
+
+        .keyword-rule {
+            font-size: 14px;
+            color: #c9a86a;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        .keyword-description {
+            background: linear-gradient(135deg, rgba(0, 167, 181, 0.1) 0%, rgba(201, 168, 106, 0.05) 100%);
+            border: 1px solid rgba(0, 167, 181, 0.3);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+
+        .keyword-description p {
+            font-size: 22px;
+            line-height: 1.6;
+            color: #e0e0ff;
+        }
+
+        .keyword-example {
+            background: rgba(201, 168, 106, 0.1);
+            border-left: 4px solid #c9a86a;
+            padding: 25px;
+            border-radius: 0 12px 12px 0;
+            text-align: left;
+        }
+
+        .keyword-example h4 {
+            color: #c9a86a;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .keyword-example p {
+            color: #8892b0;
+            font-size: 16px;
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        /* CARD RULING LAYOUT */
+        .card-ruling {
             display: flex;
             gap: 40px;
-            max-width: 900px;
+            max-width: 1000px;
             width: 100%;
+            align-items: flex-start;
         }
 
         .card-image-container {
@@ -218,6 +295,7 @@
             border-radius: 16px;
             border: 3px solid rgba(0, 167, 181, 0.3);
             overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 167, 181, 0.2);
         }
 
         .card-image {
@@ -226,43 +304,48 @@
             object-fit: contain;
         }
 
-        .ruling-content {
+        .card-placeholder {
+            padding-top: 180px;
+            text-align: center;
+            color: #4a5568;
+        }
+
+        .card-content {
             flex: 1;
         }
 
-        .ruling-title {
-            font-size: 32px;
+        .card-name {
+            font-size: 36px;
             color: #00a7b5;
             margin-bottom: 20px;
-        }
-
-        .arbiter-ruling {
-            background: rgba(0, 167, 181, 0.1);
-            border-left: 4px solid #00a7b5;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 0 8px 8px 0;
-            font-size: 18px;
-            line-height: 1.6;
+            font-weight: 300;
         }
 
         .oracle-box {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(0, 167, 181, 0.2);
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
         }
 
         .oracle-box h4 {
-            color: #c9a86a;
+            color: #00a7b5;
             font-size: 12px;
             text-transform: uppercase;
-            margin-bottom: 8px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .oracle-box p {
+            color: #8892b0;
+            line-height: 1.6;
+            font-style: italic;
         }
 
         .ruling-close {
-            padding: 12px 30px;
+            margin-top: 30px;
+            padding: 15px 50px;
             background: transparent;
             border: 2px solid #00a7b5;
             color: #00a7b5;
@@ -270,6 +353,8 @@
             cursor: pointer;
             font-size: 14px;
             text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
         }
 
         .ruling-close:hover {
@@ -289,10 +374,10 @@
 
         .log-entry {
             background: rgba(0, 0, 0, 0.7);
-            padding: 8px 16px;
+            padding: 10px 20px;
             border-radius: 20px;
-            margin-bottom: 8px;
-            font-size: 13px;
+            margin-bottom: 10px;
+            font-size: 14px;
             animation: fadeIn 0.3s;
         }
 
@@ -310,6 +395,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
+<base target="_blank">
 </head>
 <body>
     <canvas id="particle-canvas"></canvas>
@@ -334,31 +420,184 @@
         </div>
     </div>
 
+    <!-- ADAPTIVE RULING OVERLAY -->
     <div id="ruling-overlay">
-        <div class="ruling-card">
-            <div class="card-image-container" id="card-box">
-                <div style="padding-top: 180px; text-align: center; color: #4a5568;">Loading...</div>
-            </div>
-            <div class="ruling-content">
-                <div class="ruling-title" id="card-name">Card</div>
-                <div class="arbiter-ruling" id="ruling-text">Ruling...</div>
-                <div class="oracle-box">
-                    <h4>Oracle Text</h4>
-                    <p id="oracle-text">...</p>
-                </div>
-                <button class="ruling-close" onclick="closeRuling()">Continue</button>
-            </div>
+        <div class="ruling-header">
+            <div class="ruling-icon">⚖️</div>
+            <div class="ruling-announcement">The Law Has Been Determined</div>
         </div>
+        
+        <!-- Dynamic content container -->
+        <div id="ruling-content"></div>
+        
+        <button class="ruling-close" onclick="closeRuling()">The Stack Resolves. Continue.</button>
     </div>
 
     <script>
         // ============================================
-        // DATA
+        // KEYWORD DATABASE (from index.html)
+        // ============================================
+        const keywords = {
+            'trample': {
+                description: 'If this creature would assign enough damage to its blockers to destroy them, you may have it assign the rest of its damage to the defending player or planeswalker.',
+                example: 'A 6/6 creature with trample blocked by a 2/2 deals 2 damage to the blocker and 4 damage to the defending player.',
+                rule: '702.19b'
+            },
+            'hexproof': {
+                description: 'Cannot be the target of spells or abilities your opponents control.',
+                example: 'Your opponent cannot cast Doom Blade targeting your hexproof creature, but they can still target it with board wipes like Wrath of God.',
+                rule: '702.11c'
+            },
+            'shroud': {
+                description: 'Cannot be the target of spells or abilities.',
+                example: 'Unlike hexproof, shroud prevents ALL targeting, including your own spells and abilities.',
+                rule: '702.18'
+            },
+            'deathtouch': {
+                description: 'Any amount of damage this deals to a creature is enough to destroy it.',
+                example: 'A 1/1 with deathtouch can kill a 10/10 creature in combat.',
+                rule: '702.2b'
+            },
+            'lifelink': {
+                description: 'Damage dealt by this source also causes you to gain that much life.',
+                example: 'If a 5/5 with lifelink deals combat damage, you gain 5 life simultaneously.',
+                rule: '702.15b'
+            },
+            'flying': {
+                description: 'This creature can only be blocked by creatures with flying or reach.',
+                example: 'A creature with flying can attack past ground creatures unless the defender has a creature with reach.',
+                rule: '702.9b'
+            },
+            'haste': {
+                description: 'This creature can attack and activate abilities with the tap symbol the turn it enters the battlefield.',
+                example: 'A creature with haste can attack immediately on the turn you cast it.',
+                rule: '702.10'
+            },
+            'vigilance': {
+                description: 'Attacking does not cause this creature to tap.',
+                example: 'A creature with vigilance can attack and still be available to block on your opponent\'s turn.',
+                rule: '702.20b'
+            },
+            'first strike': {
+                description: 'This creature deals combat damage before creatures without first strike.',
+                example: 'A 2/2 with first strike kills a 3/3 without first strike and survives.',
+                rule: '702.7b'
+            },
+            'double strike': {
+                description: 'This creature deals combat damage twice - once during the first strike step and once during normal combat.',
+                example: 'A 3/3 with double strike deals 3 damage in first strike, then 3 more in regular combat.',
+                rule: '702.8b'
+            },
+            'indestructible': {
+                description: 'Cannot be destroyed by lethal damage or effects that say "destroy."',
+                example: 'An indestructible creature survives Wrath of God, but can still be exiled or have its toughness reduced to 0.',
+                rule: '702.12b'
+            },
+            'menace': {
+                description: 'This creature cannot be blocked except by two or more creatures.',
+                example: 'A creature with menace must be blocked by at least two creatures, or not blocked at all.',
+                rule: '702.110b'
+            },
+            'reach': {
+                description: 'This creature can block creatures with flying.',
+                example: 'Creatures with reach act as anti-air defense but do not have flying themselves.',
+                rule: '702.17b'
+            },
+            'the stack': {
+                description: 'A zone where spells and abilities wait to resolve. Last in, first out.',
+                example: 'You cast a creature, opponent counters it, you counter their counter. The last counter resolves first, then your creature resolves.',
+                rule: '405.1'
+            },
+            'commander tax': {
+                description: 'Each time you cast your commander from the command zone, it costs 2 more mana for each previous time you cast it from there.',
+                example: 'First cast: normal cost. Second cast: +2 mana. Third cast: +4 mana, etc.',
+                rule: '903.8'
+            },
+            'commander damage': {
+                description: 'If a player is dealt 21 or more combat damage by the same commander, they lose the game.',
+                example: 'If your commander deals 7 damage three times to a player, they lose.',
+                rule: '903.10a'
+            },
+            'priority': {
+                description: 'The right to cast spells and activate abilities. Passes back and forth between players.',
+                example: 'After you cast a spell, you get priority again, then your opponent gets priority to respond.',
+                rule: '116.1'
+            },
+            'mana ability': {
+                description: 'An ability that produces mana and resolves immediately without using the stack.',
+                example: 'Tapping a Forest for green mana is a mana ability - it happens instantly and cannot be responded to.',
+                rule: '605.1a'
+            },
+            'replacement effect': {
+                description: 'An effect that changes how an event happens by replacing it with a different event.',
+                example: 'If a creature would be destroyed, regenerate it instead. The destruction never happens.',
+                rule: '614.1'
+            },
+            'state-based actions': {
+                description: 'Game rules that check for certain conditions and automatically resolve them.',
+                example: 'A creature with 0 toughness dies, a player with 0 life loses, legendary rule violations - all checked automatically.',
+                rule: '704.1'
+            },
+            'legendary': {
+                description: 'If you control two legendary permanents with the same name, choose one to keep.',
+                example: 'If you play a second copy of your commander, you must put one in the graveyard immediately.',
+                rule: '704.5j'
+            },
+            'planeswalker': {
+                description: 'A permanent that can be attacked and damaged like a player. Can activate loyalty abilities once per turn.',
+                example: 'You can attack an opponent\'s planeswalker instead of them. Each loyalty ability can only be used at sorcery speed.',
+                rule: '306.5'
+            },
+            'exile': {
+                description: 'A zone outside the game. Exiled cards can return or remain gone depending on the effect.',
+                example: 'Path to Exile exiles a creature permanently. Oblivion Ring exiles until the Ring leaves the battlefield.',
+                rule: '406.1'
+            },
+            'tapped': {
+                description: 'A tapped permanent cannot attack, block, or activate tap abilities.',
+                example: 'After attacking, a creature becomes tapped and cannot block on your opponent\'s turn.',
+                rule: '302.6'
+            },
+            'untap': {
+                description: 'The first step of your turn where tapped permanents become untapped.',
+                example: 'During your untap step, all your tapped lands and creatures ready themselves for the new turn.',
+                rule: '502.1'
+            },
+            'combat': {
+                description: 'The phase where creatures attack and block, divided into steps.',
+                example: 'Beginning of combat, declare attackers, declare blockers, combat damage, end of combat.',
+                rule: '506.1'
+            },
+            'end step': {
+                description: 'The final step of a turn, often when "at the beginning of your end step" triggers happen.',
+                example: 'Many abilities trigger here, like drawing cards from Phyrexian Arena.',
+                rule: '513.1'
+            },
+            'upkeep': {
+                description: 'The step where "at the beginning of your upkeep" triggers occur and you pay costs.',
+                example: 'You might pay cumulative upkeep costs or draw cards from Howling Mine here.',
+                rule: '503.1'
+            },
+            'draw step': {
+                description: 'The step where you draw a card for the turn.',
+                example: 'You draw your card for the turn after your upkeep. Some effects can make you draw more or fewer cards.',
+                rule: '504.1'
+            },
+            'main phase': {
+                description: 'The phase where you can cast sorceries, creatures, and other non-instant spells.',
+                example: 'Pre-combat main phase and post-combat main phase. Most of your strategic plays happen here.',
+                rule: '505.1'
+            }
+        };
+
+        // ============================================
+        // SESSION DATA
         // ============================================
         window.sessionData = {
             startTime: new Date().toISOString(),
             endTime: null,
             players: ['Player 1', 'Player 2', 'Player 3', 'Player 4'],
+            events: [],
             disputes: [],
             winner: 'Unknown'
         };
@@ -367,7 +606,7 @@
         let recognition = null;
         let isProcessing = false;
         let expectingCardName = false;
-        let currentDispute = null;
+        let pendingQuestion = null;
 
         // ============================================
         // UI HELPERS
@@ -376,9 +615,8 @@
             document.getElementById('main-text').textContent = main;
             document.getElementById('sub-text').textContent = sub;
             const pulse = document.getElementById('pulse');
-            pulse.classList.remove('thinking', 'speaking');
+            pulse.classList.remove('thinking');
             if (type === 'thinking') pulse.classList.add('thinking');
-            if (type === 'speaking') pulse.classList.add('speaking');
         }
 
         function addLog(text, speaker) {
@@ -408,7 +646,7 @@
                 return;
             }
 
-            updateStatus('Arbiter Speaking', text.substring(0, 50) + '...', 'speaking');
+            updateStatus('Arbiter Speaking', text.substring(0, 50) + '...');
             addLog('Arbiter: ' + text, 'arbiter');
 
             const u = new SpeechSynthesisUtterance(text);
@@ -422,7 +660,7 @@
             if (v) u.voice = v;
 
             u.onend = () => {
-                updateStatus('Listening', 'Speak to the Arbiter');
+                updateStatus('Listening', 'The Arbiter hears all disputes');
                 if (onDone) onDone();
             };
 
@@ -441,7 +679,7 @@
         }
 
         // ============================================
-        // SCRYFALL
+        // SCRYFALL API
         // ============================================
         async function findCard(name) {
             try {
@@ -454,56 +692,148 @@
         }
 
         // ============================================
-        // RULING DISPLAY
+        // SMART QUESTION ANALYZER
         // ============================================
-        async function showRuling(cardName) {
+        function analyzeQuestion(text) {
+            const lower = text.toLowerCase();
+            
+            // 1. Check for keywords first
+            for (const [keyword, data] of Object.entries(keywords)) {
+                if (lower.includes(keyword.toLowerCase())) {
+                    return { type: 'keyword', keyword, data };
+                }
+            }
+            
+            // 2. Check for dispute triggers
+            const triggers = ['wait', 'hold on', 'can you', 'does that', 'is that', 
+                            "you can't", 'you cannot', 'illegal', 'wrong', 'not legal', 
+                            'target', 'stack', 'priority', 'trigger', 'combat', 'destroy', 
+                            'counter', 'what does', 'how does'];
+            
+            const hasDispute = triggers.some(t => lower.includes(t));
+            
+            if (hasDispute) {
+                return { type: 'card', needsCardName: true };
+            }
+            
+            // 3. No dispute detected
+            return { type: 'none' };
+        }
+
+        // ============================================
+        // SHOW KEYWORD RULING
+        // ============================================
+        function showKeywordRuling(keyword, data) {
             isProcessing = true;
-            updateStatus('Searching', `Looking for ${cardName}...`, 'thinking');
+            updateStatus('Ruling', 'The Arbiter speaks', 'thinking');
+
+            const content = document.getElementById('ruling-content');
+            content.innerHTML = `
+                <div class="keyword-ruling">
+                    <div class="keyword-title">${keyword}</div>
+                    <div class="keyword-rule">Comprehensive Rules ${data.rule}</div>
+                    
+                    <div class="keyword-description">
+                        <p>${data.description}</p>
+                    </div>
+                    
+                    <div class="keyword-example">
+                        <h4>Example Scenario</h4>
+                        <p>${data.example}</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('ruling-overlay').classList.add('active');
+
+            // Speak the ruling
+            speak(`${keyword}. ${data.description}`, () => {
+                speak(data.example, () => {
+                    isProcessing = false;
+                });
+            });
+
+            // Save to session
+            window.sessionData.disputes.push({
+                timestamp: new Date().toISOString(),
+                type: 'keyword',
+                keyword: keyword,
+                question: pendingQuestion || 'Keyword question',
+                ruling: data
+            });
+            disputeCount++;
+            updateTimer();
+        }
+
+        // ============================================
+        // SHOW CARD RULING
+        // ============================================
+        async function showCardRuling(cardName) {
+            isProcessing = true;
+            updateStatus('Searching', `Consulting archives for ${cardName}...`, 'thinking');
 
             const card = await findCard(cardName);
-
+            
+            const content = document.getElementById('ruling-content');
+            
             if (!card) {
-                speak(`I cannot find ${cardName}. Speak the name again.`, () => {
-                    expectingCardName = true;
+                // Card not found - show error in keyword format
+                content.innerHTML = `
+                    <div class="keyword-ruling">
+                        <div class="keyword-title">Card Not Found</div>
+                        <div class="keyword-description">
+                            <p>The Arbiter cannot locate "${cardName}" in the comprehensive archives. 
+                            Speak the name clearly, or check the printed text on the card.</p>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('ruling-overlay').classList.add('active');
+                speak(`I cannot find ${cardName} in the archives. Speak the name again.`, () => {
                     isProcessing = false;
-                    updateStatus('Say Card Name', 'Speak clearly');
+                    expectingCardName = true;
                 });
                 return;
             }
 
-            // Found card - show ruling
-            currentDispute.cardData = card;
-            
-            document.getElementById('card-name').textContent = card.name;
-            document.getElementById('oracle-text').textContent = card.oracle_text || 'No oracle text.';
-            
-            if (card.image_uris) {
-                document.getElementById('card-box').innerHTML = 
-                    `<img src="${card.image_uris.normal}" class="card-image">`;
-            }
+            // Show card ruling
+            content.innerHTML = `
+                <div class="card-ruling">
+                    <div class="card-image-container">
+                        ${card.image_uris ? 
+                            `<img src="${card.image_uris.normal}" class="card-image" alt="${card.name}">` :
+                            `<div class="card-placeholder">No image available</div>`
+                        }
+                    </div>
+                    
+                    <div class="card-content">
+                        <div class="card-name">${card.name}</div>
+                        
+                        <div class="oracle-box">
+                            <h4>Oracle Text</h4>
+                            <p>${card.oracle_text || 'No oracle text available.'}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
 
-            // Generate ruling
-            let ruling = `Regarding ${card.name}: `;
-            if (card.oracle_text) {
-                ruling += card.oracle_text.substring(0, 100) + 
-                         (card.oracle_text.length > 100 ? '...' : '');
-            } else {
-                ruling += 'Follow the printed text.';
-            }
-
-            document.getElementById('ruling-text').textContent = ruling;
             document.getElementById('ruling-overlay').classList.add('active');
 
-            speak(ruling, () => {
-                speak('The stack resolves. Continue.', () => {
-                    isProcessing = false;
-                    expectingCardName = false;
-                });
+            // Speak oracle text
+            const textToSpeak = card.oracle_text || 'No oracle text available.';
+            speak(`${card.name}. ${textToSpeak.substring(0, 150)}${textToSpeak.length > 150 ? '...' : ''}`, () => {
+                isProcessing = false;
             });
 
-            // Save
-            window.sessionData.disputes.push(currentDispute);
+            // Save to session
+            window.sessionData.disputes.push({
+                timestamp: new Date().toISOString(),
+                type: 'card',
+                card: card.name,
+                oracle_text: card.oracle_text,
+                image: card.image_uris ? card.image_uris.normal : null
+            });
             disputeCount++;
+            updateTimer();
         }
 
         function closeRuling() {
@@ -511,55 +841,48 @@
             updateStatus('Listening', 'The Arbiter hears all disputes');
             isProcessing = false;
             expectingCardName = false;
-            currentDispute = null;
+            pendingQuestion = null;
         }
 
         // ============================================
-        // MAIN LOGIC
+        // MAIN SPEECH HANDLER
         // ============================================
         function handleSpeech(text) {
-            console.log('Heard:', text, 'Processing:', isProcessing, 'Expecting:', expectingCardName);
+            console.log('Heard:', text, 'Processing:', isProcessing);
             
-            if (isProcessing && !expectingCardName) return;
+            if (isProcessing) return;
 
-            const lower = text.toLowerCase();
             addLog('You: ' + text, 'player');
 
             // If we're expecting a card name
             if (expectingCardName) {
-                currentDispute = {
-                    timestamp: new Date().toISOString(),
-                    cardName: text,
-                    context: ''
-                };
-                showRuling(text);
+                showCardRuling(text);
+                expectingCardName = false;
+                pendingQuestion = null;
                 return;
             }
 
-            // Check for dispute triggers
-            const triggers = ['wait', 'hold on', 'can you', 'does that', 'is that', 
-                            "you can't", 'illegal', 'wrong', 'target', 'stack', 
-                            'priority', 'trigger', 'combat', 'destroy', 'counter'];
-            
-            const isDispute = triggers.some(t => lower.includes(t));
-            
-            if (isDispute) {
-                isProcessing = true;
-                currentDispute = { initialText: text, timestamp: new Date().toISOString() };
-                
-                const questions = [
-                    'A dispute! What card are you asking about?',
-                    'The Law requires clarity. Name the card.',
-                    'I sense confusion. Speak the card name.'
+            // Analyze the question
+            const analysis = analyzeQuestion(text);
+            pendingQuestion = text;
+
+            if (analysis.type === 'keyword') {
+                // Keyword detected - explain immediately
+                showKeywordRuling(analysis.keyword, analysis.data);
+            } else if (analysis.type === 'card') {
+                // Dispute but no keyword - need card name
+                expectingCardName = true;
+                const responses = [
+                    'I hear your question. What card are you asking about?',
+                    'The Law requires specifics. Name the card.',
+                    'Speak the card name, and I shall reveal the ruling.'
                 ];
-                
-                const q = questions[Math.floor(Math.random() * questions.length)];
-                
-                speak(q, () => {
-                    expectingCardName = true;
+                const response = responses[Math.floor(Math.random() * responses.length)];
+                speak(response, () => {
                     updateStatus('Say Card Name', 'Speak the card name clearly');
                 });
             }
+            // If type === 'none', ignore (not a dispute)
         }
 
         // ============================================
@@ -582,7 +905,6 @@
             };
 
             recognition.onend = () => {
-                // Restart immediately
                 setTimeout(() => {
                     if (recognition) recognition.start();
                 }, 100);
@@ -595,7 +917,6 @@
 
             recognition.onerror = (e) => {
                 console.log('Error:', e.error);
-                // Auto-restart on error
                 setTimeout(() => {
                     if (recognition) recognition.start();
                 }, 500);
@@ -604,7 +925,6 @@
             recognition.start();
         }
 
-        // Start
         if (speechSynthesis.onvoiceschanged !== undefined) {
             speechSynthesis.onvoiceschanged = setupRecognition;
         } else {
@@ -612,7 +932,7 @@
         }
 
         // ============================================
-        // PARTICLES
+        // PARTICLE SYSTEM
         // ============================================
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
